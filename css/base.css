@@ -1,0 +1,172 @@
+/* =========================================================
+   SafariNomad: base styles
+   Design tokens, reset, typography, buttons, shared helpers.
+   Change brand colours here and they update everywhere.
+   ========================================================= */
+
+:root{
+  --orange:#1E6FD9;
+  --orange-dark:#1557B0;
+  --orange-soft:#DCEBFF;
+  --navy:#0B1F3A;
+  --navy-2:#13305A;
+  --green:#3F6B3A;
+  --cream:#FFFFFF;
+  --sand:#FFFFFF;
+  --gray:#6B7280;
+  --line:#E3E8EF;
+  --red:#B4412C;
+  --shadow:0 24px 48px -18px rgba(11,31,58,0.22);
+  --radius:14px;
+  /* Boxes, YouTube style: flat light-grey surfaces, 12px corners, no borders or shadows */
+  --box-bg:#F3F6FA;
+  --box-hover:#E8EEF6;
+  --box-radius:12px;
+  /* YouTube-style surfaces (cards, chips, boxes) */
+  --yt-text:#0f0f0f;
+  --yt-muted:#606060;
+  --yt-surface:#F3F6FA;
+  --yt-hover:#E8EEF6;
+  --yt-line:#E8EEF6;
+  --yt-radius:12px;
+  /* Travel Talk-style menu greys */
+  --tt-gray:#757a7e;
+  --tt-hover:#ececec;
+  --font-body:'Plus Jakarta Sans',sans-serif;
+  --font-display:'DM Serif Display',serif;
+  /* Buttons (see "Buttons" below) */
+  --btn-glow:#BFD8FF;          /* resting glow, a light shade of the brand blue */
+  --btn-glow-hover:#1E6FD9;    /* hover glow, the brand blue */
+  --btn-hover:#D6E7FF;         /* hover fill */
+  --chip-hover:#E3EEFF;        /* chips & icon buttons on hover */
+}
+
+/* ---------- Reset ---------- */
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:90px;}
+body{font-family:var(--font-body);color:var(--navy);background:#fff;line-height:1.6;-webkit-font-smoothing:antialiased;}
+body.no-scroll{overflow:hidden;}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:400;color:var(--navy);line-height:1.15;}
+a{text-decoration:none;color:inherit;}
+img{display:block;max-width:100%;}
+button{font-family:inherit;}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px;}
+
+/* ---------- Layout helpers ---------- */
+.wrap{max-width:1280px;margin:0 auto;padding:0 28px;}
+section{padding:96px 0;}
+[hidden]{display:none !important;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+.bg-cream{background:#fff;}
+.pt-0{padding-top:0 !important;}
+
+/* ---------- Buttons ----------
+   ONE place for how every button looks and behaves.
+   1. Action buttons ("button-73"): white pill with a soft blue glow
+      that fills pale blue on hover.
+   2. Chips & tabs: compact, same blue hover, blue when selected.
+   3. Icon buttons: same blue hover and the same press effect.
+   Colours: the --btn-* and --chip-hover tokens in :root above.          */
+
+/* 1. Action buttons */
+.btn,.btn-outline,.btn-ghost,.btn-soft,.md-any,.adm-btn,.adm-side-foot button{
+  appearance:none;
+  background-color:#FFFFFF;
+  border-radius:40em;
+  border-style:none;
+  box-shadow:var(--btn-glow) 0 -9px 5px inset;
+  box-sizing:border-box;
+  color:#000000;
+  cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-family:-apple-system,sans-serif;
+  font-size:1rem;
+  font-weight:700;
+  letter-spacing:-.2px;
+  line-height:1.2;
+  margin:0;
+  outline:none;
+  padding:.7rem 1.35rem;
+  width:auto;
+  quotes:auto;
+  text-align:center;
+  text-decoration:none;
+  transition:all .15s;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:manipulation;
+  white-space:nowrap;
+  max-width:100%;
+}
+@media (min-width:768px){
+  .btn{font-size:1.05rem;padding:.75rem 1.6rem;}
+}
+/* Compact sizes for tight spots */
+.btn-sm,.btn-soft,.md-any,.adm-btn,.adm-side-foot button{font-size:.88rem !important;padding:.5rem 1rem !important;box-shadow:var(--btn-glow) 0 -8px 5px inset;}
+.md-any{font-size:.82rem !important;padding:.4rem .95rem !important;box-shadow:var(--btn-glow) 0 -6px 4px inset;}
+.btn-block{width:100%;}
+
+/* 2. Chips & tabs */
+.tab,.mchip span,.pg-btn,.ai-chip,.seg button,.adm-filters button{transition:background-color .15s,color .15s,border-color .15s,transform .15s;}
+.tab.active,.mchip input:checked + span,.pg-btn.active,.seg button.on,.adm-filters button.on{background:var(--orange);color:#fff;border-color:var(--orange);}
+
+/* 3. Icon buttons */
+.car-btn,.cal-nav,.icon-btn,.chat-x,.chat-back,.adm-drawer-x,.stepper button,.share-btn,.burger,.wish{transition:background-color .15s,color .15s,transform .15s;}
+
+/* Hover: only with a mouse, so phones don't keep buttons "stuck" */
+@media (hover:hover){
+  .btn:hover,.btn-yt:hover,.btn-soft:hover,.mm-restart:hover,.mm-back:hover,.md-any:hover,.adm-btn:hover,.adm-side-foot button:hover{
+    background-color:var(--btn-hover);
+    box-shadow:var(--btn-glow-hover) 0 -6px 8px inset;
+    color:#000000;
+    transform:scale(1.05);
+  }
+  .btn-sm:hover,.btn-yt:hover,.btn-soft:hover,.mm-restart:hover,.mm-back:hover,.md-any:hover,.adm-btn:hover,.adm-side-foot button:hover{box-shadow:var(--btn-glow-hover) 0 -5px 6px inset;transform:scale(1.04);}
+  .tab:not(.active):hover,.mchip span:hover,.pg-btn:not(.active):hover,.sr-chip:hover,.ai-chip:hover,.seg button:not(.on):hover,.adm-filters button:not(.on):hover,.bk-chip:not(.on):hover{background:var(--chip-hover);color:#000;border-color:var(--btn-glow);}
+  .car-btn:hover:not(:disabled),.cal-nav:hover:not(:disabled),.circle-btn:hover,.icon-btn:hover,.search-clear:hover,.stepper button:hover,.share-btn:hover,.burger:hover{background:var(--chip-hover);color:var(--orange-dark);}
+}
+/* Press: every button gives the same little squeeze */
+.btn:active,.btn-soft:active,.md-any:active,.adm-btn:active,.adm-side-foot button:active{transform:scale(1.025);}
+.tab:active,.mchip span:active,.pg-btn:active,.ai-chip:active,.seg button:active,.adm-filters button:active,
+.car-btn:active:not(:disabled),.cal-nav:active:not(:disabled),.icon-btn:active:active,.chat-x:active,.chat-back:active,.adm-drawer-x:active,.stepper button:active,.share-btn:active,.burger:active,.wish:active{transform:scale(.94);}
+/* Touch screens: a quick colour flash while pressed */
+@media (hover:none){
+  .btn:active,.btn-yt:active,.btn-soft:active,.mm-restart:active,.mm-back:active,.md-any:active,.adm-btn:active,.adm-side-foot button:active{background-color:var(--btn-hover);box-shadow:var(--btn-glow-hover) 0 -6px 8px inset;}
+}
+/* Keyboard focus and disabled, for all of them */
+.btn:focus-visible,.md-any:focus-visible,.adm-btn:focus-visible,.tab:focus-visible,.pg-btn:focus-visible,.ai-chip:focus-visible{outline:2px solid var(--orange);outline-offset:3px;}
+.btn:disabled,.btn[disabled],.adm-btn:disabled{opacity:.5;cursor:not-allowed;transform:none !important;}
+
+/* Small screens: buttons stay compact; long labels wrap instead of stretching */
+@media (max-width:600px){
+  .btn{white-space:normal;font-size:.98rem;padding:.65rem 1.2rem;}
+  .hero-ctas,.cta-band .actions,.bk-done-actions,.form-foot{flex-wrap:wrap;}
+}
+
+.link-arrow{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--navy);border-bottom:2px solid var(--orange);padding-bottom:2px;}
+.link-arrow i{transition:transform .2s;}
+.link-arrow:hover i{transform:translateX(4px);}
+
+/* ---------- Typography helpers ---------- */
+.eyebrow{
+  color:var(--orange-dark);font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;
+}
+.eyebrow::before{content:"";width:18px;height:2px;background:var(--orange);display:inline-block;}
+.eyebrow.light{color:#9CC6FF;}
+.eyebrow.light::before{background:#9CC6FF;}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:38px;gap:24px;flex-wrap:wrap;}
+.sec-head h2{font-size:clamp(28px,3.4vw,40px);}
+.sec-head p{color:var(--gray);max-width:560px;margin-top:10px;font-size:15.5px;}
+.stars{color:var(--orange);letter-spacing:1px;}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:50px;text-transform:uppercase;letter-spacing:.03em;}
+
+@media (max-width:980px){
+  section{padding:64px 0;}
+}
+@media (max-width:700px){
+  .wrap{padding-left:16px;padding-right:16px;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;scroll-behavior:auto !important;}
+}

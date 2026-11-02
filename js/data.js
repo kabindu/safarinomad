@@ -1,0 +1,732 @@
+/* =========================================================
+   SafariNomad: site data
+   ---------------------------------------------------------
+   This is the ONE place to edit trips, prices and contact
+   details. Every page reads from here.
+
+   Trip fields
+     id          unique, no spaces (used in links)
+     title       trip name
+     countries   text shown above the title
+     country     kenya | tanzania | uganda | rwanda | multi
+     styles      any of: wildlife, gorilla, beach, trek,
+                 camping, family, luxury
+     days, group (max group size), stay (accommodation)
+     rating, reviews
+     price       current price in USD, per person
+     was         old price in USD (leave out if not on sale)
+     badge       small label on the photo (optional)
+     badgeType   best | sale | new  (colour of the badge)
+     img, alt    photo in /images and its description
+     featured    true = shown on the home page
+     route       the journey, shown on the card (use → between stops)
+     months      best months to travel, 1 = Jan … 12 = Dec
+                 (used by the "When?" search)
+   ========================================================= */
+
+const SITE = {
+  name: 'SafariNomad',
+  phone: '+254 700 123 456',
+  phoneLink: '+254700123456',
+  whatsapp: '254700123456',
+  email: 'hello@safarinomad.com',
+  address: 'Westlands, Nairobi, Kenya',
+  hoursText: 'Mon–Sat, 8am–6pm EAT',
+  social: {
+    facebook: 'https://facebook.com',
+    instagram: 'https://instagram.com',
+    youtube: 'https://youtube.com',
+    tiktok: 'https://tiktok.com',
+    x: 'https://x.com'
+  },
+  promo: { text: 'The Big Safari Sale: save up to 25% on selected safaris', link: 'services.html#flash-deals', cta: 'See flash deals', endsAt: '2026-10-31T23:59:59+03:00' },
+  hours: { open: 8, close: 18, days: [1,2,3,4,5,6] }   // office hours in Nairobi time (EAT), Mon–Sat
+};
+
+const TRIPS = [
+  { id:'great-migration', route:'Nairobi → Maasai Mara → Serengeti → Arusha', months:[7,8,9,10], title:'Great Migration Safari: Maasai Mara & Serengeti', countries:'Kenya · Tanzania', country:'multi',
+    styles:['wildlife'], days:9, group:12, stay:'Lodges & camps', rating:4.9, reviews:1386, price:3450, was:3950,
+    badge:'Best Seller', badgeType:'best', img:'images/lion-and-cub.jpg', alt:'Lion and cub resting in the grass', featured:true },
+
+  { id:'classic-kenya', route:'Nairobi → Maasai Mara → Lake Nakuru → Amboseli', months:[1,2,6,7,8,9,10,12], title:'Classic Kenya: Maasai Mara, Nakuru & Amboseli', countries:'Kenya', country:'kenya',
+    styles:['wildlife'], days:7, group:12, stay:'Lodges', rating:4.9, reviews:1102, price:1890, was:2150,
+    badge:'Save 12%', badgeType:'sale', img:'images/elephants-grassland.jpg', alt:'Elephants crossing golden grassland', featured:true },
+
+  { id:'northern-circuit', route:'Arusha → Tarangire → Ngorongoro → Serengeti', months:[1,2,6,7,8,9,10], title:'Northern Circuit: Tarangire, Ngorongoro & Serengeti', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife','luxury'], days:8, group:10, stay:'Tented camps', rating:5.0, reviews:864, price:2690,
+    badge:'New for 2027', badgeType:'new', img:'images/giraffe-sunset.jpg', alt:'Giraffe beside an acacia at sunset', featured:true },
+
+  { id:'uganda-primates', route:'Entebbe → Kibale → Queen Elizabeth → Bwindi', months:[1,2,6,7,8,9,12], title:'Gorillas & Chimps: Bwindi, Kibale & Queen Elizabeth', countries:'Uganda', country:'uganda',
+    styles:['gorilla'], days:6, group:8, stay:'Forest lodges', rating:4.9, reviews:512, price:2980,
+    badge:'Permit included', img:'images/forest-canopy-walk.jpg', alt:'Trekker on a rainforest canopy walk', featured:true },
+
+  { id:'rwanda-gorillas', route:'Kigali → Volcanoes NP → Lake Kivu', months:[1,2,6,7,8,9,12], title:'Rwanda: Gorillas, Golden Monkeys & Lake Kivu', countries:'Rwanda', country:'rwanda',
+    styles:['gorilla','luxury'], days:5, group:8, stay:'Boutique lodges', rating:4.8, reviews:431, price:3850,
+    badge:'Permit included', img:'images/lake-kivu-sunset.jpg', alt:'Sunset over Lake Kivu', featured:true },
+
+  { id:'serengeti-zanzibar', route:'Arusha → Serengeti → Ngorongoro → Zanzibar', months:[1,2,6,7,8,9,10], title:'Serengeti & Zanzibar: Safari and Sand', countries:'Tanzania · Zanzibar', country:'tanzania',
+    styles:['wildlife','beach'], days:10, group:12, stay:'Camps & beach resort', rating:4.9, reviews:978, price:3120, was:3480,
+    badge:'Save 10%', badgeType:'sale', img:'images/zanzibar-palms.jpg', alt:'Palm trees over a white-sand beach', featured:true },
+
+  { id:'kilimanjaro-machame', route:'Moshi → Machame Gate → Uhuru Peak', months:[1,2,3,6,7,8,9,10], title:'Kilimanjaro Climb: Machame Route', countries:'Tanzania', country:'tanzania',
+    styles:['trek'], days:7, group:10, stay:'Mountain camps', rating:4.8, reviews:356, price:2240,
+    badge:'93% summit rate', img:'images/kilimanjaro.jpg', alt:'Snow-capped Mount Kilimanjaro', featured:true },
+
+  { id:'amboseli-tsavo', route:'Nairobi → Amboseli → Tsavo West', months:[1,2,6,7,8,9,10], title:'Amboseli & Tsavo: Land of Giants', countries:'Kenya', country:'kenya',
+    styles:['wildlife'], days:4, group:12, stay:'Lodges', rating:4.8, reviews:620, price:980, was:1090,
+    badge:'Save 10%', badgeType:'sale', img:'images/elephant-amboseli.jpg', alt:'Elephant facing the camera in Amboseli', featured:true },
+
+  { id:'grand-journey', route:'Nairobi → Mara → Bwindi → Kigali → Serengeti → Zanzibar', months:[6,7,8,9], title:'East Africa Grand Journey: 4 Countries', countries:'Kenya · Uganda · Rwanda · Tanzania', country:'multi',
+    styles:['wildlife','gorilla','beach','luxury'], days:16, group:10, stay:'Lodges & camps', rating:5.0, reviews:218, price:7450,
+    badge:'Signature', badgeType:'new', img:'images/acacia-sunset.jpg', alt:'Acacia tree silhouetted at sunset', featured:true },
+
+  { id:'serengeti-camping', route:'Arusha → Serengeti → Ngorongoro', months:[1,2,6,7,8,9,10], title:'Serengeti Under Canvas: Camping Safari', countries:'Tanzania', country:'tanzania',
+    styles:['camping','wildlife'], days:5, group:12, stay:'Public campsites', rating:4.7, reviews:402, price:1260,
+    badge:'Budget pick', img:'images/camp-at-night.jpg', alt:'Tents glowing at a campsite at night', featured:true },
+
+  { id:'northern-kenya', route:'Nairobi → Samburu → Laikipia', months:[1,2,6,7,8,9,10], title:'Samburu & Laikipia: Northern Kenya Wildlife', countries:'Kenya', country:'kenya',
+    styles:['wildlife','luxury'], days:6, group:10, stay:'Conservancy camps', rating:4.8, reviews:288, price:2350,
+    img:'images/rhino-and-calf.jpg', alt:'Rhino and calf in a Kenyan conservancy' },
+
+  { id:'kenya-family', route:'Nairobi → Naivasha → Maasai Mara', months:[3,4,7,8,12], title:'Kenya Family Safari: Junior Rangers Edition', countries:'Kenya', country:'kenya',
+    styles:['wildlife','family'], days:8, group:12, stay:'Family lodges', rating:4.9, reviews:341, price:2590,
+    badge:'Kids from 50% off', badgeType:'new', img:'images/elephant-walking.jpg', alt:'Elephant walking across the plains' },
+
+  { id:'mara-diani', route:'Nairobi → Maasai Mara → Diani Beach', months:[1,2,7,8,9,10,12], title:'Maasai Mara & Diani Beach', countries:'Kenya', country:'kenya',
+    styles:['wildlife','beach'], days:9, group:12, stay:'Lodge & beach resort', rating:4.8, reviews:402, price:2870,
+    img:'images/coast-resort.jpg', alt:'Beach resort overlooking the Indian Ocean' },
+
+  { id:'primate-explorer', route:'Kigali → Volcanoes → Bwindi → Kibale → Entebbe', months:[1,2,6,7,8,9,12], title:'Primate Explorer: Rwanda & Uganda', countries:'Rwanda · Uganda', country:'multi',
+    styles:['gorilla'], days:9, group:8, stay:'Forest lodges', rating:4.9, reviews:190, price:5680,
+    badge:'2 gorilla treks', img:'images/forest-elephant.jpg', alt:'Forest elephant among the trees' },
+
+  { id:'kilimanjaro-lemosho', route:'Moshi → Lemosho Gate → Uhuru Peak', months:[1,2,3,6,7,8,9,10], title:'Kilimanjaro Climb: Lemosho Route', countries:'Tanzania', country:'tanzania',
+    styles:['trek'], days:8, group:10, stay:'Mountain camps', rating:4.9, reviews:211, price:2780,
+    badge:'Best views', img:'images/hiker-summit.jpg', alt:'Hiker celebrating on a mountain summit' },
+
+  { id:'uganda-classic', route:'Entebbe → Murchison Falls → Queen Elizabeth', months:[1,2,6,7,8,9,12], title:'Uganda Wildlife Classic: Murchison & Queen Elizabeth', countries:'Uganda', country:'uganda',
+    styles:['wildlife'], days:7, group:10, stay:'Lodges', rating:4.7, reviews:164, price:2150,
+    img:'images/leopard.jpg', alt:'Leopard resting on a branch' },
+
+  { id:'luxury-honeymoon', route:'Arusha → Serengeti → Zanzibar', months:[1,2,6,7,8,9,10,12], title:'Luxury Honeymoon: Serengeti & Zanzibar', countries:'Tanzania · Zanzibar', country:'tanzania',
+    styles:['beach','luxury'], days:10, group:2, stay:'Luxury camps & villa', rating:5.0, reviews:126, price:6890,
+    badge:'Private', img:'images/overwater-villas.jpg', alt:'Overwater villas on turquoise sea' },
+
+  /* ---- More packages ---- */
+  { id:'mara-short-break', route:'Nairobi → Maasai Mara', months:[1,2,6,7,8,9,10,12], title:'Maasai Mara Short Break', countries:'Kenya', country:'kenya',
+    styles:['wildlife'], days:3, group:12, stay:'Tented camps', rating:4.8, reviews:733, price:890,
+    img:'images/lion-portrait.jpg', alt:'Portrait of a male lion' },
+
+  { id:'naivasha-hells-gate', route:'Nairobi → Lake Naivasha → Hell\'s Gate', months:[1,2,3,6,7,8,9,10,11,12], title:'Lake Naivasha & Hell\'s Gate Adventure', countries:'Kenya', country:'kenya',
+    styles:['wildlife','family'], days:3, group:12, stay:'Lakeside lodge', rating:4.7, reviews:288, price:640,
+    img:'images/flamingo.jpg', alt:'Flamingo wading in a lake' },
+
+  { id:'ol-pejeta-mount-kenya', route:'Nairobi → Ol Pejeta → Mount Kenya', months:[1,2,6,7,8,9,10,12], title:'Ol Pejeta & Mount Kenya Rhino Safari', countries:'Kenya', country:'kenya',
+    styles:['wildlife','family'], days:5, group:10, stay:'Conservancy camps', rating:4.8, reviews:214, price:1780,
+    img:'images/rhinos.jpg', alt:'Two rhinos grazing on the plains' },
+
+  { id:'lamu-island', route:'Nairobi → Lamu Island → Shela', months:[1,2,3,7,8,9,10,11,12], title:'Lamu Island Getaway', countries:'Kenya', country:'kenya',
+    styles:['beach','luxury'], days:4, group:2, stay:'Boutique beach hotel', rating:4.8, reviews:157, price:1150,
+    img:'images/resort-pool.jpg', alt:'Resort pool by the Indian Ocean' },
+
+  { id:'tsavo-watamu', route:'Mombasa → Tsavo East → Watamu', months:[1,2,6,7,8,9,10,12], title:'Tsavo East & Watamu Beach', countries:'Kenya', country:'kenya',
+    styles:['wildlife','beach','family'], days:6, group:12, stay:'Lodge & beach resort', rating:4.7, reviews:198, price:1640,
+    img:'images/elephants-grassland.jpg', alt:'Elephants crossing golden grassland' },
+
+  { id:'southern-tanzania', route:'Dar es Salaam → Nyerere → Ruaha', months:[6,7,8,9,10], title:'Southern Tanzania: Nyerere & Ruaha', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife','luxury'], days:8, group:8, stay:'Remote tented camps', rating:4.9, reviews:142, price:4250,
+    img:'images/leopard.jpg', alt:'Leopard resting on a branch' },
+
+  { id:'manyara-ngorongoro', route:'Arusha → Lake Manyara → Ngorongoro', months:[1,2,6,7,8,9,10,12], title:'Lake Manyara & Ngorongoro Crater', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife','family'], days:3, group:12, stay:'Crater-rim lodge', rating:4.8, reviews:507, price:980,
+    img:'images/misty-acacia.jpg', alt:'Acacia trees in the morning mist' },
+
+  { id:'zanzibar-spice', route:'Stone Town → Spice farms → Nungwi', months:[1,2,6,7,8,9,10,12], title:'Zanzibar Spice Island & Stone Town', countries:'Zanzibar', country:'tanzania',
+    styles:['beach'], days:5, group:12, stay:'Beach resort', rating:4.8, reviews:366, price:890,
+    img:'images/zanzibar-palms.jpg', alt:'Palm trees over a white-sand beach' },
+
+  { id:'kilimanjaro-marangu', route:'Moshi → Marangu Gate → Uhuru Peak', months:[1,2,3,6,7,8,9,10], title:'Kilimanjaro Climb: Marangu Route', countries:'Tanzania', country:'tanzania',
+    styles:['trek'], days:6, group:10, stay:'Mountain huts', rating:4.7, reviews:243, price:1980,
+    img:'images/kilimanjaro.jpg', alt:'Snow-capped Mount Kilimanjaro' },
+
+  { id:'bwindi-gorilla-express', route:'Entebbe → Bwindi', months:[1,2,6,7,8,9,12], title:'Bwindi Gorilla Express', countries:'Uganda', country:'uganda',
+    styles:['gorilla'], days:3, group:8, stay:'Forest lodge', rating:4.9, reviews:276, price:1890,
+    badge:'Permit included', img:'images/forest-canopy-walk.jpg', alt:'Trekker on a rainforest canopy walk' },
+
+  { id:'murchison-ziwa', route:'Kampala → Ziwa Rhino Sanctuary → Murchison Falls', months:[1,2,6,7,8,9,12], title:'Murchison Falls & Ziwa Rhinos', countries:'Uganda', country:'uganda',
+    styles:['wildlife'], days:4, group:10, stay:'Riverside lodge', rating:4.7, reviews:131, price:1240,
+    img:'images/rhino-and-calf.jpg', alt:'Rhino and calf in the bush' },
+
+  { id:'akagera-big-five', route:'Kigali → Akagera', months:[1,2,6,7,8,9,12], title:'Akagera Big Five Safari', countries:'Rwanda', country:'rwanda',
+    styles:['wildlife','family'], days:3, group:8, stay:'Lakeside lodge', rating:4.7, reviews:118, price:990,
+    img:'images/zebra.jpg', alt:'Close-up of a zebra' },
+
+  { id:'nyungwe-chimps', route:'Kigali → Nyungwe → Lake Kivu', months:[1,2,6,7,8,9,12], title:'Nyungwe Canopy Walk & Chimps', countries:'Rwanda', country:'rwanda',
+    styles:['gorilla'], days:4, group:8, stay:'Forest lodge', rating:4.8, reviews:96, price:1560,
+    img:'images/forest-elephant.jpg', alt:'Forest elephant among the trees' },
+
+  { id:'kenya-tanzania-zanzibar', route:'Nairobi → Maasai Mara → Serengeti → Ngorongoro → Zanzibar', months:[1,2,6,7,8,9,10], title:'Kenya, Tanzania & Zanzibar Explorer', countries:'Kenya · Tanzania · Zanzibar', country:'multi',
+    styles:['wildlife','beach'], days:12, group:12, stay:'Lodges, camps & beach resort', rating:4.9, reviews:301, price:5290,
+    img:'images/safari-vehicle.jpg', alt:'Safari vehicle on the savannah at sunset' },
+
+  /* ---- Even more packages ---- */
+  { id:'amboseli-kili-views', route:'Nairobi → Amboseli', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Amboseli: Kilimanjaro Views', countries:'Kenya', country:'kenya',
+    styles:['wildlife'], days:3, group:12, stay:'Lodges', rating:4.8, reviews:402, price:760,
+    img:'images/elephant-amboseli.jpg', alt:'Elephant in front of Kilimanjaro' },
+
+  { id:'samburu-special-five', route:'Nairobi → Samburu', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Samburu Special Five Safari', countries:'Kenya', country:'kenya',
+    styles:['wildlife'], days:4, group:10, stay:'Riverside lodge', rating:4.8, reviews:188, price:1290,
+    img:'images/lioness.jpg', alt:'Lioness lying in the grass' },
+
+  { id:'mara-balloon', route:'Nairobi → Maasai Mara', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Maasai Mara Balloon Safari', countries:'Kenya', country:'kenya',
+    styles:['wildlife', 'luxury'], days:4, group:8, stay:'Luxury tented camp', rating:4.9, reviews:311, price:2190,
+    img:'images/hero-balloon-zebras.jpg', alt:'Hot-air balloon over zebras' },
+
+  { id:'rift-valley-lakes', route:'Nairobi → Lake Nakuru → Lake Bogoria → Lake Naivasha', months:[1, 2, 3, 6, 7, 8, 9, 10, 11, 12], title:'Rift Valley Lakes: Nakuru, Bogoria & Naivasha', countries:'Kenya', country:'kenya',
+    styles:['wildlife', 'family'], days:5, group:12, stay:'Lodges', rating:4.7, reviews:164, price:1180,
+    img:'images/flamingo.jpg', alt:'Flamingo in a soda lake' },
+
+  { id:'diani-escape', route:'Mombasa → Diani Beach', months:[1, 2, 3, 7, 8, 9, 10, 11, 12], title:'Diani Beach Escape', countries:'Kenya', country:'kenya',
+    styles:['beach', 'family'], days:5, group:12, stay:'Beach resort', rating:4.7, reviews:290, price:820,
+    img:'images/coast-resort.jpg', alt:'Beach resort by the ocean' },
+
+  { id:'laikipia-walking', route:'Nairobi → Laikipia', months:[1, 2, 6, 7, 8, 9, 10], title:'Laikipia Walking Safari', countries:'Kenya', country:'kenya',
+    styles:['wildlife', 'trek'], days:5, group:8, stay:'Conservancy camps', rating:4.9, reviews:77, price:2480,
+    img:'images/rhino-and-calf.jpg', alt:'Rhino and calf in a conservancy' },
+
+  { id:'kenya-budget-camping', route:'Nairobi → Maasai Mara → Lake Nakuru', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Kenya Budget Camping: Mara & Nakuru', countries:'Kenya', country:'kenya',
+    styles:['camping', 'wildlife'], days:4, group:12, stay:'Public campsites', rating:4.6, reviews:355, price:690,
+    img:'images/camp-at-night.jpg', alt:'Tents glowing at night' },
+
+  { id:'kenya-in-depth', route:'Nairobi → Samburu → Ol Pejeta → Lake Nakuru → Maasai Mara', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Kenya in Depth: 10 Days', countries:'Kenya', country:'kenya',
+    styles:['wildlife'], days:10, group:12, stay:'Lodges & camps', rating:4.9, reviews:233, price:4390,
+    img:'images/elephant-walking.jpg', alt:'Elephant walking across the plains' },
+
+  { id:'mount-kenya-climb', route:'Nanyuki → Sirimon Gate → Point Lenana', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Mount Kenya Climb: Sirimon Route', countries:'Kenya', country:'kenya',
+    styles:['trek'], days:5, group:10, stay:'Mountain huts', rating:4.7, reviews:96, price:1390,
+    img:'images/hiker-summit.jpg', alt:'Hiker on a mountain summit' },
+
+  { id:'serengeti-fly-in', route:'Arusha → Serengeti', months:[1, 2, 6, 7, 8, 9, 10], title:'Serengeti Fly-In Safari', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife', 'luxury'], days:4, group:8, stay:'Tented camps', rating:4.9, reviews:247, price:2650,
+    img:'images/serengeti-acacia.jpg', alt:'Acacia tree on the Serengeti' },
+
+  { id:'tarangire-manyara', route:'Arusha → Tarangire → Lake Manyara', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Tarangire & Lake Manyara', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife', 'family'], days:3, group:12, stay:'Lodges', rating:4.7, reviews:318, price:860,
+    img:'images/elephant-savannah.jpg', alt:'Elephant in tall grass' },
+
+  { id:'calving-season', route:'Arusha → Ndutu → Ngorongoro', months:[1, 2, 3], title:'Serengeti Calving Season Safari', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife'], days:6, group:10, stay:'Tented camps', rating:4.9, reviews:174, price:2890,
+    img:'images/lion-and-cub.jpg', alt:'Lion and cub resting' },
+
+  { id:'tanzania-family', route:'Arusha → Tarangire → Ngorongoro → Serengeti', months:[3, 4, 7, 8, 12], title:'Tanzania Family Safari', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife', 'family'], days:7, group:12, stay:'Family lodges', rating:4.8, reviews:205, price:2790,
+    img:'images/giraffe-sunset.jpg', alt:'Giraffe at sunset' },
+
+  { id:'tanzania-camping-7', route:'Arusha → Tarangire → Serengeti → Ngorongoro', months:[1, 2, 6, 7, 8, 9, 10], title:'Tanzania Budget Camping: 7 Days', countries:'Tanzania', country:'tanzania',
+    styles:['camping', 'wildlife'], days:7, group:12, stay:'Public campsites', rating:4.7, reviews:421, price:1690,
+    img:'images/tent-view.jpg', alt:'View from inside a tent' },
+
+  { id:'zanzibar-honeymoon', route:'Stone Town → Nungwi → Mnemba Atoll', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Zanzibar Honeymoon Villas', countries:'Zanzibar', country:'tanzania',
+    styles:['beach', 'luxury'], days:6, group:2, stay:'Beach villa', rating:4.9, reviews:138, price:2150,
+    img:'images/overwater-villas.jpg', alt:'Villas over turquoise water' },
+
+  { id:'kilimanjaro-rongai', route:'Moshi → Rongai Gate → Uhuru Peak', months:[1, 2, 3, 6, 7, 8, 9, 10], title:'Kilimanjaro Climb: Rongai Route', countries:'Tanzania', country:'tanzania',
+    styles:['trek'], days:7, group:10, stay:'Mountain camps', rating:4.8, reviews:167, price:2390,
+    img:'images/kilimanjaro.jpg', alt:'Snow-capped Kilimanjaro' },
+
+  { id:'mount-meru', route:'Arusha → Momella Gate → Socialist Peak', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Mount Meru Climb', countries:'Tanzania', country:'tanzania',
+    styles:['trek'], days:4, group:10, stay:'Mountain huts', rating:4.7, reviews:82, price:1190,
+    img:'images/misty-acacia.jpg', alt:'Acacia trees in the mist' },
+
+  { id:'nyerere-zanzibar', route:'Dar es Salaam → Nyerere → Zanzibar', months:[6, 7, 8, 9, 10], title:'Nyerere & Zanzibar', countries:'Tanzania · Zanzibar', country:'tanzania',
+    styles:['wildlife', 'beach'], days:7, group:10, stay:'Camps & beach resort', rating:4.8, reviews:119, price:3150,
+    img:'images/lion-walking.jpg', alt:'Lion walking through grass' },
+
+  { id:'uganda-in-depth', route:'Entebbe → Murchison Falls → Kibale → Queen Elizabeth → Bwindi', months:[1, 2, 6, 7, 8, 9, 12], title:'Uganda in Depth: Gorillas, Chimps & Big Game', countries:'Uganda', country:'uganda',
+    styles:['gorilla', 'wildlife'], days:10, group:8, stay:'Lodges', rating:4.9, reviews:112, price:4890,
+    img:'images/forest-elephant.jpg', alt:'Forest elephant' },
+
+  { id:'mburo-bwindi', route:'Entebbe → Lake Mburo → Bwindi', months:[1, 2, 6, 7, 8, 9, 12], title:'Lake Mburo & Bwindi Gorillas', countries:'Uganda', country:'uganda',
+    styles:['gorilla'], days:5, group:8, stay:'Lodges', rating:4.8, reviews:143, price:2390,
+    img:'images/zebra.jpg', alt:'Zebra close-up' },
+
+  { id:'kibale-chimps', route:'Entebbe → Kibale', months:[1, 2, 6, 7, 8, 9, 12], title:'Kibale Chimpanzee Trek', countries:'Uganda', country:'uganda',
+    styles:['gorilla'], days:3, group:8, stay:'Forest lodge', rating:4.7, reviews:201, price:990,
+    img:'images/forest-canopy-walk.jpg', alt:'Rainforest canopy walk' },
+
+  { id:'ishasha-lions', route:'Entebbe → Queen Elizabeth → Ishasha', months:[1, 2, 6, 7, 8, 9, 12], title:'Queen Elizabeth Tree-Climbing Lions', countries:'Uganda', country:'uganda',
+    styles:['wildlife'], days:4, group:10, stay:'Lodges', rating:4.7, reviews:108, price:1290,
+    img:'images/lion-portrait.jpg', alt:'Male lion portrait' },
+
+  { id:'rwenzori-trek', route:'Kasese → Rwenzori → Margherita Peak', months:[1, 2, 6, 7, 8, 12], title:'Rwenzori Mountains Trek', countries:'Uganda', country:'uganda',
+    styles:['trek'], days:8, group:8, stay:'Mountain huts', rating:4.8, reviews:54, price:2650,
+    img:'images/hiker-summit.jpg', alt:'Hiker celebrating on a summit' },
+
+  { id:'rwanda-gorilla-express', route:'Kigali → Volcanoes', months:[1, 2, 6, 7, 8, 9, 12], title:'Rwanda Gorilla Express', countries:'Rwanda', country:'rwanda',
+    styles:['gorilla', 'luxury'], days:3, group:8, stay:'Boutique lodge', rating:4.9, reviews:186, price:2690,
+    img:'images/forest-canopy-walk.jpg', alt:'Rainforest canopy walk' },
+
+  { id:'rwanda-complete', route:'Kigali → Volcanoes → Lake Kivu → Nyungwe → Akagera', months:[1, 2, 6, 7, 8, 9, 12], title:'Rwanda Complete: Gorillas, Chimps & Big Five', countries:'Rwanda', country:'rwanda',
+    styles:['gorilla', 'wildlife'], days:9, group:8, stay:'Lodges', rating:4.9, reviews:74, price:5490,
+    img:'images/camp-at-night.jpg', alt:'Camp at night' },
+
+  { id:'lake-kivu-retreat', route:'Kigali → Lake Kivu', months:[1, 2, 3, 6, 7, 8, 9, 10, 11, 12], title:'Lake Kivu Retreat', countries:'Rwanda', country:'rwanda',
+    styles:['beach'], days:3, group:12, stay:'Lakeside lodge', rating:4.6, reviews:88, price:690,
+    img:'images/lake-kivu-sunset.jpg', alt:'Sunset over Lake Kivu' },
+
+  { id:'golden-monkeys', route:'Kigali → Volcanoes', months:[1, 2, 6, 7, 8, 9, 12], title:'Golden Monkeys & Dian Fossey Hike', countries:'Rwanda', country:'rwanda',
+    styles:['gorilla', 'trek'], days:3, group:8, stay:'Lodges', rating:4.8, reviews:97, price:1190,
+    img:'images/forest-elephant.jpg', alt:'Forest at the foot of the volcanoes' },
+
+  { id:'migration-crossing', route:'Nairobi → Maasai Mara → Serengeti → Arusha', months:[7, 8, 9, 10], title:'Mara–Serengeti Migration Crossing', countries:'Kenya · Tanzania', country:'multi',
+    styles:['wildlife'], days:8, group:12, stay:'Tented camps', rating:4.9, reviews:259, price:3990,
+    img:'images/elephants-grassland.jpg', alt:'Elephants crossing grassland' },
+
+  { id:'gorilla-double', route:'Entebbe → Bwindi → Volcanoes → Kigali', months:[1, 2, 6, 7, 8, 9, 12], title:'Uganda & Rwanda Gorilla Double', countries:'Uganda · Rwanda', country:'multi',
+    styles:['gorilla'], days:7, group:8, stay:'Forest lodges', rating:4.9, reviews:91, price:4790,
+    img:'images/forest-canopy-walk.jpg', alt:'Rainforest canopy walk' },
+
+  { id:'kenya-uganda-overland', route:'Nairobi → Lake Naivasha → Jinja → Murchison Falls → Kampala', months:[1, 2, 6, 7, 8, 9, 12], title:'Kenya & Uganda Overland Adventure', countries:'Kenya · Uganda', country:'multi',
+    styles:['camping', 'wildlife'], days:9, group:12, stay:'Camps & lodges', rating:4.7, reviews:133, price:2190,
+    img:'images/safari-vehicle.jpg', alt:'Safari vehicle at sunset' },
+
+  { id:'east-africa-highlights', route:'Nairobi → Maasai Mara → Serengeti → Ngorongoro → Kigali → Volcanoes', months:[6, 7, 8, 9, 10], title:'East Africa Highlights: 14 Days', countries:'Kenya · Tanzania · Rwanda', country:'multi',
+    styles:['wildlife', 'gorilla', 'luxury'], days:14, group:10, stay:'Lodges & camps', rating:4.9, reviews:102, price:6890,
+    img:'images/acacia-sunset.jpg', alt:'Acacia tree at sunset' },
+
+  /* ---- Lakes, coast, mountains, rivers & forests ---- */
+  { id:'nairobi-national-park', route:'Nairobi → Nairobi National Park → Giraffe Centre', months:[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], title:'Nairobi National Park & Giraffe Centre', countries:'Kenya', country:'kenya',
+    styles:['wildlife', 'family'], days:2, group:12, stay:'City hotel', rating:4.7, reviews:512, price:340,
+    img:'images/giraffe-sunset.jpg', alt:'Giraffe at sunset' },
+
+  { id:'meru-national-park', route:'Nairobi → Meru National Park', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Meru National Park: Born Free Country', countries:'Kenya', country:'kenya',
+    styles:['wildlife'], days:4, group:10, stay:'Riverside lodge', rating:4.8, reviews:121, price:1240,
+    img:'images/lion-portrait.jpg', alt:'Male lion portrait' },
+
+  { id:'tsavo-west-chyulu', route:'Nairobi → Tsavo West → Chyulu Hills', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Tsavo West & Chyulu Hills', countries:'Kenya', country:'kenya',
+    styles:['wildlife'], days:4, group:12, stay:'Lodges', rating:4.7, reviews:146, price:1190,
+    img:'images/elephants-grassland.jpg', alt:'Elephants on the plains' },
+
+  { id:'baringo-bogoria', route:'Nairobi → Lake Baringo → Lake Bogoria', months:[1, 2, 3, 6, 7, 8, 9, 10, 11, 12], title:'Lake Baringo & Bogoria Birding', countries:'Kenya', country:'kenya',
+    styles:['wildlife'], days:3, group:10, stay:'Lakeside lodge', rating:4.6, reviews:87, price:690,
+    img:'images/flamingo.jpg', alt:'Flamingo in a soda lake' },
+
+  { id:'kisumu-kakamega', route:'Nairobi → Kisumu → Lake Victoria → Kakamega Forest', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Lake Victoria & Kakamega Forest', countries:'Kenya', country:'kenya',
+    styles:['wildlife', 'trek'], days:4, group:10, stay:'Lodges', rating:4.6, reviews:64, price:980,
+    img:'images/forest-canopy-walk.jpg', alt:'Rainforest canopy' },
+
+  { id:'malindi-watamu', route:'Mombasa → Malindi → Watamu', months:[1, 2, 3, 7, 8, 9, 10, 11, 12], title:'Malindi & Watamu Marine Park', countries:'Kenya', country:'kenya',
+    styles:['beach', 'family'], days:5, group:12, stay:'Beach resort', rating:4.7, reviews:203, price:760,
+    img:'images/coast-resort.jpg', alt:'Resort by the Indian Ocean' },
+
+  { id:'mombasa-kilifi', route:'Mombasa → Fort Jesus → Kilifi Creek', months:[1, 2, 3, 7, 8, 9, 10, 11, 12], title:'Mombasa Old Town & Kilifi Creek', countries:'Kenya', country:'kenya',
+    styles:['beach'], days:4, group:12, stay:'Beach hotel', rating:4.6, reviews:118, price:640,
+    img:'images/resort-pool.jpg', alt:'Pool by the sea' },
+
+  { id:'longonot-hike', route:'Nairobi → Mount Longonot → Hell\'s Gate', months:[1, 2, 3, 6, 7, 8, 9, 10, 11, 12], title:'Mount Longonot & Hell\'s Gate Hike', countries:'Kenya', country:'kenya',
+    styles:['trek', 'family'], days:2, group:12, stay:'Lakeside lodge', rating:4.7, reviews:176, price:290,
+    img:'images/hiker-summit.jpg', alt:'Hiker on a summit' },
+
+  { id:'aberdare-treetops', route:'Nairobi → Aberdare Mountains → Karuru Falls', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Aberdare Mountains & Waterfalls', countries:'Kenya', country:'kenya',
+    styles:['wildlife', 'trek'], days:3, group:10, stay:'Tree lodge', rating:4.7, reviews:93, price:890,
+    img:'images/misty-acacia.jpg', alt:'Misty highland forest' },
+
+  { id:'sipi-falls-elgon', route:'Kampala → Sipi Falls → Mount Elgon', months:[1, 2, 6, 7, 8, 9, 12], title:'Sipi Falls & Mount Elgon', countries:'Uganda', country:'uganda',
+    styles:['trek'], days:3, group:10, stay:'Mountain lodge', rating:4.8, reviews:142, price:590,
+    img:'images/hiker-summit.jpg', alt:'Hiker above the falls' },
+
+  { id:'jinja-nile', route:'Kampala → Jinja → Source of the Nile', months:[1, 2, 3, 6, 7, 8, 9, 10, 11, 12], title:'Jinja: Source of the Nile Rafting', countries:'Uganda', country:'uganda',
+    styles:['family'], days:2, group:12, stay:'Riverside lodge', rating:4.8, reviews:311, price:420,
+    img:'images/lake-kivu-sunset.jpg', alt:'Sunset over the water' },
+
+  { id:'murchison-boat', route:'Kampala → Murchison Falls → Nile Delta', months:[1, 2, 6, 7, 8, 9, 12], title:'Murchison Falls Boat Safari', countries:'Uganda', country:'uganda',
+    styles:['wildlife'], days:3, group:10, stay:'Riverside lodge', rating:4.8, reviews:167, price:890,
+    img:'images/elephant-walking.jpg', alt:'Elephant by the river' },
+
+  { id:'lake-bunyonyi', route:'Kabale → Lake Bunyonyi', months:[1, 2, 3, 6, 7, 8, 9, 10, 11, 12], title:'Lake Bunyonyi Island Escape', countries:'Uganda', country:'uganda',
+    styles:['family'], days:3, group:12, stay:'Island eco-lodge', rating:4.7, reviews:98, price:560,
+    img:'images/lake-kivu-sunset.jpg', alt:'Lake at sunset' },
+
+  { id:'kidepo-valley', route:'Kampala → Kidepo Valley', months:[1, 2, 6, 7, 8, 9, 12], title:'Kidepo Valley Wilderness', countries:'Uganda', country:'uganda',
+    styles:['wildlife', 'luxury'], days:4, group:8, stay:'Safari lodge', rating:4.9, reviews:59, price:1890,
+    img:'images/lioness.jpg', alt:'Lioness in the grass' },
+
+  { id:'ssese-islands', route:'Entebbe → Lake Victoria → Ssese Islands', months:[1, 2, 6, 7, 8, 9, 12], title:'Ssese Islands & Lake Victoria', countries:'Uganda', country:'uganda',
+    styles:['beach'], days:3, group:12, stay:'Beach lodge', rating:4.5, reviews:71, price:520,
+    img:'images/zanzibar-palms.jpg', alt:'Palms on a lake beach' },
+
+  { id:'mgahinga-gorillas', route:'Kisoro → Mgahinga', months:[1, 2, 6, 7, 8, 9, 12], title:'Mgahinga Gorillas & Golden Monkeys', countries:'Uganda', country:'uganda',
+    styles:['gorilla', 'trek'], days:3, group:8, stay:'Forest lodge', rating:4.8, reviews:84, price:1290,
+    img:'images/forest-elephant.jpg', alt:'Forest at the foot of the volcanoes' },
+
+  { id:'crater-lakes-kazinga', route:'Kampala → Fort Portal Crater Lakes → Kazinga Channel', months:[1, 2, 6, 7, 8, 9, 12], title:'Crater Lakes & Kazinga Channel', countries:'Uganda', country:'uganda',
+    styles:['wildlife'], days:4, group:10, stay:'Lodges', rating:4.7, reviews:102, price:1090,
+    img:'images/safari-vehicle.jpg', alt:'Safari vehicle at dusk' },
+
+  { id:'lake-natron', route:'Arusha → Lake Natron → Ol Doinyo Lengai', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Lake Natron & Ol Doinyo Lengai', countries:'Tanzania', country:'tanzania',
+    styles:['trek'], days:3, group:10, stay:'Tented camp', rating:4.7, reviews:112, price:890,
+    img:'images/flamingo.jpg', alt:'Flamingos on Lake Natron' },
+
+  { id:'mikumi', route:'Dar es Salaam → Mikumi', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Mikumi National Park Safari', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife', 'family'], days:3, group:12, stay:'Lodges', rating:4.6, reviews:134, price:790,
+    img:'images/zebra.jpg', alt:'Zebra close-up' },
+
+  { id:'katavi', route:'Arusha → Katavi', months:[6, 7, 8, 9, 10], title:'Katavi Wilderness Fly-In', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife', 'luxury'], days:5, group:6, stay:'Remote tented camps', rating:4.9, reviews:38, price:5200,
+    img:'images/lion-walking.jpg', alt:'Lion walking' },
+
+  { id:'gombe-chimps', route:'Kigoma → Gombe Stream → Lake Tanganyika', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Gombe Stream Chimps & Lake Tanganyika', countries:'Tanzania', country:'tanzania',
+    styles:['gorilla'], days:3, group:8, stay:'Lakeside camp', rating:4.8, reviews:66, price:1450,
+    img:'images/forest-canopy-walk.jpg', alt:'Forest canopy' },
+
+  { id:'mahale', route:'Arusha → Mahale Mountains → Lake Tanganyika', months:[6, 7, 8, 9, 10], title:'Mahale Mountains Chimpanzee Safari', countries:'Tanzania', country:'tanzania',
+    styles:['gorilla', 'luxury'], days:5, group:6, stay:'Beach tented camp', rating:4.9, reviews:41, price:4690,
+    img:'images/camp-at-night.jpg', alt:'Camp at night by the lake' },
+
+  { id:'pemba-island', route:'Zanzibar → Pemba Island', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Pemba Island Diving Escape', countries:'Zanzibar', country:'tanzania',
+    styles:['beach', 'luxury'], days:5, group:8, stay:'Eco beach lodge', rating:4.8, reviews:57, price:1390,
+    img:'images/overwater-villas.jpg', alt:'Villas over turquoise water' },
+
+  { id:'mafia-whale-sharks', route:'Dar es Salaam → Mafia Island', months:[1, 2, 10, 11, 12], title:'Mafia Island Whale Sharks', countries:'Tanzania', country:'tanzania',
+    styles:['beach'], days:4, group:10, stay:'Beach lodge', rating:4.8, reviews:73, price:1190,
+    img:'images/resort-pool.jpg', alt:'Island resort pool' },
+
+  { id:'usambara-hike', route:'Moshi → Lushoto → Usambara Mountains', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Usambara Mountains Hiking', countries:'Tanzania', country:'tanzania',
+    styles:['trek'], days:4, group:12, stay:'Mountain guesthouse', rating:4.6, reviews:88, price:590,
+    img:'images/misty-acacia.jpg', alt:'Misty hills' },
+
+  { id:'rubondo-island', route:'Mwanza → Lake Victoria → Rubondo Island', months:[6, 7, 8, 9, 10, 12], title:'Rubondo Island & Lake Victoria', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife'], days:3, group:8, stay:'Island camp', rating:4.7, reviews:39, price:1290,
+    img:'images/lake-kivu-sunset.jpg', alt:'Island lake at sunset' },
+
+  { id:'mount-bisoke', route:'Kigali → Volcanoes → Mount Bisoke', months:[1, 2, 6, 7, 8, 9, 12], title:'Mount Bisoke Crater Lake Hike', countries:'Rwanda', country:'rwanda',
+    styles:['trek'], days:2, group:10, stay:'Lodges', rating:4.8, reviews:104, price:690,
+    img:'images/hiker-summit.jpg', alt:'Hiker on the volcano' },
+
+  { id:'mount-karisimbi', route:'Kigali → Volcanoes → Mount Karisimbi', months:[1, 2, 6, 7, 8, 9, 12], title:'Mount Karisimbi Summit Trek', countries:'Rwanda', country:'rwanda',
+    styles:['trek'], days:3, group:8, stay:'Mountain camp', rating:4.8, reviews:47, price:990,
+    img:'images/kilimanjaro.jpg', alt:'Volcano summit' },
+
+  { id:'congo-nile-trail', route:'Rubavu → Congo Nile Trail → Karongi → Lake Kivu', months:[1, 2, 6, 7, 8, 9, 12], title:'Congo Nile Trail: Lake Kivu by Bike', countries:'Rwanda', country:'rwanda',
+    styles:['trek'], days:5, group:10, stay:'Lakeside guesthouses', rating:4.7, reviews:62, price:1090,
+    img:'images/lake-kivu-sunset.jpg', alt:'Lake Kivu at sunset' },
+
+  { id:'gishwati-chimps', route:'Kigali → Gishwati-Mukura', months:[1, 2, 6, 7, 8, 9, 12], title:'Gishwati-Mukura Forest Chimps', countries:'Rwanda', country:'rwanda',
+    styles:['gorilla'], days:2, group:8, stay:'Eco lodge', rating:4.6, reviews:35, price:640,
+    img:'images/forest-elephant.jpg', alt:'Rainforest' },
+
+  { id:'twin-lakes', route:'Kigali → Musanze → Twin Lakes Burera & Ruhondo', months:[1, 2, 3, 6, 7, 8, 9, 10, 11, 12], title:'Twin Lakes Burera & Ruhondo', countries:'Rwanda', country:'rwanda',
+    styles:['family'], days:2, group:12, stay:'Lakeside lodge', rating:4.6, reviews:58, price:390,
+    img:'images/lake-kivu-sunset.jpg', alt:'Lake view' },
+
+  { id:'akagera-camping', route:'Kigali → Akagera → Lake Ihema', months:[1, 2, 6, 7, 8, 9, 12], title:'Akagera Camping & Lake Ihema Boat Trip', countries:'Rwanda', country:'rwanda',
+    styles:['camping', 'wildlife'], days:3, group:12, stay:'Public campsites', rating:4.6, reviews:69, price:590,
+    img:'images/tent-view.jpg', alt:'Tent view' },
+
+  { id:'rufiji-river', route:'Dar es Salaam → Nyerere → Rufiji River', months:[6,7,8,9,10], title:'Nyerere: Rufiji River Boat Safari', countries:'Tanzania', country:'tanzania',
+    styles:['wildlife'], days:4, group:8, stay:'Riverside tented camp', rating:4.8, reviews:77, price:1690,
+    img:'images/elephants-grassland.jpg', alt:'Elephants near the river' }
+];
+
+/* Last-minute departures (shown on the home and deals pages) */
+const LAST_MINUTE = [
+  { id:'lm-mara', title:'Maasai Mara Fly-In Safari', countries:'Kenya', days:3, extra:'Flights incl.', extraIcon:'fa-plane',
+    departs:'12 Oct 2026', spaces:4, price:1190, was:1400, img:'images/lion-walking.jpg', alt:'Male lion walking through grassland' },
+  { id:'lm-serengeti', title:'Serengeti & Ngorongoro Camping', countries:'Tanzania', days:5, extra:'Camping', extraIcon:'fa-campground',
+    departs:'19 Oct 2026', spaces:3, price:1260, was:1480, img:'images/tent-view.jpg', alt:'View from inside a safari tent' },
+  { id:'lm-nakuru', title:'Lake Nakuru & Naivasha Weekend', countries:'Kenya', days:2, extra:'Lodge', extraIcon:'fa-hotel',
+    departs:'25 Oct 2026', spaces:6, price:380, was:440, img:'images/flamingo.jpg', alt:'Flamingo wading in shallow water' },
+  { id:'lm-zanzibar', title:'Zanzibar Beach & Stone Town', countries:'Zanzibar', days:5, extra:'Beachfront', extraIcon:'fa-umbrella-beach',
+    departs:'2 Nov 2026', spaces:2, price:690, was:810, img:'images/coast-resort.jpg', alt:'Resort pool overlooking the ocean' }
+];
+
+
+/* Parks, islands and peaks. Shown as "place" cards on the home and
+   destinations pages; the number of trips and the lowest price are
+   worked out from TRIPS (any trip whose title or route mentions `match`). */
+const PLACES = [
+  { name:'Maasai Mara',       country:'kenya',    img:'images/lion-walking.jpg',       match:'Maasai Mara|Mara' },
+  { name:'Amboseli',          country:'kenya',    img:'images/elephant-amboseli.jpg',  match:'Amboseli' },
+  { name:'Samburu',           country:'kenya',    img:'images/lioness.jpg',            match:'Samburu' },
+  { name:'Lake Nakuru',       country:'kenya',    img:'images/flamingo.jpg',           match:'Nakuru|Naivasha' },
+  { name:'Ol Pejeta',         country:'kenya',    img:'images/rhinos.jpg',             match:'Ol Pejeta|Laikipia' },
+  { name:'Tsavo',             country:'kenya',    img:'images/elephants-grassland.jpg',match:'Tsavo' },
+  { name:'Diani & Watamu',    country:'kenya',    img:'images/coast-resort.jpg',       match:'Diani|Watamu' },
+  { name:'Lamu',              country:'kenya',    img:'images/resort-pool.jpg',        match:'Lamu' },
+  { name:'Serengeti',         country:'tanzania', img:'images/serengeti-acacia.jpg',   match:'Serengeti' },
+  { name:'Ngorongoro Crater', country:'tanzania', img:'images/misty-acacia.jpg',       match:'Ngorongoro' },
+  { name:'Tarangire',         country:'tanzania', img:'images/elephant-savannah.jpg',  match:'Tarangire' },
+  { name:'Kilimanjaro',       country:'tanzania', img:'images/kilimanjaro.jpg',        match:'Kilimanjaro|Uhuru' },
+  { name:'Zanzibar',          country:'tanzania', img:'images/zanzibar-palms.jpg',     match:'Zanzibar|Stone Town' },
+  { name:'Ruaha & Nyerere',   country:'tanzania', img:'images/leopard.jpg',            match:'Ruaha|Nyerere' },
+  { name:'Bwindi',            country:'uganda',   img:'images/forest-canopy-walk.jpg', match:'Bwindi' },
+  { name:'Kibale',            country:'uganda',   img:'images/forest-elephant.jpg',    match:'Kibale' },
+  { name:'Queen Elizabeth',   country:'uganda',   img:'images/elephant-walking.jpg',   match:'Queen Elizabeth' },
+  { name:'Murchison Falls',   country:'uganda',   img:'images/rhino-and-calf.jpg',     match:'Murchison' },
+  { name:'Volcanoes',         country:'rwanda',   img:'images/hiker-summit.jpg',       match:'Volcanoes|Bwindi → Kigali' },
+  { name:'Akagera',           country:'rwanda',   img:'images/zebra.jpg',              match:'Akagera' },
+  { name:'Nyungwe',           country:'rwanda',   img:'images/camp-at-night.jpg',      match:'Nyungwe' },
+  { name:'Lake Kivu',         country:'rwanda',   img:'images/lake-kivu-sunset.jpg',   match:'Kivu' },
+  { name:'Mount Kenya',       country:'kenya',    img:'images/hiker-summit.jpg',       match:'Mount Kenya|Sirimon|Lenana' },
+  { name:'Mount Meru',        country:'tanzania', img:'images/misty-acacia.jpg',       match:'Meru|Momella' },
+  { name:'Lake Mburo',        country:'uganda',   img:'images/zebra.jpg',              match:'Mburo' },
+  { name:'Rwenzori',          country:'uganda',   img:'images/hiker-summit.jpg',       match:'Rwenzori' },
+  { name:'Lake Victoria',     country:'uganda',   img:'images/zanzibar-palms.jpg',     match:'Lake Victoria|Ssese' },
+  { name:'Jinja & the Nile',  country:'uganda',   img:'images/lake-kivu-sunset.jpg',   match:'Jinja|Nile' },
+  { name:'Sipi Falls',        country:'uganda',   img:'images/hiker-summit.jpg',       match:'Sipi' },
+  { name:'Lake Bunyonyi',     country:'uganda',   img:'images/lake-kivu-sunset.jpg',   match:'Bunyonyi' },
+  { name:'Kidepo Valley',     country:'uganda',   img:'images/lioness.jpg',            match:'Kidepo' },
+  { name:'Meru National Park',country:'kenya',    img:'images/lion-portrait.jpg',      match:'Meru National Park' },
+  { name:'Malindi & Watamu',  country:'kenya',    img:'images/coast-resort.jpg',       match:'Malindi|Watamu' },
+  { name:'Aberdares',         country:'kenya',    img:'images/misty-acacia.jpg',       match:'Aberdare' },
+  { name:'Lake Natron',       country:'tanzania', img:'images/flamingo.jpg',           match:'Natron' },
+  { name:'Lake Tanganyika',   country:'tanzania', img:'images/camp-at-night.jpg',      match:'Tanganyika' },
+  { name:'Pemba & Mafia',     country:'tanzania', img:'images/overwater-villas.jpg',   match:'Pemba|Mafia' },
+  { name:'Mount Bisoke',      country:'rwanda',   img:'images/hiker-summit.jpg',       match:'Bisoke|Karisimbi' },
+  { name:'Twin Lakes',        country:'rwanda',   img:'images/lake-kivu-sunset.jpg',   match:'Twin Lakes' }
+];
+
+
+/* Landscapes: how packages are grouped on the destinations page.
+   A trip belongs to every landscape whose `match` appears in its title or route. */
+const LANDSCAPES = [
+  { key:'savannah',  label:'Savannahs & national parks', icon:'fa-sun',
+    match:'Mara|Serengeti|Amboseli|Tsavo|Samburu|Tarangire|Ngorongoro|Ndutu|Akagera|Queen Elizabeth|Laikipia|Ol Pejeta|Nyerere|Ruaha|Kidepo|Nairobi National Park|Meru National Park|Mikumi|Katavi|Lake Mburo|Murchison|Kazinga' },
+  { key:'lakes',     label:'Lakes', icon:'fa-water',
+    match:'Lake |Lakes|Naivasha|Nakuru|Kivu|Bunyonyi|Bogoria|Baringo|Manyara|Natron|Tanganyika|Ihema|Rubondo' },
+  { key:'coast',     label:'Beaches & islands', icon:'fa-umbrella-beach',
+    match:'Diani|Watamu|Lamu|Zanzibar|Mombasa|Malindi|Kilifi|Pemba|Mafia|Nungwi|Mnemba|Ssese|Beach' },
+  { key:'mountains', label:'Mountains & hikes', icon:'fa-mountain',
+    match:'Kilimanjaro|Uhuru|Mount Kenya|Mount Meru|Rwenzori|Elgon|Bisoke|Karisimbi|Longonot|Usambara|Aberdare|Mahale|Ol Doinyo|Golden Monkeys|Mgahinga|Chyulu|Hike|Trek' },
+  { key:'rivers',    label:'Rivers & waterfalls', icon:'fa-droplet',
+    match:'Murchison|Nile|Jinja|Sipi|Falls|Kazinga|Rufiji|Hell\'s Gate' },
+  { key:'forests',   label:'Forests & primates', icon:'fa-tree',
+    match:'Bwindi|Kibale|Nyungwe|Volcanoes|Gorilla|Chimp|Kakamega|Gombe|Mahale|Gishwati|Mgahinga|Primate' }
+];
+
+
+/* Flights we can book: from Europe to East Africa, and between East African cities.
+   time is approximate; stops: 0 = direct. The photo shows the arrival city. */
+const AIRPORTS = {
+  LHR:'London Heathrow', LGW:'London Gatwick', AMS:'Amsterdam', CDG:'Paris', BRU:'Brussels', FRA:'Frankfurt', IST:'Istanbul',
+  NBO:'Nairobi', MBA:'Mombasa', KIS:'Kisumu', JRO:'Kilimanjaro', ARK:'Arusha', DAR:'Dar es Salaam', ZNZ:'Zanzibar',
+  EBB:'Entebbe', KGL:'Kigali'
+};
+const ARRIVAL_IMG = { NBO:'giraffe-sunset', MBA:'resort-pool', KIS:'flamingo', JRO:'kilimanjaro', ARK:'misty-acacia', DAR:'coast-resort',
+  ZNZ:'zanzibar-palms', EBB:'forest-canopy-walk', KGL:'lake-kivu-sunset' };
+const FLIGHTS = [
+  // From Europe
+  { from:'LHR', to:'NBO', time:'8h 40m', stops:0, region:'europe' },
+  { from:'LGW', to:'EBB', time:'8h 50m', stops:0, region:'europe' },
+  { from:'AMS', to:'NBO', time:'8h 30m', stops:0, region:'europe' },
+  { from:'AMS', to:'JRO', time:'9h 30m', stops:0, region:'europe' },
+  { from:'AMS', to:'DAR', time:'11h 30m', stops:1, region:'europe' },
+  { from:'CDG', to:'NBO', time:'8h 20m', stops:0, region:'europe' },
+  { from:'CDG', to:'ZNZ', time:'11h', stops:1, region:'europe' },
+  { from:'BRU', to:'KGL', time:'8h 30m', stops:0, region:'europe' },
+  { from:'BRU', to:'EBB', time:'10h', stops:1, region:'europe' },
+  { from:'FRA', to:'JRO', time:'9h 30m', stops:0, region:'europe' },
+  { from:'FRA', to:'ZNZ', time:'9h 40m', stops:0, region:'europe' },
+  { from:'FRA', to:'NBO', time:'11h', stops:1, region:'europe' },
+  { from:'IST', to:'NBO', time:'6h 30m', stops:0, region:'europe' },
+  { from:'IST', to:'ZNZ', time:'7h 45m', stops:0, region:'europe' },
+  { from:'IST', to:'KGL', time:'8h 30m', stops:1, region:'europe' },
+  // Within East Africa
+  { from:'NBO', to:'KGL', time:'1h 20m', stops:0, region:'regional' },
+  { from:'NBO', to:'EBB', time:'1h 10m', stops:0, region:'regional' },
+  { from:'NBO', to:'DAR', time:'1h 20m', stops:0, region:'regional' },
+  { from:'NBO', to:'JRO', time:'1h', stops:0, region:'regional' },
+  { from:'NBO', to:'ZNZ', time:'1h 30m', stops:0, region:'regional' },
+  { from:'NBO', to:'MBA', time:'1h', stops:0, region:'regional' },
+  { from:'NBO', to:'KIS', time:'50m', stops:0, region:'regional' },
+  { from:'MBA', to:'ZNZ', time:'45m', stops:0, region:'regional' },
+  { from:'EBB', to:'KGL', time:'1h 10m', stops:0, region:'regional' },
+  { from:'EBB', to:'DAR', time:'1h 50m', stops:0, region:'regional' },
+  { from:'KGL', to:'DAR', time:'2h', stops:0, region:'regional' },
+  { from:'JRO', to:'ZNZ', time:'1h 10m', stops:0, region:'regional' },
+  { from:'ARK', to:'ZNZ', time:'1h 20m', stops:0, region:'regional' },
+  { from:'DAR', to:'ZNZ', time:'20m', stops:0, region:'regional' },
+  { from:'DAR', to:'JRO', time:'1h 10m', stops:0, region:'regional' }
+];
+
+/* City, beach and lake hotels we book (name, area, city group, type, photo) */
+const HOTEL_CITIES = { nairobi:'Nairobi', coast:'Mombasa & Diani', arusha:'Arusha', dar:'Dar es Salaam & Zanzibar', kampala:'Kampala & Entebbe', kigali:'Kigali' };
+const HOTELS = [
+  { name:'Ngong Hills Hotel', area:'Ngong Road', city:'nairobi', type:'City hotel', img:'resort-pool' },
+  { name:'Sarova Stanley', area:'City Centre', city:'nairobi', type:'Historic hotel', img:'safari-lodge' },
+  { name:'Hemingways Nairobi', area:'Karen', city:'nairobi', type:'Boutique hotel', img:'safari-lodge' },
+  { name:'Giraffe Manor', area:'Karen', city:'nairobi', type:'Boutique hotel', img:'giraffe-sunset' },
+  { name:'Tribe Hotel', area:'Gigiri', city:'nairobi', type:'Design hotel', img:'resort-pool' },
+  { name:'Radisson Blu Upper Hill', area:'Upper Hill', city:'nairobi', type:'Business hotel', img:'resort-pool' },
+  { name:'Fairview Hotel', area:'Upper Hill', city:'nairobi', type:'Garden hotel', img:'safari-lodge' },
+  { name:'Eka Hotel', area:'Mombasa Road', city:'nairobi', type:'Business hotel', img:'resort-pool' },
+  { name:'Ole Sereni', area:'Mombasa Road', city:'nairobi', type:'Park-view hotel', img:'elephant-savannah' },
+  { name:'The Boma Nairobi', area:'South C', city:'nairobi', type:'City hotel', img:'resort-pool' },
+  { name:'Serena Beach Resort & Spa', area:'Shanzu', city:'coast', type:'Beach resort', img:'coast-resort' },
+  { name:'Sarova Whitesands', area:'Bamburi', city:'coast', type:'Beach resort', img:'coast-resort' },
+  { name:'Voyager Beach Resort', area:'Nyali', city:'coast', type:'Beach resort', img:'resort-pool' },
+  { name:'PrideInn Paradise', area:'Shanzu', city:'coast', type:'Beach resort', img:'coast-resort' },
+  { name:'Leopard Beach Resort', area:'Diani', city:'coast', type:'Beach resort', img:'zanzibar-palms' },
+  { name:'Baobab Beach Resort', area:'Diani', city:'coast', type:'Beach resort', img:'coast-resort' },
+  { name:'Arusha Coffee Lodge', area:'Burka coffee estate', city:'arusha', type:'Boutique hotel', img:'safari-lodge' },
+  { name:'Mount Meru Hotel', area:'Arusha town', city:'arusha', type:'City hotel', img:'resort-pool' },
+  { name:'Gran Meliá Arusha', area:'Arusha', city:'arusha', type:'Luxury hotel', img:'misty-acacia' },
+  { name:'Four Points by Sheraton Arusha', area:'Arusha town', city:'arusha', type:'City hotel', img:'resort-pool' },
+  { name:'Hyatt Regency Dar es Salaam', area:'City Centre', city:'dar', type:'City hotel', img:'coast-resort' },
+  { name:'Dar es Salaam Serena', area:'City Centre', city:'dar', type:'City hotel', img:'resort-pool' },
+  { name:'Park Hyatt Zanzibar', area:'Stone Town', city:'dar', type:'Luxury hotel', img:'zanzibar-palms' },
+  { name:'Emerson Spice', area:'Stone Town', city:'dar', type:'Boutique hotel', img:'overwater-villas' },
+  { name:'Zuri Zanzibar', area:'Kendwa', city:'dar', type:'Beach resort', img:'overwater-villas' },
+  { name:'Kampala Serena', area:'City Centre', city:'kampala', type:'City hotel', img:'resort-pool' },
+  { name:'Sheraton Kampala', area:'City Centre', city:'kampala', type:'City hotel', img:'safari-lodge' },
+  { name:'Speke Resort Munyonyo', area:'Munyonyo, Lake Victoria', city:'kampala', type:'Lake resort', img:'lake-kivu-sunset' },
+  { name:'Protea Hotel Entebbe', area:'Entebbe', city:'kampala', type:'Lakeside hotel', img:'lake-kivu-sunset' },
+  { name:'Lake Victoria Serena', area:'Kigo', city:'kampala', type:'Lake resort', img:'lake-kivu-sunset' },
+  { name:'Kigali Marriott', area:'Kiyovu', city:'kigali', type:'City hotel', img:'resort-pool' },
+  { name:'Radisson Blu Kigali', area:'Kimihurura', city:'kigali', type:'Business hotel', img:'resort-pool' },
+  { name:'Kigali Serena', area:'City Centre', city:'kigali', type:'City hotel', img:'safari-lodge' },
+  { name:'Hôtel des Mille Collines', area:'Kiyovu', city:'kigali', type:'Historic hotel', img:'lake-kivu-sunset' }
+];
+
+/* Labels used by filters and search */
+const COUNTRY_NAMES = { kenya:'Kenya', tanzania:'Tanzania', uganda:'Uganda', rwanda:'Rwanda', multi:'Multi-country' };
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+/* Trip-length buckets used by the "How long for?" search and trip filters */
+const DURATIONS = {
+  '2-6':   { label:'2 to 6 days',   fits:d => d <= 6 },
+  '7-10':  { label:'7 to 10 days',  fits:d => d >= 7 && d <= 10 },
+  '11-14': { label:'11 to 14 days', fits:d => d >= 11 && d <= 14 },
+  '15+':   { label:'15+ days',      fits:d => d >= 15 }
+};
+const STYLE_NAMES = { wildlife:'Wildlife safari', gorilla:'Gorilla & primates', beach:'Safari & beach', trek:'Kilimanjaro & trekking', camping:'Camping safari', family:'Family safari', luxury:'Luxury' };
+
+/* Facts the AI assistant answers from (also used offline).
+   Add a { q, a, tags } entry to teach it something new. */
+const KNOWLEDGE = [
+  { q:'What is included in the price?', tags:'included price cost fees meals transfers flights tips',
+    a:'Your guide and 4x4 vehicle, accommodation, park and conservancy fees, most meals, airport transfers and drinking water on game drives. International flights, visas, travel insurance, tips and optional extras (like balloon safaris) are not included.' },
+  { q:'How do I book and how much is the deposit?', tags:'book booking deposit pay payment balance',
+    a:'A $250 per person deposit secures most trips, with the balance due 60 days before departure. Gorilla trips need the permit paid upfront. Date changes are free up to 60 days before you travel. Start with a free quote at contact.html.' },
+  { q:'Do I need a visa?', tags:'visa eta e-visa entry passport',
+    a:'Most visitors need an eTA for Kenya and an e-Visa for Tanzania and Uganda; Rwanda offers visa on arrival. The East Africa Tourist Visa covers Kenya, Uganda and Rwanda. Rules change, so always check the official government websites before travelling.' },
+  { q:'Which vaccinations do I need?', tags:'vaccine vaccination yellow fever malaria health',
+    a:'Yellow fever vaccination is recommended and a certificate can be required, for example when travelling between Kenya and Tanzania or Zanzibar. Malaria prevention is advised in most safari areas. See a travel clinic 6 to 8 weeks before you go.' },
+  { q:'How much does a gorilla permit cost?', tags:'gorilla permit price cost uganda rwanda',
+    a:'Permits are set by each government and are included in our gorilla trips. At the time of writing they are around $800 per person in Uganda and $1,500 in Rwanda; we confirm the current price when we quote.' },
+  { q:'When is the best time to go?', tags:'when best time season month weather migration rain',
+    a:'East Africa is year-round. The dry seasons (June to October, and January to February) are best for game viewing. The Mara River crossings are usually July to October; calving in the southern Serengeti is January to March. April and May is Green Season, with up to 25% off.' },
+  { q:'How big are the groups?', tags:'group size small private solo',
+    a:'Small-group trips have a maximum of 12 travellers (8 on gorilla trips), and everyone gets a guaranteed window seat in a pop-top Land Cruiser. Private trips are just you and your party.' },
+  { q:'Is travel insurance required?', tags:'insurance medical evacuation',
+    a:'Yes. Comprehensive travel insurance with medical evacuation cover is required. Every safari also includes flying-doctor emergency cover while you are on safari.' },
+  { q:'How much luggage can I take on bush flights?', tags:'luggage baggage flight bag weight',
+    a:'Light aircraft usually allow about 15 kg (33 lb) per person including hand luggage, in a soft bag with no wheels. We can store extra luggage in Nairobi, Arusha or Kigali.' },
+  { q:'Is a safari safe and physically demanding?', tags:'safe safety fitness demanding hard',
+    a:'Most safaris are not physically demanding: game drives are by vehicle. Gorilla treks can mean 1 to 6 hours of hiking on steep trails, and Kilimanjaro needs good fitness. Our guides are first-aid trained and our team is on call 24/7.' },
+  { q:'Can I combine a safari with a beach holiday?', tags:'beach zanzibar diani combine island',
+    a:'Yes, it is one of our most popular combinations. Zanzibar and Kenya\'s Diani coast are a short flight from the parks, and we can add beach nights to any itinerary.' },
+  { q:'Do you do honeymoon safaris?', tags:'honeymoon honeymoons couple couples romantic anniversary wedding',
+    a:'Yes, honeymoons are a speciality. Think private vehicles, sundowners, a candlelit bush dinner and a few days on a Zanzibar or Diani beach to finish. Honeymooners also get free upgrades where available.' },
+  { q:'Can I travel with kids?', tags:'kids children family age',
+    a:'Absolutely. We choose family-friendly lodges with pools and family tents, keep drives shorter, and children 5 to 15 can travel from 50% off on selected trips. Gorilla trekking has a minimum age of 15.' },
+  { q:'Can I hire a private guide?', tags:'private guide hire specialist photography birding',
+    a:'Yes. You can travel with your own guide and 4x4, choose a guide by name or language, or add a photography, birding, walking or cultural specialist. See services.html.' },
+  { q:'Do you book flights?', tags:'flight flights fly international bush transfer airport',
+    a:'Yes. We book bush flights between parks (for example Nairobi to the Maasai Mara in about 45 minutes), beach flights to Zanzibar and Diani, and help with international flights into Nairobi, Kilimanjaro, Entebbe and Kigali. Airport transfers are included on every safari. See flights.html.' }
+];
+
+/* =========================================================
+   Booking rules: used by the booking calendar (book.html)
+   AND checked again by the server, so they always agree.
+   ---------------------------------------------------------
+   Small-group trips leave on set weekdays (departDays, where
+   0 = Sun … 6 = Sat; Saturdays if not set). Private trips
+   (group of 2 or less) can start on any day. Last-minute
+   trips leave on their one listed date.
+   ========================================================= */
+const BOOKING = {
+  deposit: 250,          // USD per person to secure a booking
+  balanceDays: 60,       // balance due this many days before departure
+  noticeDays: 7,         // earliest start date: a week from today
+  monthsAhead: 12,       // how far ahead the calendar opens
+  childRate: 0.5,        // children (5 to 15) pay this share on family trips
+  departDays: { 'great-migration':[2,6], 'classic-kenya':[1,4], 'northern-circuit':[0,4], 'serengeti-zanzibar':[3,6], 'amboseli-tsavo':[1,3,5], 'kilimanjaro-machame':[0,3], 'kilimanjaro-lemosho':[2] }
+};
+
+const BookingRules = (function(){
+  const DAY = 86400000;
+  const iso = d => d.toISOString().slice(0, 10);
+  const parse = s => { const d = new Date(String(s).slice(0, 10) + 'T00:00:00Z'); return isNaN(d) ? null : d; };
+  const today = () => parse(new Date(Date.now() + 3 * 3600000).toISOString()); // Nairobi date (EAT)
+  const addDays = (s, n) => iso(new Date(parse(s).getTime() + n * DAY));
+
+  function find(id){
+    const t = TRIPS.find(x => x.id === id);
+    if(t) return { trip:t, kind: t.group <= 2 ? 'private' : 'group', capacity:t.group, price:t.price };
+    const l = LAST_MINUTE.find(x => x.id === id);
+    if(l) return { trip:l, kind:'fixed', capacity:l.spaces, price:l.price, date: iso(new Date(l.departs + ' 12:00 UTC')) };
+    return null;
+  }
+  // Is this a start date the trip offers? (ignores seats; the server checks those)
+  function isDeparture(id, date, isPrivate){
+    const f = find(id), d = parse(date);
+    if(!f || !d) return false;
+    const first = parse(addDays(iso(today()), BOOKING.noticeDays));
+    const last = new Date(today()); last.setUTCMonth(last.getUTCMonth() + BOOKING.monthsAhead);
+    if(f.kind === 'fixed') return date === f.date && d >= today();
+    if(d < first || d > last) return false;
+    if(f.kind === 'private' || isPrivate) return true;
+    return (BOOKING.departDays[id] || [6]).includes(d.getUTCDay());
+  }
+  function price(id, adults, children){
+    const f = find(id);
+    if(!f) return 0;
+    const kids = f.trip.styles && f.trip.styles.includes('family') ? BOOKING.childRate : 1;
+    return Math.round(f.price * adults + f.price * kids * children);
+  }
+  return { find, isDeparture, price, iso, parse, today, addDays };
+})();
+
+
+/* =========================================================
+   Admin edits (from the dashboard's "Website content" pages)
+   ---------------------------------------------------------
+   The server saves them in server/data/content.json and writes
+   js/content.js, which every page loads right after this file
+   and which calls applyContent(...). The server applies the
+   same edits, so bookings are charged the prices shown.
+     trips       { id: { title, price, was, img, alt, days, route, badge, hidden, featured } }
+     added       new packages (full trip objects)
+     flash       [{ trip, pct, ends, label }]   time-limited sales
+     lastMinute  replaces LAST_MINUTE when set
+     flights     replaces FLIGHTS when set (fare = from-price, USD one way)
+   ========================================================= */
+function applyContent(C, now){
+  if(!C || typeof C !== 'object') return;
+  now = now || Date.now();
+  const swap = (list, items) => { if(Array.isArray(items)){ list.length = 0; items.forEach(x => list.push(x)); } };
+  (C.added || []).forEach(t => { if(t && t.id && !TRIPS.some(x => x.id === t.id)) TRIPS.push(Object.assign({ styles:['wildlife'], months:[], group:12, rating:4.8, reviews:0, stay:'Lodges', countries:'', country:'kenya', route:'' }, t)); });
+  Object.entries(C.trips || {}).forEach(([id, edit]) => { const t = TRIPS.find(x => x.id === id); if(t) Object.assign(t, edit); });
+  for(let i = TRIPS.length - 1; i >= 0; i--) if(TRIPS[i].hidden) TRIPS.splice(i, 1);
+  (C.flash || []).forEach(f => {
+    const t = TRIPS.find(x => x.id === f.trip), pct = Number(f.pct);
+    if(!t || !(pct > 0 && pct < 90) || (f.ends && new Date(f.ends).getTime() < now) || (f.starts && new Date(f.starts).getTime() > now)) return;
+    t.was = t.price;                                   // the price before the sale
+    t.price = Math.round(t.price * (1 - pct / 100));
+    t.flash = { pct, ends: f.ends || '', label: f.label || 'Flash sale' };
+    t.badge = `${t.flash.label} −${pct}%`; t.badgeType = 'sale';
+  });
+  if(typeof LAST_MINUTE !== 'undefined') swap(LAST_MINUTE, C.lastMinute);
+  if(typeof FLIGHTS !== 'undefined') swap(FLIGHTS, C.flights);
+  dropPastDepartures(now);
+}
+
+// Last-minute departures disappear from the site once their date has passed (Nairobi time)
+function dropPastDepartures(now){
+  const today = new Date((now || Date.now()) + 3 * 3600000).toISOString().slice(0, 10);
+  for(let i = LAST_MINUTE.length - 1; i >= 0; i--){
+    const d = new Date(LAST_MINUTE[i].departs + ' 12:00 UTC');
+    if(!isNaN(d) && d.toISOString().slice(0, 10) < today) LAST_MINUTE.splice(i, 1);
+  }
+}
+dropPastDepartures();

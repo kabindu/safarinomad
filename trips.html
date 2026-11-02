@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Safari: All Trips &amp; Tours | SafariNomad</title>
+<meta name="description" content="Browse every SafariNomad safari, gorilla trek, Kilimanjaro climb and beach combo across Kenya, Tanzania, Uganda and Rwanda. Filter by country, style, length and price.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body data-page="trips">
+
+<div id="site-header"></div>
+
+<main>
+
+<section class="page-hero">
+  <div class="bg"><img src="images/acacia-sunset.jpg" alt="Acacia tree silhouetted at sunset"></div>
+  <div class="wrap">
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i class="fa-solid fa-chevron-right"></i><span>Trips</span></nav>
+    <h1 id="pageTitle">Find your safari</h1>
+    <p>Every itinerary includes an expert local guide, park fees, game drives and most meals. Filter to find your perfect trip, or ask us to tailor one.</p>
+  </div>
+</section>
+
+
+<section id="finder" class="finder-sec">
+  <div class="wrap finder">
+
+    <!-- Filters -->
+    <aside class="filters" id="filters" aria-label="Trip filters">
+      <h3>Filters <button type="button" id="clearFilters">Clear all</button></h3>
+
+      <div class="filter-group">
+        <h4>Keyword</h4>
+        <div class="filter-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="search" id="tripQuery" placeholder="e.g. gorillas, Zanzibar" aria-label="Search trips by keyword">
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <h4>Destination</h4>
+        <label><input type="radio" name="country" value="" checked> Anywhere <span data-c-country=""></span></label>
+        <label><input type="radio" name="country" value="kenya"> Kenya <span data-c-country="kenya"></span></label>
+        <label><input type="radio" name="country" value="tanzania"> Tanzania &amp; Zanzibar <span data-c-country="tanzania"></span></label>
+        <label><input type="radio" name="country" value="uganda"> Uganda <span data-c-country="uganda"></span></label>
+        <label><input type="radio" name="country" value="rwanda"> Rwanda <span data-c-country="rwanda"></span></label>
+        <label><input type="radio" name="country" value="multi"> Multi-country <span data-c-country="multi"></span></label>
+      </div>
+      <div class="filter-group">
+        <h4>Landscape</h4>
+        <div id="landRadios"></div>
+      </div>
+
+      <div class="filter-group">
+        <h4>Travel style</h4>
+        <label><input type="checkbox" name="style" value="wildlife"> Wildlife safari <span data-c-style="wildlife"></span></label>
+        <label><input type="checkbox" name="style" value="gorilla"> Gorilla &amp; primates <span data-c-style="gorilla"></span></label>
+        <label><input type="checkbox" name="style" value="beach"> Safari &amp; beach <span data-c-style="beach"></span></label>
+        <label><input type="checkbox" name="style" value="trek"> Kilimanjaro &amp; trekking <span data-c-style="trek"></span></label>
+        <label><input type="checkbox" name="style" value="family"> Family <span data-c-style="family"></span></label>
+        <label><input type="checkbox" name="style" value="luxury"> Luxury &amp; honeymoon <span data-c-style="luxury"></span></label>
+        <label><input type="checkbox" name="style" value="camping"> Camping <span data-c-style="camping"></span></label>
+      </div>
+
+      <div class="filter-group">
+        <h4>When?</h4>
+        <div class="month-chips" id="monthChips"></div>
+      </div>
+
+      <div class="filter-group">
+        <h4>How long for?</h4>
+        <label><input type="radio" name="len" value="" checked> Any duration</label>
+        <label><input type="radio" name="len" value="2-6"> 2 to 6 days</label>
+        <label><input type="radio" name="len" value="7-10"> 7 to 10 days</label>
+        <label><input type="radio" name="len" value="11-14"> 11 to 14 days</label>
+        <label><input type="radio" name="len" value="15+"> 15+ days</label>
+      </div>
+
+      <div class="filter-group">
+        <h4>Price per person</h4>
+        <input type="range" id="maxPrice" min="500" max="8000" step="250" value="8000" aria-label="Maximum price">
+        <div class="range-val"><span id="maxPriceLabel">Any price</span></div>
+      </div>
+
+      <div class="filter-group">
+        <label><input type="checkbox" id="savedOnly"> <i class="fa-solid fa-heart" style="color:var(--red);"></i> Only my saved trips</label>
+      </div>
+    </aside>
+
+    <!-- Results -->
+    <div>
+      <div class="results-bar">
+        <button class="btn btn-sm btn-outline filter-toggle" id="filterToggle" type="button" aria-expanded="false"><i class="fa-solid fa-sliders"></i> Filters</button>
+        <p id="resultCount"></p>
+        <label>
+          <span class="sr-only">Sort trips</span>
+          <select id="sortBy">
+            <option value="popular">Most popular</option>
+            <option value="rating">Highest rated</option>
+            <option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option>
+            <option value="days">Shortest first</option>
+          </select>
+        </label>
+      </div>
+      <div class="card-grid" id="tripGrid"></div>
+      <div class="empty-state" id="noResults">
+        <p id="noResultsText"></p>
+        <a class="btn" href="contact.html" style="margin-top:14px;">Plan a tailor-made trip</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<section>
+  <div class="wrap">
+    <div class="cta-band">
+      <div>
+        <h2>Can't find exactly what you want?</h2>
+        <p>Every trip can be tailored: change the dates, add a beach stay, upgrade the lodges or go private.</p>
+      </div>
+      <div class="actions">
+        <a class="btn" href="contact.html">Tailor my trip</a>
+        <a class="btn btn-ghost" href="https://wa.me/254700123456" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/content.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script src="js/assistant.js"></script>
+<script src="js/trips.js"></script>
+</body>
+</html>

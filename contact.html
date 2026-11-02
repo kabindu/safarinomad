@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request a Free Safari Quote | SafariNomad</title>
+<meta name="description" content="Tell us about your dream safari and a SafariNomad specialist will send a tailored itinerary and price within 24 hours.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body data-page="contact">
+
+<div id="site-header"></div>
+
+<main>
+
+<!-- The form is the first thing on the page: no photo hero pushing it down -->
+<section class="ct-section">
+  <div class="wrap">
+    <nav class="breadcrumb ct-crumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i class="fa-solid fa-chevron-right"></i><span>Contact</span></nav>
+    <div class="ct-layout">
+
+      <div class="ct-form-card" id="quote">
+        <h1>Request a free quote</h1>
+        <p class="ct-sub"><i class="fa-regular fa-clock"></i> A safari expert replies within 24 hours</p>
+        <div class="contact-status show" id="tripNotice" hidden><i class="fa-solid fa-circle-info"></i> You're asking about: <b id="tripNoticeName"></b></div>
+        <form id="contactForm" novalidate>
+          <div class="contact-form">
+            <div class="form-field"><label for="name">Full name <span class="req" aria-hidden="true">*</span></label><input id="name" name="name" type="text" placeholder="Your full name" autocomplete="name" required aria-required="true"></div>
+            <div class="form-field"><label for="email">Email <span class="req" aria-hidden="true">*</span></label><input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required aria-required="true"></div>
+            <div class="form-field"><label for="phone">Phone / WhatsApp</label><input id="phone" name="phone" type="tel" placeholder="+1 555 123 4567" autocomplete="tel"></div>
+            <div class="form-field">
+              <label for="destination">Destination</label>
+              <select id="destination" name="destination">
+                <option value="Not sure yet">Not sure yet</option>
+                <option value="Kenya">Kenya</option><option value="Tanzania">Tanzania</option><option value="Uganda">Uganda</option><option value="Rwanda">Rwanda</option>
+                <option value="Zanzibar / Coast">Zanzibar / Coast</option><option value="Multi-country">Multi-country</option>
+              </select>
+            </div>
+            <div class="form-field"><label for="travelMonth">Travel month</label><input id="travelMonth" name="travelMonth" type="month"></div>
+            <div class="form-field">
+              <label for="groupSize">Travellers</label>
+              <select id="groupSize" name="groupSize"><option>1</option><option selected>2</option><option>3–5</option><option>6+</option></select>
+            </div>
+            <div class="form-field full">
+              <label for="budget">Budget per person</label>
+              <select id="budget" name="budget"><option>Under $1,500</option><option selected>$1,500–$3,000</option><option>$3,000–$5,000</option><option>$5,000+</option></select>
+            </div>
+            <div class="form-field full"><label for="message">Your trip <span class="req" aria-hidden="true">*</span></label><textarea id="message" name="message" rows="4" placeholder="E.g. honeymoon in August, river crossings and a few beach days" required aria-required="true"></textarea></div>
+          </div>
+          <button class="btn ct-send" type="submit">Send my request <i class="fa-solid fa-paper-plane"></i></button>
+          <small class="ct-privacy"><i class="fa-solid fa-lock"></i> We never share your details · <span class="req">*</span> required</small>
+          <div id="contactStatus" class="contact-status" aria-live="polite"></div>
+        </form>
+      </div>
+
+      <aside class="ct-side" aria-label="Other ways to reach us">
+        <h2>Prefer to talk?</h2>
+        <a class="ct-way wa" href="https://wa.me/254700123456" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i><span><b>WhatsApp</b><small>Fastest reply</small></span><i class="fa-solid fa-chevron-right go"></i></a>
+        <a class="ct-way" href="tel:+254700123456"><i class="fa-solid fa-phone"></i><span><b>+254 700 123 456</b><small>Mon–Sat, 8am–6pm EAT</small></span><i class="fa-solid fa-chevron-right go"></i></a>
+        <a class="ct-way" href="mailto:hello@safarinomad.com"><i class="fa-solid fa-envelope"></i><span><b>hello@safarinomad.com</b><small>Email us</small></span><i class="fa-solid fa-chevron-right go"></i></a>
+        <button class="ct-way" type="button" data-open-chat><i class="fa-regular fa-comments"></i><span><b>Live chat</b><small>Ask Nomad or a planner</small></span><i class="fa-solid fa-chevron-right go"></i></button>
+        <div class="ct-way plain"><i class="fa-solid fa-location-dot"></i><span><b>Westlands, Nairobi</b><small>Visit our office</small></span></div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/content.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script src="js/assistant.js"></script>
+<script src="js/contact.js"></script>
+</body>
+</html>

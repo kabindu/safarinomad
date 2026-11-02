@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safari Blog: East Africa Guides &amp; Travel Notes | SafariNomad</title>
+<meta name="description" content="In-depth guides, wildlife updates, packing tips and honest field notes from our guides across Kenya, Tanzania, Uganda and Rwanda.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/blog.css">
+</head>
+<body data-page="blog">
+
+<div id="site-header"></div>
+
+<main>
+
+<!-- ════════════ LISTING VIEW ════════════ -->
+<div id="view-listing" class="view active">
+
+  <div class="blog-hero">
+    <div class="wrap" style="position:relative;z-index:1;">
+      <div class="eyebrow">Field Notes &amp; Guides</div>
+      <h1>The East Africa Safari Blog</h1>
+      <p>In-depth guides, wildlife updates, packing tips and honest field notes from our guides and travellers across Kenya, Tanzania, Uganda &amp; Rwanda.</p>
+      <div class="blog-search">
+        <label for="searchInput" class="sr-only">Search articles</label>
+        <input type="text" id="searchInput" placeholder="Search articles…">
+        <button onclick="doSearch()" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </div>
+      <div class="cat-pills">
+        <span class="cat-pill active" data-cat="All" onclick="filterCat('All',this)">All</span>
+        <span class="cat-pill" data-cat="Wildlife" onclick="filterCat('Wildlife',this)">Wildlife</span>
+        <span class="cat-pill" data-cat="Trekking" onclick="filterCat('Trekking',this)">Trekking</span>
+        <span class="cat-pill" data-cat="Travel Tips" onclick="filterCat('Travel Tips',this)">Travel Tips</span>
+        <span class="cat-pill" data-cat="Culture" onclick="filterCat('Culture',this)">Culture</span>
+        <span class="cat-pill" data-cat="Gear" onclick="filterCat('Gear',this)">Gear</span>
+        <span class="cat-pill" data-cat="Destinations" onclick="filterCat('Destinations',this)">Destinations</span>
+        <span class="cat-pill" data-cat="Planning" onclick="filterCat('Planning',this)">Planning</span>
+      </div>
+    </div>
+  </div>
+
+  <section style="padding:60px 0;">
+    <div class="wrap">
+      <div class="eyebrow" style="margin-bottom:20px;">Featured Story</div>
+      <div class="featured" id="featured"></div>
+
+      <div class="blog-layout">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:12px;flex-wrap:wrap;">
+            <h2 style="font-size:28px;" id="gridHeading">Latest Articles</h2>
+            <span id="articleCount" style="color:var(--gray);font-size:14px;"></span>
+          </div>
+          <div class="blog-grid" id="blogGrid"></div>
+          <div class="pagination" id="pagination"></div>
+        </div>
+
+        <aside class="sidebar">
+          <div class="sidebar-widget">
+            <h5><i class="fa-solid fa-fire" style="color:var(--orange);margin-right:6px;"></i>Recent Posts</h5>
+            <div id="sidebarRecent"></div>
+          </div>
+          <div class="sidebar-widget">
+            <h5>Categories</h5>
+            <div id="sidebarCats"></div>
+          </div>
+          <div class="sidebar-widget">
+            <h5>Popular Tags</h5>
+            <div class="tag-cloud">
+              <span onclick="filterCat('Wildlife',null)">Maasai Mara</span>
+              <span onclick="filterCat('Wildlife',null)">Big Five</span>
+              <span onclick="filterCat('Trekking',null)">Gorillas</span>
+              <span onclick="filterCat('Planning',null)">Safari Planning</span>
+              <span onclick="filterCat('Gear',null)">Camera Gear</span>
+              <span onclick="filterCat('Wildlife',null)">Migration</span>
+              <span onclick="filterCat('Destinations',null)">Zanzibar</span>
+              <span onclick="filterCat('Culture',null)">Maasai</span>
+              <span onclick="filterCat('Planning',null)">Budget Travel</span>
+              <span onclick="filterCat('Trekking',null)">Chimps</span>
+            </div>
+          </div>
+          <div class="newsletter-widget">
+            <h5>Stay in the Loop</h5>
+            <p>Safari tips, wildlife updates and exclusive offers, delivered monthly.</p>
+            <div class="nl-input">
+              <input type="email" placeholder="Your email address" aria-label="Email address">
+              <button onclick="subscribe(this)">Join</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ════════════ ARTICLE VIEW ════════════ -->
+<div id="view-article" class="view">
+
+  <div class="article-hero">
+    <img id="artHeroImg" src="" alt="">
+    <div class="article-hero-content">
+      <div class="wrap">
+        <div id="artHeroTag" style="margin-bottom:14px;"></div>
+        <h1 id="artHeroTitle"></h1>
+        <div class="article-meta" id="artMeta"></div>
+      </div>
+    </div>
+  </div>
+
+  <section style="padding:50px 0 80px;">
+    <div class="wrap">
+      <div class="blog-layout">
+        <div>
+          <div class="post-breadcrumb">
+            <a onclick="showView('listing')">Blog</a>
+            <i class="fa-solid fa-chevron-right"></i>
+            <span id="artBreadcrumb"></span>
+          </div>
+          <article class="article-body-wrap" id="artBody"></article>
+
+          <div class="share-bar">
+            <span>Share this article:</span>
+            <button class="share-btn fb" onclick="shareTo('fb')" aria-label="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></button>
+            <button class="share-btn tw" onclick="shareTo('tw')" aria-label="Share on X"><i class="fa-brands fa-x-twitter"></i></button>
+            <button class="share-btn wa" onclick="shareTo('wa')" aria-label="Share on WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
+            <button class="share-btn lk" onclick="shareTo('lk')" aria-label="Share on LinkedIn"><i class="fa-brands fa-linkedin-in"></i></button>
+          </div>
+
+          <div class="author-bio" id="artAuthorBio"></div>
+
+          <h3 style="font-size:26px;">You Might Also Like</h3>
+          <div class="related-grid" id="relatedGrid"></div>
+          <div style="margin-top:30px;">
+            <button class="btn btn-outline" onclick="showView('listing')"><i class="fa-solid fa-arrow-left"></i> Back to All Articles</button>
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <div class="sidebar-widget">
+            <h5>Recent Posts</h5>
+            <div id="artSidebarRecent"></div>
+          </div>
+          <div class="sidebar-widget">
+            <h5>Categories</h5>
+            <div id="artSidebarCats"></div>
+          </div>
+          <div class="newsletter-widget">
+            <h5>Safari Tips Monthly</h5>
+            <p>Expert tips and offers from our guides, once a month.</p>
+            <div class="nl-input">
+              <input type="email" placeholder="Your email" aria-label="Email address">
+              <button onclick="subscribe(this)">Join</button>
+            </div>
+          </div>
+          <div class="cta-widget">
+            <i class="fa-solid fa-binoculars"></i>
+            <h5>Ready to go?</h5>
+            <p>Turn your reading into reality. Browse our East Africa trips.</p>
+            <a href="trips.html" class="btn btn-sm btn-block">Explore trips</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/content.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script src="js/assistant.js"></script>
+<script src="js/blog-data.js"></script>
+<script src="js/blog.js"></script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Safari Flights: Bush Flights, Beach Hops &amp; Transfers | SafariNomad</title>
+<meta name="description" content="Light-aircraft safari flights between East Africa's parks, beach hops to Zanzibar and Diani, help with international flights and airport transfers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body data-page="flights">
+
+<div id="site-header"></div>
+
+<main>
+
+<section class="page-hero">
+  <div class="bg" data-slides>
+    <img class="on" src="images/hero/flights-kenya-airways-hd.jpg" srcset="images/hero/flights-kenya-airways-hd.jpg 1920w, images/hero/flights-kenya-airways-4k.jpg 3840w" sizes="100vw" alt="Kenya Airways Dreamliner on the runway" fetchpriority="high" style="object-position:center 55%">
+    <img data-src="images/hero/flights-passport-hd.jpg" data-srcset="images/hero/flights-passport-hd.jpg 1920w, images/hero/flights-passport-4k.jpg 3840w" sizes="100vw" alt="Passport and travel documents on a desk" style="object-position:center 50%">
+    <img data-src="images/hero/flights-wing-clouds-hd.jpg" data-srcset="images/hero/flights-wing-clouds-hd.jpg 1920w, images/hero/flights-wing-clouds-4k.jpg 3840w" sizes="100vw" alt="Aircraft wing above the clouds" style="object-position:center 40%">
+    <img data-src="images/hero/flights-departures-hd.jpg" data-srcset="images/hero/flights-departures-hd.jpg 1920w, images/hero/flights-departures-4k.jpg 3840w" sizes="100vw" alt="Airport departures board" style="object-position:center 50%">
+    <img data-src="images/hero/flights-rwandair-hd.jpg" data-srcset="images/hero/flights-rwandair-hd.jpg 1920w, images/hero/flights-rwandair-4k.jpg 3840w" sizes="100vw" alt="RwandAir Airbus at the gate" style="object-position:center 55%">
+    <img data-src="images/hero/flights-window-view-hd.jpg" data-srcset="images/hero/flights-window-view-hd.jpg 1920w, images/hero/flights-window-view-4k.jpg 3840w" sizes="100vw" alt="Traveller looking out of the plane window" style="object-position:center 50%">
+  </div>
+  <div class="wrap">
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i class="fa-solid fa-chevron-right"></i><span>Flights</span></nav>
+    <h1>Flights to East Africa</h1>
+    <p>From Europe's major cities, and between Nairobi, Kilimanjaro, Entebbe, Kigali and Zanzibar.</p>
+    <div class="hero-ctas" style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap;">
+      <a class="btn" href="#request">Request flights</a>
+      <a class="btn" href="#visas">Visas &amp; passports</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ROUTES ================= -->
+<section id="routes">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Getting here &amp; around</div>
+        <h2>Flights to and around East Africa</h2>
+      </div>
+    </div>
+
+    <!-- Flight search -->
+    <form class="fs-form" id="flightSearch" novalidate>
+      <div class="fs-trip">
+        <button type="button" class="on" data-trip="return">Round trip</button>
+        <button type="button" data-trip="oneway">One way</button>
+      </div>
+      <div class="fs-row">
+        <label class="fs-field fs-place"><span>From</span><select id="fsFrom" translate="no"></select></label>
+        <button type="button" class="fs-swap" id="fsSwap" aria-label="Swap"><i class="fa-solid fa-right-left"></i></button>
+        <label class="fs-field fs-place"><span>To</span><select id="fsTo" translate="no"></select></label>
+        <label class="fs-field"><span>Depart</span><input type="date" id="fsDepart"></label>
+        <label class="fs-field"><span>Return</span><input type="date" id="fsReturn"></label>
+        <div class="fs-field fs-pax">
+          <span>Travellers &amp; class</span>
+          <button type="button" class="fs-pax-btn" id="fsPaxBtn"><i class="fa-solid fa-user"></i> <b id="fsPaxLabel"></b></button>
+          <div class="fs-pax-panel" id="fsPaxPanel" hidden>
+            <div class="fs-pax-row"><div><b>Adults</b><small>Age 12+</small></div><div class="stepper"><button type="button" data-pax="adults" data-d="-1" aria-label="Fewer adults"><i class="fa-solid fa-minus"></i></button><output id="fs-adults">1</output><button type="button" data-pax="adults" data-d="1" aria-label="More adults"><i class="fa-solid fa-plus"></i></button></div></div>
+            <div class="fs-pax-row"><div><b>Children</b><small>Age 2 to 11</small></div><div class="stepper"><button type="button" data-pax="children" data-d="-1" aria-label="Fewer children"><i class="fa-solid fa-minus"></i></button><output id="fs-children">0</output><button type="button" data-pax="children" data-d="1" aria-label="More children"><i class="fa-solid fa-plus"></i></button></div></div>
+            <label class="fs-cabin"><span>Cabin</span><select id="fsCabin"><option value="economy">Economy</option><option value="premium">Premium economy</option><option value="business">Business</option><option value="first">First</option></select></label>
+          </div>
+        </div>
+        <button class="btn fs-go" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+      </div>
+    </form>
+
+    <!-- Results -->
+    <div class="fs-results" id="fsResults" hidden>
+      <div class="fs-summary" id="fsSummary"></div>
+      <div class="fs-dates" id="fsDates"></div>
+      <div class="fs-body">
+        <aside class="fs-filters" id="fsFilters">
+          <h4>Stops</h4>
+          <label><input type="checkbox" name="fsStops" value="0" checked> Direct</label>
+          <label><input type="checkbox" name="fsStops" value="1" checked> 1 stop</label>
+          <h4>Airlines</h4>
+          <div id="fsAirlines"></div>
+          <h4>Departure time</h4>
+          <label><input type="checkbox" name="fsTime" value="morning" checked> Morning (before 12:00)</label>
+          <label><input type="checkbox" name="fsTime" value="afternoon" checked> Afternoon (12:00 to 18:00)</label>
+          <label><input type="checkbox" name="fsTime" value="evening" checked> Evening (after 18:00)</label>
+        </aside>
+        <div class="fs-main">
+          <div class="fs-sort">
+            <button type="button" class="on" data-sort="best"><b>Best</b><span id="fsSortBest" data-usd=""></span></button>
+            <button type="button" data-sort="cheapest"><b>Cheapest</b><span id="fsSortCheap" data-usd=""></span></button>
+            <button type="button" data-sort="fastest"><b>Fastest</b><span id="fsSortFast" translate="no"></span></button>
+          </div>
+          <div class="fs-count" id="fsCount"></div>
+          <div class="fs-list" id="fsList"></div>
+          <p class="fs-note"><i class="fa-solid fa-circle-info"></i> Typical schedules and estimated fares. A planner confirms live seats and the final price before you pay.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="fs-popular">Popular routes</h3>
+    <div class="tabs" id="routeTabs">
+      <button class="tab active" data-route="">All routes</button>
+      <button class="tab" data-route="europe">From Europe</button>
+      <button class="tab" data-route="regional">Within East Africa</button>
+    </div>
+    <div class="fl-list" id="routeGrid" data-flights></div>
+  </div>
+</section>
+
+<!-- ================= REQUEST FORM ================= -->
+<!-- ================= VISAS & PASSPORTS ================= -->
+<section class="pt-0" id="visas">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow"><i class="fa-solid fa-passport"></i> Before you fly</div>
+        <h2>Visas &amp; passports</h2>
+      </div>
+    </div>
+    <div class="visa-grid">
+      <a class="visa-card" href="https://evisa.go.ke/" target="_blank" rel="noopener">
+        <span class="visa-flag" translate="no">KE</span><b>Kenya</b><span>eTA online before you travel</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </a>
+      <a class="visa-card" href="https://visa.immigration.go.tz/" target="_blank" rel="noopener">
+        <span class="visa-flag" translate="no">TZ</span><b>Tanzania &amp; Zanzibar</b><span>eVisa online</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </a>
+      <a class="visa-card" href="https://visas.immigration.go.ug/" target="_blank" rel="noopener">
+        <span class="visa-flag" translate="no">UG</span><b>Uganda</b><span>eVisa online</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </a>
+      <a class="visa-card" href="https://irembo.gov.rw/" target="_blank" rel="noopener">
+        <span class="visa-flag" translate="no">RW</span><b>Rwanda</b><span>Apply on Irembo</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </a>
+    </div>
+    <div class="visa-tips">
+      <div class="visa-eatv"><i class="fa-solid fa-stamp"></i><div><b>East Africa Tourist Visa</b><span>Kenya + Uganda + Rwanda on one visa · <b data-usd="100"></b> · 90 days</span></div></div>
+      <ul>
+        <li><i class="fa-solid fa-passport"></i> Passport valid 6+ months, 2 blank pages</li>
+        <li><i class="fa-solid fa-syringe"></i> Yellow fever card may be asked for</li>
+        <li><i class="fa-solid fa-circle-check"></i> We check your entry rules when we book</li>
+      </ul>
+    </div>
+    <p class="photo-credit" translate="no">Header photos via Wikimedia Commons: Alan Wilson (CC BY-SA 2.0), Mike Peel (CC BY-SA 4.0); Unsplash contributors Alex Robert, Brian Gaid, Matthew Smith, Tim Gouw (CC0).</p>
+  </div>
+</section>
+
+<section class="bg-cream" id="request">
+  <div class="wrap contact-wrap">
+    <div class="contact-panel" style="background:#fff;">
+      <div class="eyebrow">Flight request</div>
+      <h2>Let us book your flights</h2>
+      <p>Send us your route and dates and a planner will reply within 24 hours with options and prices. There's no booking fee when flights are added to a safari.</p>
+      <div class="contact-meta">
+        <a class="contact-meta-item" href="https://wa.me/254700123456" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i><div><strong>WhatsApp</strong><span>Quick questions about flights</span></div></a>
+        <a class="contact-meta-item" href="tel:+254700123456"><i class="fa-solid fa-phone"></i><div><strong>Call us</strong><span>+254 700 123 456</span></div></a>
+      </div>
+    </div>
+    <div class="contact-form-card">
+      <form data-mailto="Flight request" novalidate>
+        <div class="contact-form">
+          <div class="form-field"><label for="fName">Full name</label><input id="fName" name="Name" type="text" required></div>
+          <div class="form-field"><label for="fEmail">Email address</label><input id="fEmail" name="Email" type="email" required></div>
+          <div class="form-field full">
+            <label for="fType">What do you need?</label>
+            <select id="fType" name="Flight type">
+              <option>International (from Europe)</option><option>Regional (within East Africa)</option><option>Both</option>
+            </select>
+          </div>
+          <div class="form-field"><label for="fRoute">Route</label><input id="fRoute" name="Route" type="text" placeholder="e.g. Paris → Nairobi" required></div>
+          <div class="form-field"><label for="fDate">Travel date</label><input id="fDate" name="Date" type="date"></div>
+          <div class="form-field"><label for="fPax">Travellers</label><select id="fPax" name="Travellers"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5+</option></select></div>
+          <div class="form-field"><label for="fFrom">Flying in from</label><input id="fFrom" name="Flying in from" type="text" placeholder="e.g. New York, London"></div>
+          <div class="form-field full"><label for="fNotes">Anything else?</label><textarea id="fNotes" name="Notes" rows="3" placeholder="Return flight, extra luggage, connecting safari…"></textarea></div>
+        </div>
+        <div class="form-foot">
+          <small><i class="fa-solid fa-lock"></i> We never share your details.</small>
+          <button class="btn" type="submit">Send flight request <i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        <div class="contact-status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/content.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script src="js/assistant.js"></script>
+<script src="js/pages.js"></script>
+<script src="js/flights.js"></script>
+</body>
+</html>

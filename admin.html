@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin | SafariNomad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="adm-body">
+
+<!-- Sign in -->
+<div class="adm-login" id="login">
+  <form class="adm-login-card" id="loginForm">
+    <a class="adm-logo" href="index.html"><i class="fa-solid fa-paw"></i> SafariNomad</a>
+    <h1>Admin sign in</h1>
+    <p>Bookings, enquiries, and the packages, prices and deals on the website.</p>
+    <label for="pw">Password</label>
+    <div class="adm-pw"><input id="pw" type="password" autocomplete="current-password" required autofocus><button type="button" id="pwShow" aria-label="Show password"><i class="fa-regular fa-eye"></i></button></div>
+    <div class="adm-caps" id="capsWarn" hidden><i class="fa-solid fa-triangle-exclamation"></i> Caps Lock is on</div>
+    <button class="btn" type="submit">Sign in <i class="fa-solid fa-arrow-right"></i></button>
+    <div class="adm-err" id="loginErr"></div>
+    <small class="adm-tip"><i class="fa-solid fa-circle-info"></i> The password is shown in the server window when it starts, and saved in <code>server/data/admin-password.txt</code>.</small>
+  </form>
+</div>
+
+<!-- Dashboard -->
+<div class="adm" id="app" hidden>
+  <aside class="adm-side">
+    <a class="adm-logo" href="index.html" target="_blank"><i class="fa-solid fa-paw"></i> SafariNomad</a>
+    <nav class="adm-nav" id="nav">
+      <button data-view="overview" class="on"><i class="fa-solid fa-gauge"></i> Overview</button>
+      <button data-view="bookings"><i class="fa-solid fa-calendar-check"></i> Bookings <b id="cntBookings"></b></button>
+      <button data-view="departures"><i class="fa-solid fa-van-shuttle"></i> Departures</button>
+      <button data-view="enquiries"><i class="fa-solid fa-envelope-open-text"></i> Enquiries <b id="cntEnquiries"></b></button>
+      <button data-view="questions"><i class="fa-solid fa-comments"></i> Chat questions <b id="cntQuestions"></b></button>
+      <span class="adm-nav-label">Website content</span>
+      <button data-view="packages"><i class="fa-solid fa-suitcase-rolling"></i> Packages</button>
+      <button data-view="flash"><i class="fa-solid fa-bolt"></i> Flash sales</button>
+      <button data-view="lastminute"><i class="fa-solid fa-hourglass-half"></i> Last-minute deals</button>
+      <button data-view="flights"><i class="fa-solid fa-plane"></i> Flights</button>
+    </nav>
+    <div class="adm-side-foot">
+      <span id="updated"></span>
+      <button id="logout"><i class="fa-solid fa-right-from-bracket"></i> Sign out</button>
+    </div>
+  </aside>
+
+  <main class="adm-main">
+    <header class="adm-top">
+      <div><h1 id="viewTitle">Overview</h1><p id="viewSub"></p></div>
+      <div class="adm-top-actions">
+        <div class="adm-search"><i class="fa-solid fa-magnifying-glass"></i><input id="search" type="search" placeholder="Search names, emails, trips, refs…"></div>
+        <button class="adm-btn" id="refresh" title="Refresh"><i class="fa-solid fa-rotate"></i></button>
+        <button class="adm-btn" id="export" title="Download as CSV"><i class="fa-solid fa-file-arrow-down"></i> CSV</button>
+      </div>
+    </header>
+    <div class="adm-filters" id="filters"></div>
+    <section id="view"></section>
+  </main>
+</div>
+
+<!-- Detail panel -->
+<div class="adm-drawer-bg" id="drawerBg"></div>
+<aside class="adm-drawer" id="drawer" aria-hidden="true">
+  <button class="adm-drawer-x" id="drawerX" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+  <div id="drawerBody"></div>
+</aside>
+
+<div class="adm-toast" id="toast"></div>
+
+<script src="js/admin-content.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

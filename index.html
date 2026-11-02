@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafariNomad | Small-Group Safaris &amp; Tailor-Made Tours in East Africa</title>
+<meta name="description" content="Small-group safaris, gorilla treks and tailor-made journeys across Kenya, Tanzania, Uganda and Rwanda, led by expert local guides. Flexible booking from a $250 deposit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/home.css">
+</head>
+<body data-page="home">
+
+<div id="site-header"></div>
+
+<main>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="hero-bg">
+    <!-- 4K photo slideshow (js/home.js): each photo fades in with a slow zoom; 1920px or 3840px picked by screen -->
+    <div class="hero-slide on" data-place="Mara River, Kenya"><img src="images/hero/hero-mara-crossing-hd.jpg" srcset="images/hero/hero-mara-crossing-hd.jpg 1920w, images/hero/hero-mara-crossing-4k.jpg 3840w" sizes="100vw" alt="Wildebeest crossing the Mara River" fetchpriority="high" style="object-position:center 55%"></div>
+    <div class="hero-slide" data-place="Amboseli, Kenya"><img data-src="images/hero/hero-amboseli-kilimanjaro-hd.jpg" data-srcset="images/hero/hero-amboseli-kilimanjaro-hd.jpg 1920w, images/hero/hero-amboseli-kilimanjaro-4k.jpg 3840w" sizes="100vw" alt="Elephants below Mount Kilimanjaro in Amboseli" style="object-position:center 45%"></div>
+    <div class="hero-slide" data-place="Maasai Mara, Kenya"><img data-src="images/hero/hero-lion-family-hd.jpg" data-srcset="images/hero/hero-lion-family-hd.jpg 1920w, images/hero/hero-lion-family-4k.jpg 3840w" sizes="100vw" alt="A lion family resting in the Maasai Mara" style="object-position:center 35%"></div>
+    <div class="hero-slide" data-place="Serengeti, Tanzania"><img data-src="images/hero/hero-serengeti-giraffe-hd.jpg" data-srcset="images/hero/hero-serengeti-giraffe-hd.jpg 1920w, images/hero/hero-serengeti-giraffe-4k.jpg 3840w" sizes="100vw" alt="Masai giraffe on the Serengeti plains" style="object-position:60% 40%"></div>
+    <div class="hero-slide" data-place="Bwindi, Uganda"><img data-src="images/hero/hero-bwindi-gorilla-hd.jpg" data-srcset="images/hero/hero-bwindi-gorilla-hd.jpg 1920w, images/hero/hero-bwindi-gorilla-4k.jpg 3840w" sizes="100vw" alt="Mountain gorilla in Bwindi Impenetrable Forest" style="object-position:65% 35%"></div>
+    <div class="hero-slide" data-place="Serengeti, Tanzania"><img data-src="images/hero/hero-serengeti-leopard-hd.jpg" data-srcset="images/hero/hero-serengeti-leopard-hd.jpg 1920w, images/hero/hero-serengeti-leopard-4k.jpg 3840w" sizes="100vw" alt="Young leopard resting in a tree" style="object-position:60% 40%"></div>
+    <div class="hero-slide" data-place="Zanzibar, Tanzania"><img data-src="images/hero/hero-zanzibar-dhow-hd.jpg" data-srcset="images/hero/hero-zanzibar-dhow-hd.jpg 1920w, images/hero/hero-zanzibar-dhow-4k.jpg 3840w" sizes="100vw" alt="Traditional dhow on the Zanzibar shore" style="object-position:center 60%"></div>
+  </div>
+  <div class="hero-controls" id="heroControls">
+    <span class="hero-place" id="heroPlace" translate="no"><i class="fa-solid fa-location-dot"></i> <span>Mara River, Kenya</span></span>
+    <div class="hero-dots" id="heroDots" translate="no"></div>
+    <button type="button" class="hero-pause" id="heroPause" aria-label="Pause slideshow"><i class="fa-solid fa-pause"></i></button>
+  </div>
+  <div class="wrap hero-content">
+    <h1>Wild East Africa, <em>up close</em></h1>
+    <div class="hero-ctas">
+      <a class="btn" href="trips.html"><span>Find Your Safari</span> <i class="fa-solid fa-arrow-right"></i></a>
+      <a class="btn btn-ghost" href="services.html#flash-deals">Flash deals</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SEARCH ================= -->
+<div class="wrap search-widget" id="search">
+  <div class="search-card" role="search">
+    <div class="search-field">
+      <button class="sf-btn" type="button" aria-expanded="false">
+        <label>Where to?</label>
+        <div class="val"><i class="fa-solid fa-location-dot lead"></i><span class="txt" id="destVal">Anywhere in East Africa</span><i class="fa-solid fa-chevron-down chev"></i></div>
+      </button>
+      <div class="sf-drop dest-drop">
+        <div class="top">
+          <button class="sf-opt selected" data-set="country" data-value="" data-label="Anywhere in East Africa">Anywhere</button>
+          <button class="sf-opt" data-set="country" data-value="multi" data-label="Multi-country">Multi-country</button>
+        </div>
+        <div>
+          <div class="fd-title">Kenya</div>
+          <button class="sf-opt" data-set="country" data-value="kenya" data-label="Kenya"><i class="fa-solid fa-flag"></i> All Kenya</button>
+          <button class="sf-opt" data-set="country" data-value="kenya" data-label="Maasai Mara"><i class="fa-solid fa-paw"></i> Maasai Mara</button>
+          <button class="sf-opt" data-set="country" data-value="kenya" data-label="Amboseli"><i class="fa-solid fa-paw"></i> Amboseli</button>
+          <button class="sf-opt" data-set="country" data-value="kenya" data-label="Lake Nakuru"><i class="fa-solid fa-water"></i> Lake Nakuru</button>
+        </div>
+        <div>
+          <div class="fd-title">Tanzania</div>
+          <button class="sf-opt" data-set="country" data-value="tanzania" data-label="Tanzania"><i class="fa-solid fa-flag"></i> All Tanzania</button>
+          <button class="sf-opt" data-set="country" data-value="tanzania" data-label="Serengeti"><i class="fa-solid fa-mound"></i> Serengeti</button>
+          <button class="sf-opt" data-set="country" data-value="tanzania" data-label="Zanzibar"><i class="fa-solid fa-umbrella-beach"></i> Zanzibar</button>
+          <button class="sf-opt" data-set="country" data-value="tanzania" data-label="Kilimanjaro"><i class="fa-solid fa-mountain"></i> Kilimanjaro</button>
+        </div>
+        <div>
+          <div class="fd-title">Uganda</div>
+          <button class="sf-opt" data-set="country" data-value="uganda" data-label="Uganda"><i class="fa-solid fa-flag"></i> All Uganda</button>
+          <button class="sf-opt" data-set="country" data-value="uganda" data-label="Bwindi Forest"><i class="fa-solid fa-tree"></i> Bwindi Forest</button>
+          <button class="sf-opt" data-set="country" data-value="uganda" data-label="Queen Elizabeth NP"><i class="fa-solid fa-paw"></i> Queen Elizabeth</button>
+          <button class="sf-opt" data-set="country" data-value="uganda" data-label="Kibale Forest"><i class="fa-solid fa-tree"></i> Kibale Forest</button>
+        </div>
+        <div>
+          <div class="fd-title">Rwanda</div>
+          <button class="sf-opt" data-set="country" data-value="rwanda" data-label="Rwanda"><i class="fa-solid fa-flag"></i> All Rwanda</button>
+          <button class="sf-opt" data-set="country" data-value="rwanda" data-label="Volcanoes NP"><i class="fa-solid fa-mountain"></i> Volcanoes NP</button>
+          <button class="sf-opt" data-set="country" data-value="rwanda" data-label="Lake Kivu"><i class="fa-solid fa-water"></i> Lake Kivu</button>
+          <button class="sf-opt" data-set="country" data-value="rwanda" data-label="Nyungwe Forest"><i class="fa-solid fa-tree"></i> Nyungwe</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-field">
+      <button class="sf-btn" type="button" aria-expanded="false">
+        <label>When?</label>
+        <div class="val"><i class="fa-regular fa-calendar lead"></i><span class="txt" id="dateVal">Anytime</span><i class="fa-solid fa-chevron-down chev"></i></div>
+      </button>
+      <div class="sf-drop month-drop">
+        <div class="mg-years" id="monthYears" translate="no"></div>
+        <div class="month-grid" id="monthGrid"></div>
+        <div class="md-foot">
+          <button type="button" class="md-any" id="monthAny">Any time</button>
+          <button type="button" class="btn btn-sm" id="monthDone">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-field">
+      <button class="sf-btn" type="button" aria-expanded="false">
+        <label>How long for?</label>
+        <div class="val"><i class="fa-regular fa-clock lead"></i><span class="txt" id="lenVal">Any duration</span><i class="fa-solid fa-chevron-down chev"></i></div>
+      </button>
+      <div class="sf-drop">
+        <button class="sf-opt selected" data-set="len" data-value="" data-label="Any duration"><i class="fa-solid fa-infinity"></i> Any duration</button>
+        <button class="sf-opt" data-set="len" data-value="2-6" data-label="2 to 6 days"><i class="fa-regular fa-clock"></i> 2 to 6 days <span class="sub" data-len-count="2-6"></span></button>
+        <button class="sf-opt" data-set="len" data-value="7-10" data-label="7 to 10 days"><i class="fa-regular fa-clock"></i> 7 to 10 days <span class="sub" data-len-count="7-10"></span></button>
+        <button class="sf-opt" data-set="len" data-value="11-14" data-label="11 to 14 days"><i class="fa-regular fa-clock"></i> 11 to 14 days <span class="sub" data-len-count="11-14"></span></button>
+        <button class="sf-opt" data-set="len" data-value="15+" data-label="15+ days"><i class="fa-regular fa-clock"></i> 15+ days <span class="sub" data-len-count="15+"></span></button>
+      </div>
+    </div>
+
+    <div class="search-field">
+      <button class="sf-btn" type="button" aria-expanded="false">
+        <label>Who's going?</label>
+        <div class="val"><i class="fa-solid fa-user-group lead"></i><span class="txt" id="paxVal">2 adults</span><i class="fa-solid fa-chevron-down chev"></i></div>
+      </button>
+      <div class="sf-drop pax-drop">
+        <div class="pax-row">
+          <div><strong>Adults</strong><small>Age 16+</small></div>
+          <div class="stepper" data-pax="adults"><button type="button" data-step="-1" aria-label="Fewer adults"><i class="fa-solid fa-minus"></i></button><output>2</output><button type="button" data-step="1" aria-label="More adults"><i class="fa-solid fa-plus"></i></button></div>
+        </div>
+        <div class="pax-row">
+          <div><strong>Children</strong><small>Age 5–15</small></div>
+          <div class="stepper" data-pax="children"><button type="button" data-step="-1" aria-label="Fewer children"><i class="fa-solid fa-minus"></i></button><output>0</output><button type="button" data-step="1" aria-label="More children"><i class="fa-solid fa-plus"></i></button></div>
+        </div>
+        <div class="pax-row">
+          <div><strong>Rooms</strong><small>Tents or lodge rooms</small></div>
+          <div class="stepper" data-pax="rooms"><button type="button" data-step="-1" aria-label="Fewer rooms"><i class="fa-solid fa-minus"></i></button><output>1</output><button type="button" data-step="1" aria-label="More rooms"><i class="fa-solid fa-plus"></i></button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-go">
+      <button class="btn" id="searchBtn" type="button"><i class="fa-solid fa-magnifying-glass"></i> <span>Search Trips</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TRUST STRIP ================= -->
+<div class="wrap trust-strip" id="trustStrip">
+  <div><i class="fa-solid fa-star"></i><span><b data-trust="rating" translate="no"></b> · <b data-trust="reviews" translate="no"></b> reviews</span></div>
+  <div><i class="fa-solid fa-lock"></i><span>Only <b data-usd="250"></b> deposit</span></div>
+  <div><i class="fa-regular fa-calendar-check"></i><span>Free date changes</span></div>
+  <div><i class="fa-solid fa-location-dot"></i><span>Local experts in Nairobi</span></div>
+</div>
+
+<!-- ================= PICK UP WHERE YOU LEFT OFF (returning visitors only) ================= -->
+<section class="pt-0 recent-sec" id="recentSec" hidden>
+  <div class="wrap">
+    <div class="sec-head"><div><h2>Pick up where you left off</h2></div></div>
+    <div class="carousel" id="recentRow"></div>
+  </div>
+</section>
+
+<!-- ================= FLASH DEALS (admin flash sales + last-minute departures) ================= -->
+<section class="pt-0 deals-sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow"><i class="fa-solid fa-bolt"></i> Flash deals</div>
+        <h2>Save before they're gone</h2>
+      </div>
+      <div class="sec-actions"><span class="deal-clock" id="dealClock" hidden></span><a class="link-arrow" href="services.html#flash-deals">All deals <i class="fa-solid fa-arrow-right"></i></a></div>
+    </div>
+    <div class="card-grid cols-3" id="lastMinuteGrid"></div>
+  </div>
+</section>
+
+<!-- ================= FEATURED TRIPS (cards come from js/data.js) ================= -->
+<section class="pt-0" id="trips">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Most-loved safaris</h2>
+      </div>
+      <div class="car-nav">
+        <button class="car-btn" data-car="tripCarousel" data-dir="-1" aria-label="Previous trips"><i class="fa-solid fa-arrow-left"></i></button>
+        <button class="car-btn" data-car="tripCarousel" data-dir="1" aria-label="Next trips"><i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+    <div class="tabs" id="tripTabs">
+      <button class="tab active" data-country="">All trips</button>
+      <button class="tab" data-country="kenya">Kenya</button>
+      <button class="tab" data-country="tanzania">Tanzania</button>
+      <button class="tab" data-country="uganda">Uganda</button>
+      <button class="tab" data-country="rwanda">Rwanda</button>
+      <button class="tab" data-country="multi">Multi-country</button>
+    </div>
+    <div class="carousel" id="tripCarousel"></div>
+    <div class="empty-state" id="emptyState">
+      <p><strong>No featured trips here yet</strong>, but we can build one for you.</p>
+      <a class="btn" href="contact.html" style="margin-top:14px;">Plan a tailor-made trip</a>
+    </div>
+    <div style="margin-top:18px;"><a class="link-arrow" id="tripsAll" href="trips.html">See all trips <i class="fa-solid fa-arrow-right"></i></a></div>
+  </div>
+</section>
+
+<!-- ================= DESTINATIONS ================= -->
+<section class="pt-0">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Where to go</h2>
+      </div>
+      <a class="link-arrow" href="destinations.html">Destination guides <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="dest-grid">
+      <a class="dest-tile tall" href="destinations.html#kenya">
+        <img src="images/rhino-and-calf.jpg" alt="Rhino and calf in Kenya" loading="lazy">
+        <span class="chip tag">Most popular</span>
+        <h3>Kenya</h3>
+        <div class="info"><span data-count-country="kenya"></span><i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+      <a class="dest-tile wide" href="destinations.html#tanzania">
+        <img src="images/serengeti-acacia.jpg" alt="Lone acacia in the Serengeti at dusk" loading="lazy">
+        <h3>Tanzania</h3>
+        <div class="info"><span data-count-country="tanzania"></span><i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+      <a class="dest-tile" href="destinations.html#uganda">
+        <img src="images/forest-elephant.jpg" alt="Forest elephant among trees in Uganda" loading="lazy">
+        <h3>Uganda</h3>
+        <div class="info"><span data-count-country="uganda"></span><i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+      <a class="dest-tile" href="destinations.html#rwanda">
+        <img src="images/hiker-summit.jpg" alt="Hiker on a misty hilltop" loading="lazy">
+        <h3>Rwanda</h3>
+        <div class="info"><span data-count-country="rwanda"></span><i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+      <a class="dest-tile" href="trips.html?style=beach">
+        <img src="images/resort-pool.jpg" alt="Tropical resort pool surrounded by palms" loading="lazy">
+        <span class="chip tag">Safari + beach</span>
+        <h3>Zanzibar &amp; the Coast</h3>
+        <div class="info"><span data-count-style="beach"></span><i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+      <a class="dest-tile" href="trips.html?style=trek">
+        <img src="images/kilimanjaro.jpg" alt="Mount Kilimanjaro rising above the clouds" loading="lazy">
+        <h3>Mount Kilimanjaro</h3>
+        <div class="info"><span>5,895 m · 2 routes</span><i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="pt-0">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Explore by landscape</h2>
+      </div>
+    </div>
+    <div class="land-grid" data-lands></div>
+  </div>
+</section>
+
+<section class="pt-0">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Kenya safaris &amp; tours</h2>
+      </div>
+      <div class="sec-actions"><a class="link-arrow" href="trips.html?country=kenya">See Kenya trips <i class="fa-solid fa-arrow-right"></i></a><div class="car-nav"><button class="car-btn" data-car="rowKenya" data-dir="-1" aria-label="Previous trips"><i class="fa-solid fa-arrow-left"></i></button><button class="car-btn" data-car="rowKenya" data-dir="1" aria-label="Next trips"><i class="fa-solid fa-arrow-right"></i></button></div></div>
+    </div>
+    <div class="carousel" id="rowKenya" data-pack-country="kenya"></div>
+  </div>
+</section>
+
+<section class="pt-0">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Serengeti, Kilimanjaro &amp; Zanzibar</h2>
+      </div>
+      <div class="sec-actions"><a class="link-arrow" href="trips.html?country=tanzania">See Tanzania trips <i class="fa-solid fa-arrow-right"></i></a><div class="car-nav"><button class="car-btn" data-car="rowTanzania" data-dir="-1" aria-label="Previous trips"><i class="fa-solid fa-arrow-left"></i></button><button class="car-btn" data-car="rowTanzania" data-dir="1" aria-label="Next trips"><i class="fa-solid fa-arrow-right"></i></button></div></div>
+    </div>
+    <div class="carousel" id="rowTanzania" data-pack-country="tanzania"></div>
+  </div>
+</section>
+
+<section class="pt-0">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Gorilla trekking</h2>
+      </div>
+      <div class="sec-actions"><a class="link-arrow" href="trips.html?style=gorilla">See all trips <i class="fa-solid fa-arrow-right"></i></a><div class="car-nav"><button class="car-btn" data-car="rowGorilla" data-dir="-1" aria-label="Previous trips"><i class="fa-solid fa-arrow-left"></i></button><button class="car-btn" data-car="rowGorilla" data-dir="1" aria-label="Next trips"><i class="fa-solid fa-arrow-right"></i></button></div></div>
+    </div>
+    <div class="carousel" id="rowGorilla" data-pack-style="gorilla"></div>
+  </div>
+</section>
+
+<section class="pt-0">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>Safari &amp; beach combos</h2>
+      </div>
+      <div class="sec-actions"><a class="link-arrow" href="trips.html?style=beach">See all trips <i class="fa-solid fa-arrow-right"></i></a><div class="car-nav"><button class="car-btn" data-car="rowBeach" data-dir="-1" aria-label="Previous trips"><i class="fa-solid fa-arrow-left"></i></button><button class="car-btn" data-car="rowBeach" data-dir="1" aria-label="Next trips"><i class="fa-solid fa-arrow-right"></i></button></div></div>
+    </div>
+    <div class="carousel" id="rowBeach" data-pack-style="beach"></div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="pt-0">
+  <div class="wrap">
+    <div class="cta-band">
+      <div>
+        <h2>Ready to start planning?</h2>
+        <p>Free tailored itinerary within 24 hours.</p>
+      </div>
+      <div class="actions">
+        <a class="btn" href="contact.html">Request a free quote</a>
+        <a class="btn btn-ghost" href="https://wa.me/254700123456" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <p class="wrap media-credit" translate="no">Hero photos via Wikimedia Commons: Charles J. Sharp (CC BY-SA 4.0), Ninaras (CC BY 4.0), Benh LIEU SONG (CC BY-SA 3.0), Giles Laurent (CC BY-SA 4.0), Diego Delso (CC BY-SA 4.0), Natalie Carberi (CC BY-SA 4.0).</p>
+</main>
+
+<!-- ================= "Get flash deals first" (slides in once, dismissible) ================= -->
+<aside class="deal-pop" id="dealPop" aria-label="Flash deal alerts" hidden>
+  <button type="button" class="deal-pop-x" id="dealPopX" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+  <div class="deal-pop-icon"><i class="fa-solid fa-bolt"></i></div>
+  <h3>Get flash deals first</h3>
+  <p>Seats on our best departures sell out fast. Hear about them before anyone else.</p>
+  <form id="dealPopForm" novalidate>
+    <input type="email" id="dealPopEmail" placeholder="Your email" aria-label="Your email" autocomplete="email" required>
+    <button class="btn btn-sm" type="submit">Notify me</button>
+  </form>
+  <small class="deal-pop-msg" id="dealPopMsg" aria-live="polite"></small>
+</aside>
+
+<div id="site-footer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/content.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script src="js/assistant.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>

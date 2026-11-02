@@ -1,0 +1,7 @@
+node_modules/
+
+# Runtime data and secrets — never commit
+server/data/admin-password.txt
+server/data/*.json
+.env
+.env.*

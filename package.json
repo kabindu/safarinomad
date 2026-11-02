@@ -1,0 +1,16 @@
+{
+  "name": "safarinomad",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SafariNomad website with an AI safari assistant",
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.132.1"
+  }
+}
