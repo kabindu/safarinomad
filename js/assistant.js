@@ -285,4 +285,10 @@
 
   // Re-open the AI view if the visitor was chatting on the previous page
   try{ if(sessionStorage.getItem('nomadOpen') === '1'){ chat.classList.add('open'); openAI(); } }catch(e){}
+
+  // Closing the chat panel any way (X, Escape, clicking outside, the launcher) forgets that the visitor
+  // was chatting, so the chat stays closed on the next pages until they open it again
+  new MutationObserver(() => {
+    if(!chat.classList.contains('open')){ try{ sessionStorage.removeItem('nomadOpen'); }catch(e){} }
+  }).observe(chat, { attributes:true, attributeFilter:['class'] });
 })();
