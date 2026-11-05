@@ -96,7 +96,7 @@
     if(s.saved) bits.push('Saved trips');
     if(s.q) bits.unshift(`"${s.q.replace(/[<>&]/g, '')}"`);
     $('#resultCount').innerHTML = `Showing <b>${list.length}</b> of ${TRIPS.length} trips` + (bits.length ? ` for <b>${bits.join(' · ')}</b>` : '');
-    $('#pageTitle').textContent = s.saved ? 'Your saved trips' : s.country ? `${COUNTRY_NAMES[s.country]} safaris & tours` : 'Find your safari';
+    $('#pageTitle').textContent = s.saved ? 'Your saved trips' : s.country === 'world' ? 'Holidays beyond Africa' : s.country ? `${COUNTRY_NAMES[s.country]} packages` : 'All packages';
     $('#maxPriceLabel').innerHTML = s.max >= maxPriceAll ? 'Any price' : `Up to <b data-usd="${s.max}"></b>`;
 
     // Keep the URL in sync so the page can be bookmarked or shared

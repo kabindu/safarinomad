@@ -5,7 +5,8 @@
 
 /* ---------- Trips finder ---------- */
 .finder{display:grid;grid-template-columns:270px 1fr;gap:36px;align-items:start;}
-.filters{position:sticky;top:96px;border-radius:var(--box-radius);padding:18px;background:var(--box-bg);}
+/* Sticky beside the results, but never taller than the screen: it scrolls on its own */
+.filters{position:sticky;top:96px;max-height:calc(100vh - 112px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;border-radius:var(--box-radius);padding:18px;background:var(--box-bg);}
 .filters h3{font-family:var(--font-body);font-weight:800;font-size:16px;display:flex;justify-content:space-between;align-items:center;}
 .filters h3 button{background:none;border:none;color:var(--orange-dark);font-weight:700;font-size:13px;cursor:pointer;}
 .filter-group{padding:14px 0;border-bottom:1px solid #dcdcdc;}
@@ -186,65 +187,16 @@
 .fs-summary{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:12px;}
 .fs-summary b{font-size:20px;}
 .fs-summary span{color:var(--yt-muted);font-size:14px;}
-.fs-dates{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:18px;}
-.fs-day{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border:none;border-radius:10px;background:var(--box-bg);font:inherit;font-size:12.5px;color:var(--yt-muted);cursor:pointer;}
-.fs-day b{font-size:15px;color:var(--yt-text);}
-.fs-day.on{background:var(--yt-text);color:#ddd;}
-.fs-day.on b{color:#fff;}
-.fs-body{display:grid;grid-template-columns:230px minmax(0,1fr);gap:22px;align-items:start;}
-.fs-filters{background:var(--box-bg);border-radius:var(--box-radius);padding:16px;display:grid;gap:8px;font-size:14px;}
-.fs-filters h4{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--yt-muted);margin-top:8px;}
-.fs-filters h4:first-child{margin-top:0;}
-.fs-filters label{display:flex;align-items:center;gap:8px;cursor:pointer;}
-.fs-filters input{accent-color:var(--orange);width:16px;height:16px;}
-#fsAirlines{display:grid;gap:8px;}
-.fs-sort{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--yt-line);border-radius:10px;overflow:hidden;}
-.fs-sort button{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border:none;background:#fff;font:inherit;text-align:left;cursor:pointer;border-bottom:3px solid transparent;}
-.fs-sort button + button{border-left:1px solid var(--yt-line);}
-.fs-sort b{font-size:14.5px;}
-.fs-sort span{font-size:13px;color:var(--yt-muted);}
-.fs-sort button.on{border-bottom-color:var(--orange);background:#F5F9FF;}
-.fs-count{font-size:13px;color:var(--yt-muted);margin:12px 0 8px;}
-.fs-list{display:grid;gap:10px;}
-.fs-card{display:grid;grid-template-columns:minmax(0,1fr) 150px;background:#fff;border:1px solid var(--yt-line);border-radius:12px;overflow:hidden;transition:box-shadow .15s;}
-.fs-card:hover{box-shadow:0 10px 26px -14px rgba(0,0,0,.3);}
-.fs-legs{padding:6px 18px;display:grid;}
-.fs-leg{display:grid;grid-template-columns:40px 64px minmax(0,1fr) 64px 130px;align-items:center;gap:12px;padding:10px 0;}
-.fs-leg + .fs-leg{border-top:1px dashed var(--yt-line);}
-.fs-logo{width:36px;height:36px;border-radius:8px;background:var(--navy);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;}
-.fs-pt{display:flex;flex-direction:column;}
-.fs-pt b{font-size:18px;}
-.fs-pt sup{font-size:11px;color:var(--orange-dark);margin-left:2px;}
-.fs-pt small,.fs-mid small{font-size:12.5px;color:var(--yt-muted);}
-.fs-mid{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.fs-line{width:100%;height:2px;background:#cfcfcf;position:relative;}
-.fs-line.stop::after{content:"";position:absolute;left:50%;top:-3px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#fff;border:2px solid var(--orange);}
-.fs-mid .fs-direct{color:#1d6d39;font-weight:700;}
-.fs-mid .fs-stop{color:var(--orange-dark);font-weight:700;}
-.fs-airline{font-size:13px;color:var(--yt-muted);text-align:right;}
-.fs-buy{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px;border-left:1px solid var(--yt-line);background:#fcfcfc;}
-.fs-buy b{font-size:21px;}
-.fs-buy small{font-size:12px;color:var(--yt-muted);margin-bottom:4px;}
-.fs-empty{padding:30px;text-align:center;color:var(--yt-muted);background:var(--box-bg);border-radius:12px;}
 .fs-note{font-size:12.5px;color:var(--yt-muted);margin-top:12px;}
 .fs-note i{color:var(--orange);margin-right:4px;}
 .fs-popular{font-family:var(--font-body);font-size:18px;font-weight:700;margin:40px 0 12px;}
 @media (max-width:980px){
-  .fs-body{grid-template-columns:1fr;}
-  .fs-filters{grid-template-columns:repeat(2,minmax(0,1fr));}
   .fs-filters{order:2;}   /* phones & tablets: results first, filters after */
-  .fs-filters h4{grid-column:1/-1;}
 }
 @media (max-width:700px){
   .fs-place{flex:1 1 100%;}
   .fs-swap{display:none;}
   .fs-go{margin-left:auto;}
-  .fs-dates{grid-template-columns:repeat(7,minmax(74px,1fr));overflow-x:auto;}
-  .fs-card{grid-template-columns:1fr;}
-  .fs-buy{flex-direction:row;justify-content:space-between;border-left:none;border-top:1px solid var(--yt-line);}
-  .fs-leg{grid-template-columns:34px 52px minmax(0,1fr) 52px;}
-  .fs-airline{display:none;}
-  .fs-sort b{font-size:13.5px;}
 }
 .fl-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;}
 .route-card{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto auto auto;align-items:center;gap:14px;padding:12px 16px;border-radius:10px;background:var(--box-bg);color:var(--yt-text);transition:background .15s;}
@@ -295,3 +247,31 @@
 .visa-tips ul{flex:2 1 420px;list-style:none;margin:0;padding:12px 18px;border-radius:var(--box-radius);background:var(--box-bg);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;font-size:14px;}
 .visa-tips li i{color:var(--orange);margin-right:6px;}
 @media (max-width:900px){ .visa-grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+
+/* ---------- Flight results: live prices on comparison sites, airline sites, or ask us ---------- */
+.fs-block{margin-top:22px;padding:22px;border:1px solid var(--yt-line);border-radius:16px;background:#fff;}
+.fs-block h3{display:flex;align-items:center;gap:10px;font-family:var(--font-body);font-size:18px;font-weight:700;color:var(--yt-text);}
+.fs-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;}
+.fs-sub{margin:6px 0 16px;font-size:14.5px;color:var(--yt-muted);}
+.fs-sub b{color:var(--yt-text);}
+.fs-sites{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.fs-site{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--yt-line);border-radius:14px;background:var(--box-bg);color:var(--yt-text);transition:border-color .15s,box-shadow .15s,background .15s;}
+.fs-site:hover{border-color:var(--orange);background:#fff;box-shadow:0 12px 28px -18px rgba(11,31,58,.45);}
+.fs-site-ico{width:44px;height:44px;flex:none;border-radius:12px;background:#fff;color:var(--orange-dark);display:flex;align-items:center;justify-content:center;font-size:19px;}
+.fs-site b{display:block;font-size:16px;}
+.fs-site small{display:block;font-size:13px;color:var(--yt-muted);}
+.fs-site-go{margin-left:auto;flex:none;display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:var(--orange-dark);white-space:nowrap;}
+.fs-site-go i,.fs-air-go i{font-size:11px;}
+.fs-airs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;}
+.fs-air{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--yt-line);border-radius:12px;color:var(--yt-text);transition:border-color .15s,background .15s;}
+.fs-air:hover{border-color:var(--orange);background:#F5F9FF;}
+.fs-air-txt{min-width:0;display:flex;flex-direction:column;}
+.fs-air-txt b{font-size:15px;}
+.fs-air-txt small{font-size:12.5px;color:var(--yt-muted);}
+.fs-air-go{margin-left:auto;flex:none;display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;color:var(--orange-dark);}
+.fs-logo{width:40px;height:40px;flex:none;border-radius:10px;background:var(--navy);color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.fs-ask{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--box-bg);border-color:transparent;}
+.fs-ask .fs-sub{margin-bottom:0;}
+@media (max-width:900px){.fs-sites{grid-template-columns:1fr;}}
+@media (max-width:560px){.fs-block{padding:16px;}.fs-ask .btn{width:100%;justify-content:center;}}
+

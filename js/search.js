@@ -190,7 +190,7 @@ const SNSearch = (function(){
       out.push(item({ type:'Destinations', icon:'fa-location-dot', title:country, url:`destinations.html#${key}`, img, sub:parks.slice(0, 4), keywords:parks.join(' '), boost:1.5 }));
       parks.forEach(p => out.push(item({ type:'Destinations', icon:'fa-map-pin', title:p, url:`destinations.html#${key}`, img, sub:country, keywords:country })));
     });
-    if(typeof MENU !== 'undefined') MENU.filter(m => m.key !== 'destinations').forEach(m => m.links.forEach(([title, url]) =>
+    if(typeof MENU !== 'undefined') MENU.filter(m => m.key !== 'destinations' && m.key !== 'trips').forEach(m => m.links.forEach(([title, url]) =>
       out.push(item({ type: m.key === 'deals' ? 'Deals' : 'Pages', icon: m.key === 'deals' ? 'fa-tag' : 'fa-file-lines', title, url, sub:m.label, keywords:m.label }))));
 
     [
@@ -221,7 +221,10 @@ const SNSearch = (function(){
 
   // Blog articles live in their own file; load it the first time search opens
   function loadArticles(){
-    if(typeof ARTICLES !== 'undefined' || document.getElementById('blogDataScript')) return;
+    // Wait until the page has finished parsing: the blog page includes blog-data.js itself
+    // further down, and loading it twice throws "AUTHORS has already been declared"
+    if(document.readyState === 'loading') return document.addEventListener('DOMContentLoaded', loadArticles, { once:true });
+    if(typeof ARTICLES !== 'undefined' || document.querySelector('#blogDataScript, script[src$="blog-data.js"]')) return;
     const s = document.createElement('script');
     s.src = 'js/blog-data.js'; s.id = 'blogDataScript';
     s.onload = () => { INDEX = null; if(input && input.value) render(input.value); };
@@ -367,6 +370,7 @@ const SNSearch = (function(){
     q = (q || '').trim();
     if(!q) return;
     recent.add(q);
+    if(SN.track) SN.track('search', { q });          // counted for admin → Insights (what people look for)
     const hits = search(q, 20);
     // Trips first (the trips page filters by this text); otherwise the best page, FAQ or article
     location.href = hits.some(x => x.trip) ? 'trips.html?q=' + encodeURIComponent(q) : hits.length ? hits[0].url : 'trips.html?q=' + encodeURIComponent(q);

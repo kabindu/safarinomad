@@ -422,7 +422,7 @@ const ARTICLES = [
       <h2>Understanding What Costs What</h2>
       <p>East Africa safari costs have three components: fixed costs (flights, park fees, permits), semi-fixed costs (transport and guiding), and flexible costs (accommodation). Most people try to cut accommodation — which is the right instinct — but they often don't realise how much can also be saved on transport by joining a shared group departure rather than a private safari.</p>
       <h2>The Single Best Budget Strategy: Join a Group Departure</h2>
-      <p>A private 5-day Maasai Mara safari for two people costs roughly $800–$1,200 per person (depending on camp). The same itinerary as a shared group departure (6–8 people in one vehicle) costs $380–$580 per person. The game viewing is identical. The camp is often the same. The difference is purely the vehicle cost, divided by more people.</p>
+      <p>A private 5-day Maasai Mara safari for two people costs roughly $520–$780 per person (depending on camp). The same itinerary as a shared group departure (6–8 people in one vehicle) costs $250–$380 per person. The game viewing is identical. The camp is often the same. The difference is purely the vehicle cost, divided by more people.</p>
       <div class="info-box">
         <h5><i class="fa-solid fa-piggy-bank"></i> Top budget strategies that actually work</h5>
         <ul>
@@ -439,9 +439,9 @@ const ARTICLES = [
       <img src="images/camp-at-night.jpg" alt="Budget campsite Maasai Mara" class="article-img">
       <h2>Realistic Minimum Budgets</h2>
       <ul>
-        <li><strong>Budget (shared group, bandas):</strong> $200–$350 per person per day in-country</li>
-        <li><strong>Mid-range (small group, mid-tier lodges):</strong> $400–$700 per person per day</li>
-        <li><strong>Luxury (private, top camps):</strong> $700–$2,000+ per person per day</li>
+        <li><strong>Budget (shared group, bandas):</strong> $120–$160 per person per day in-country</li>
+        <li><strong>Mid-range (small group, mid-tier lodges):</strong> $160–$250 per person per day</li>
+        <li><strong>Luxury (private, top camps):</strong> $300–$700+ per person per day</li>
       </ul>
       <p>All of these figures include park fees, guide, vehicle, full board at camp, and scheduled game drives. They do not include international flights (typically $700–$1,400 from Europe or North America) or travel insurance.</p>
       <blockquote><p>"The best value safari I've ever seen was two friends in a shared group vehicle, staying in public bandas, cooking their own breakfast. They saw exactly the same lions as the people paying three times as much." — SafariNomad team</p></blockquote>

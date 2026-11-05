@@ -16,35 +16,142 @@
      <div id="site-footer"></div>
    ========================================================= */
 
-// Main menu. Each item opens a full-width panel: titled columns of links and one main button.
-// (The phone drawer and site search use the same links, flattened.)
-const MENU_PLACE = p => [p, `trips.html?q=${encodeURIComponent(p)}`];
-const MENU = [
-  { key:'destinations', label:'Destinations', href:'destinations.html', cta:['See all trips','trips.html'], cols:[
-    { title:'Kenya', href:'trips.html?country=kenya', links:['Maasai Mara','Amboseli','Samburu','Lake Nakuru','Naivasha','Tsavo','Diani Beach'].map(MENU_PLACE) },
-    { title:'Tanzania & Zanzibar', href:'trips.html?country=tanzania', links:['Serengeti','Ngorongoro','Tarangire','Kilimanjaro','Zanzibar'].map(MENU_PLACE) },
-    { title:'Uganda', href:'trips.html?country=uganda', links:['Bwindi','Kibale','Queen Elizabeth','Murchison Falls'].map(MENU_PLACE) },
-    { title:'Rwanda', href:'trips.html?country=rwanda', links:['Volcanoes','Lake Kivu','Kigali'].map(MENU_PLACE) },
-    { title:'Multi-country', href:'trips.html?country=multi', links:[['East Africa Grand Journey','book.html?trip=grand-journey'],['Primate Explorer','book.html?trip=primate-explorer'],['Great Migration','book.html?trip=great-migration'],['Plan a custom route','contact.html']] },
-    { title:'By landscape', href:'trips.html', links:[['Savannah & plains','trips.html?land=savannah'],['Lakes','trips.html?land=lakes'],['Coast & islands','trips.html?land=coast'],['Mountains','trips.html?land=mountains'],['Rivers & waterfalls','trips.html?land=rivers'],['Forests','trips.html?land=forests']] }
-  ] },
-  { key:'services', label:'Services', href:'services.html', cta:['See all services','services.html'], cols:[
-    { title:'Save now', links:[['Flash deals','services.html#flash-deals'],['Last-minute departures','services.html#last-minute']] },
-    { title:'On safari', links:[['Safari vehicles','services.html#vehicles'],['Accommodation','services.html#stays'],['City & beach hotels','services.html#hotels']] },
-    { title:'Guides', links:[['Tour guides','services.html#guides'],['Hire a private guide','services.html#private'],['Our standards','services.html#quality']] }
-  ] },
-  { key:'flights', label:'Flights', href:'flights.html', cta:['Search flights','flights.html#flightSearch'], cols:[
-    { title:'Getting here', links:[['Flights from Europe','flights.html#routes'],['Search & compare','flights.html#flightSearch']] },
-    { title:'Getting around', links:[['Within East Africa','flights.html#routes'],['Light-aircraft flights','services.html#vehicles']] },
-    { title:'Need help?', links:[['Request flights','flights.html#request'],['Contact us','contact.html']] }
-  ] },
-  { key:'about', label:'About', href:'about.html', cta:['Learn more about us','about.html'], cols:[
-    { title:'SafariNomad', links:[['Our story','about.html#story'],['Traveller reviews','about.html#reviews']] },
-    { title:'Plan your trip', links:[['FAQ','about.html#faqs'],['Book your dates','book.html'],['Contact Us','contact.html']] },
-    { title:'Inspiration', links:[['Blog','blog.html'],['All trips','trips.html']] }
-  ] }
-];
-MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links); });
+// Main menu. Each item opens a full-width panel: columns of links on the left, one
+// highlighted card on the right. Numbers (trip counts, from-prices, ratings, flight
+// times) are worked out from js/data.js, so the menu stays right when trips change.
+// Each link is [text, url, note, icon]; note and icon are optional.
+// (The phone drawer and site search use the same links, flattened to [text, url].)
+const MENU_FACTS = (function(){
+  const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+  const from = list => list.length ? Math.min(...list.map(t => t.price)) : 0;
+  const price = usd => `<b data-usd="${usd}"></b>`;
+  const score = t => (t.rating || 0) * Math.log10((t.reviews || 0) + 10);
+  const month = new Date().getMonth() + 1;
+  const reviews = TRIPS.reduce((n, t) => n + (t.reviews || 0), 0);
+  const rating = reviews ? TRIPS.reduce((n, t) => n + (t.rating || 0) * (t.reviews || 0), 0) / reviews : 0;
+  const onSale = TRIPS.filter(t => t.was > t.price);
+  const mins = s => { const m = /(\d+)h\s*(\d+)?/.exec(s || ''); return m ? +m[1] * 60 + (+m[2] || 0) : 1e9; };
+  const direct = FLIGHTS.filter(f => f.region === 'europe' && !f.stops).sort((a, b) => mins(a.time) - mins(b.time));
+  return {
+    plural, price, month: MONTH_NAMES[month - 1],
+    trips: TRIPS.length,
+    country: c => { const l = TRIPS.filter(t => t.country === c); return l.length ? `${plural(l.length, 'trip')} · from ${price(from(l))}` : ''; },
+    style: s => TRIPS.filter(t => t.styles.includes(s)).length,
+    // The busiest parks in a country, with how many trips visit each
+    places: c => PLACES.filter(p => p.country === c).map(p => {
+      const re = new RegExp(p.match, 'i');
+      return [p.name, `trips.html?q=${encodeURIComponent(p.match.split('|')[0])}`, TRIPS.filter(t => re.test(`${t.title} ${t.route || ''}`)).length];
+    }).filter(p => p[2]).sort((a, b) => b[2] - a[2]).slice(0, 6),
+    bestNow: TRIPS.filter(t => (t.months || []).includes(month) && t.days >= 5).sort((a, b) => score(b) - score(a)).slice(0, 3),
+    onSale: onSale.length,
+    topDeals: onSale.slice().sort((a, b) => b.was / b.price - a.was / a.price).slice(0, 3),
+    topPicks: TRIPS.filter(t => t.featured).sort((a, b) => score(b) - score(a)).slice(0, 4),
+    lengths: Object.entries(DURATIONS).map(([k, d]) => [d.label, `trips.html?len=${k}`, TRIPS.filter(t => d.fits(t.days)).length]),
+    under: max => TRIPS.filter(t => t.price <= max).length,
+    lastMinute: LAST_MINUTE.length,
+    rating: rating.toFixed(1), reviews: (Math.floor(reviews / 100) * 100).toLocaleString('en-US') + '+',
+    direct: direct.length, fastest: direct[0]
+  };
+})();
+
+const MENU = (function(f){
+  // Cards on the right rotate through several items (js below); `slides` = trips, `imgs` = photos on a note card
+  const best = { slides: (f.bestNow.length ? f.bestNow : TRIPS.slice(0, 3)).map(trip => ({ eyebrow:`Best in ${f.month}`, trip })) };
+  const deals = f.topDeals.length ? { slides: f.topDeals.map(trip => ({ eyebrow:`Save ${Math.round((1 - trip.price / trip.was) * 100)}%`, trip })) } : best;
+  return [
+    { key:'trips', label:'Packages', href:'trips.html', all:[`See all ${f.trips} packages`, 'trips.html'],
+      feature:{ slides: f.topPicks.map(trip => ({ eyebrow:'Top pick', trip })) },
+      cols:[
+        { title:'By travel style', href:'trips.html', compact:true, links:[
+          ['Wildlife safaris', 'trips.html?style=wildlife', f.style('wildlife')],
+          ['Gorillas & primates', 'trips.html?style=gorilla', f.style('gorilla')],
+          ['Safari & beach', 'trips.html?style=beach', f.style('beach')],
+          ['Kilimanjaro & treks', 'trips.html?style=trek', f.style('trek')],
+          ['Family', 'trips.html?style=family', f.style('family')],
+          ['Luxury & honeymoon', 'trips.html?style=luxury', f.style('luxury')],
+          ['Budget camping', 'trips.html?style=camping', f.style('camping')],
+          ['Adventure & sport', 'trips.html?style=adventure', f.style('adventure')],
+          ['Holidays abroad', 'trips.html?style=abroad', f.style('abroad')]
+        ].filter(l => l[2]) },
+        { title:'By length', href:'trips.html', compact:true, links:f.lengths.filter(l => l[2]) },
+        { title:'By budget', href:'trips.html', compact:true, links:[500, 1000, 2000, 3500].map(n => [`Under $${n.toLocaleString('en-US')}`, `trips.html?max=${n}`, f.under(n)]).filter(l => l[2]) },
+        { title:'Ready to go', links:[
+          ['Flash deals', 'services.html#flash-deals', f.onSale ? `${f.plural(f.onSale, 'package')} on sale now` : 'Time-limited offers', 'fa-bolt'],
+          ['Top picks', 'index.html#packages', 'Our most-loved packages', 'fa-star'],
+          ['Customise your own', 'plan.html', 'Build it and see the price', 'fa-sliders']
+        ] }
+      ] },
+    { key:'destinations', label:'Destinations', href:'destinations.html', all:[`See all ${f.trips} trips`, 'trips.html'],
+      feature:best,
+      cols:[
+        ...['kenya', 'tanzania', 'uganda', 'rwanda'].map(c => ({ title:COUNTRY_NAMES[c], href:`trips.html?country=${c}`, meta:f.country(c), compact:true, links:f.places(c) })),
+        { title:'Ways to travel', href:'trips.html', compact:true, links:[
+          ['Multi-country', 'trips.html?country=multi', TRIPS.filter(t => t.country === 'multi').length],
+          ['Gorillas & primates', 'trips.html?style=gorilla', f.style('gorilla')],
+          ['Safari & beach', 'trips.html?style=beach', f.style('beach')],
+          ['Kilimanjaro & treks', 'trips.html?style=trek', f.style('trek')],
+          ['Luxury', 'trips.html?style=luxury', f.style('luxury')],
+          ['Adventure & sport', 'trips.html?style=adventure', f.style('adventure')],
+          ['Beyond Africa', 'trips.html?country=world', TRIPS.filter(t => t.country === 'world').length],
+          ['Customise your own package', 'plan.html', '']
+        ] }
+      ] },
+    { key:'services', label:'Services', href:'services.html', all:['See all services', 'services.html'],
+      feature:deals,
+      cols:[
+        { title:'Save', links:[
+          ['Flash deals', 'services.html#flash-deals', f.onSale ? `${f.plural(f.onSale, 'trip')} on sale now` : 'Time-limited offers', 'fa-bolt'],
+          ['Last-minute departures', 'services.html#last-minute', f.lastMinute ? `${f.plural(f.lastMinute, 'departure')} with seats left` : 'Seats released close to departure', 'fa-hourglass-half']
+        ] },
+        { title:'On safari', links:[
+          ['Safari vehicles', 'services.html#vehicles', 'Pop-top Land Cruisers, a window seat each', 'fa-van-shuttle'],
+          ['Accommodation', 'services.html#stays', 'From park campsites to luxury lodges', 'fa-bed'],
+          ['City & beach hotels', 'services.html#hotels', 'Before and after your safari', 'fa-hotel']
+        ] },
+        { title:'Guides', links:[
+          ['Tour guides', 'services.html#guides', 'Certified and born in the region', 'fa-id-badge'],
+          ['Hire a private guide', 'services.html#private', 'Your own 4x4 and your own schedule', 'fa-compass'],
+          ['Our standards', 'services.html#quality', 'The same promise on every trip', 'fa-shield-halved']
+        ] }
+      ] },
+    { key:'flights', label:'Flights', href:'flights.html', all:['Search flights', 'flights.html#flightSearch'],
+      feature:{ icon:'fa-plane-departure', eyebrow:'Getting here', title: f.fastest ? `${f.direct} direct routes from Europe` : 'Flights to East Africa',
+        text: f.fastest ? `The fastest takes ${f.fastest.time}, ${f.fastest.from} to ${f.fastest.to}. Tell us your dates and we'll compare fares for you.` : 'Tell us your dates and we\'ll compare fares for you.',
+        cta:['Request flights', 'flights.html#request'],
+        imgs:['images/hero/flights-kenya-airways-hd.jpg', 'images/vehicle-bush-plane.jpg', 'images/hero/flights-wing-clouds-hd.jpg'] },
+      cols:[
+        { title:'Getting here', links:[
+          ['Flights from Europe', 'flights.html#routes', f.direct ? `${f.direct} direct routes` : 'Direct and one-stop routes', 'fa-plane-arrival'],
+          ['Search & compare', 'flights.html#flightSearch', 'Fares for your dates', 'fa-magnifying-glass']
+        ] },
+        { title:'Getting around', links:[
+          ['Within East Africa', 'flights.html#routes', 'City, park and island hops', 'fa-route'],
+          ['Light-aircraft flights', 'services.html#vehicles', 'Fly straight into the parks', 'fa-plane']
+        ] },
+        { title:'Before you fly', links:[
+          ['Visas & passports', 'flights.html#visas', 'Entry rules for each country', 'fa-passport'],
+          ['Let us book your flights', 'flights.html#request', 'We book and track them for you', 'fa-headset']
+        ] }
+      ] },
+    { key:'about', label:'About', href:'about.html', all:['About SafariNomad', 'about.html'],
+      feature:{ icon:'fa-comments', eyebrow:'Talk to a planner', title:SITE.phone, text:`${SITE.hoursText}. Our Nairobi-based specialists answer.`,
+        cta:['Chat on WhatsApp', `https://wa.me/${SITE.whatsapp}`], href:`tel:${SITE.phoneLink}`,
+        imgs:['images/vehicle-landcruiser.jpg', 'images/safari-lodge.jpg', 'images/safari-vehicle.jpg'] },
+      cols:[
+        { title:'SafariNomad', links:[
+          ['Our story', 'about.html#story', 'From one Land Cruiser to 12,000 travellers', 'fa-seedling'],
+          ['Traveller reviews', 'about.html#reviews', `${f.rating}/5 from ${f.reviews} reviews`, 'fa-star'],
+          ['Blog', 'blog.html', 'Guides and stories from the field', 'fa-newspaper']
+        ] },
+        { title:'Book & ask', links:[
+          ['Book your dates', 'book.html', 'Live departures and seats left', 'fa-calendar-check'],
+          ['FAQ', 'about.html#faqs', 'Deposits, visas, packing and more', 'fa-circle-question'],
+          ['Contact us', 'contact.html', 'A free tailored plan within 24 hours', 'fa-envelope']
+        ] }
+      ] }
+  ];
+})(MENU_FACTS);
+MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h])); });
 
 (function(){
   const s = SITE;
@@ -55,16 +162,46 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links); });
   const social = keys => keys.map(k => `<a href="${s.social[k]}" target="_blank" rel="noopener" aria-label="${SOCIAL[k][0]}"><i class="fa-brands ${SOCIAL[k][1]}"></i></a>`).join('');
 
   // Desktop: the label is a real link; hovering (or keyboard focus) opens a full-width panel under the header
+  // A compact link (place name + trip count) or a rich one (icon, name, one-line note)
+  const dropLink = ([t, h, note, icon], compact) => compact
+    ? `<li><a class="drop-place" href="${h}"><span>${esc(t)}</span>${note !== '' && note != null ? `<small>${note}</small>` : ''}</a></li>`
+    : `<li><a class="drop-link" href="${h}">${icon ? `<i class="fa-solid ${icon}" aria-hidden="true"></i>` : ''}<span><b>${esc(t)}</b>${note ? `<small>${note}</small>` : ''}</span></a></li>`;
+  const arrow = '<i class="fa-solid fa-arrow-right" aria-hidden="true"></i>';
+  // The card on the right: trips that take turns (photo, price, link to its dates), or a short note with an
+  // action and photos that take turns. Only the visible slide is focusable.
+  const tripCard = (x, on) => `<a class="drop-feature df-slide${on ? ' on' : ''}" href="book.html?trip=${x.trip.id}"${on ? '' : ' tabindex="-1" aria-hidden="true"'}>
+        <span class="df-img"><img src="${x.trip.img}" alt="" loading="lazy"></span>
+        <span class="df-body"><span class="df-eyebrow">${esc(x.eyebrow)}</span><b>${esc(x.trip.title)}</b>
+          <span class="df-meta">${x.trip.days} days · from <b data-usd="${x.trip.price}"></b>${x.trip.was > x.trip.price ? ` <s data-usd="${x.trip.was}"></s>` : ''}</span>
+          <span class="df-cta">View dates ${arrow}</span></span>
+      </a>`;
+  const dots = n => n > 1 ? `<span class="df-dots" aria-hidden="true">${Array.from({ length:n }, (_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('')}</span>` : '';
+  const dropFeature = x => x.slides
+    ? `<div class="df-stack" data-rotate>${x.slides.map((sl, i) => tripCard(sl, i === 0)).join('')}${dots(x.slides.length)}</div>`
+    : `<div class="drop-feature df-note${x.imgs ? ' df-pics' : ''}">
+        ${x.imgs ? `<span class="df-img df-photos" data-rotate>${x.imgs.map((src, i) => `<img src="${src}" alt="" loading="lazy"${i ? '' : ' class="on"'}>`).join('')}${dots(x.imgs.length)}</span>` : ''}
+        <span class="df-note-body">
+        <i class="fa-solid ${x.icon} df-icon" aria-hidden="true"></i>
+        <span class="df-eyebrow">${esc(x.eyebrow)}</span>
+        ${x.href ? `<a class="df-title" href="${x.href}">${esc(x.title)}</a>` : `<b class="df-title">${esc(x.title)}</b>`}
+        <p>${esc(x.text)}</p>
+        <a class="btn btn-sm" href="${x.cta[1]}"${/^https?:/.test(x.cta[1]) ? ' target="_blank" rel="noopener"' : ''}>${esc(x.cta[0])}</a>
+        </span>
+      </div>`;
+
   const megaPanel = m => `
       <div class="drop"><div class="drop-panel"><div class="drop-inner">
-        <div class="drop-cols" style="--cols:${m.cols.length}">
-          ${m.cols.map(c => `
-          <div class="drop-col">
-            ${c.href ? `<a class="drop-head" href="${c.href}">${esc(c.title)}</a>` : `<span class="drop-head">${esc(c.title)}</span>`}
-            <ul>${c.links.map(([t, h]) => `<li><a href="${h}">${esc(t)}</a></li>`).join('')}</ul>
-          </div>`).join('')}
+        <div class="drop-main">
+          <div class="drop-cols" style="--cols:${m.cols.length}">
+            ${m.cols.map(c => `
+            <div class="drop-col">
+              ${c.href ? `<a class="drop-head" href="${c.href}">` : '<div class="drop-head">'}<span>${esc(c.title)}</span>${c.meta ? `<small>${c.meta}</small>` : ''}${c.href ? '</a>' : '</div>'}
+              <ul>${c.links.map(l => dropLink(l, c.compact)).join('')}</ul>
+            </div>`).join('')}
+          </div>
+          <a class="drop-all" href="${m.all[1]}">${esc(m.all[0])} ${arrow}</a>
         </div>
-        <div class="drop-cta"><a class="btn" href="${m.cta[1]}">${esc(m.cta[0])}</a></div>
+        ${dropFeature(m.feature)}
       </div></div></div>`;
 
   const desktopMenu = MENU.map(m => `
@@ -86,8 +223,6 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links); });
     <div class="util-inner">
       <a href="tel:${s.phoneLink}"><i class="fa-solid fa-phone"></i> ${s.phone}</a>
       <a href="about.html#faqs">Help &amp; FAQs</a>
-      <a href="contact.html">Plan a group trip</a>
-      <a href="book.html">Book your dates</a>
       <div class="util-drop">
         <button class="util-lang" aria-label="Language and currency"><i class="fa-solid fa-globe"></i> <span id="langLabel">EN</span> · <span id="curLabel">USD $</span></button>
         <div class="util-menu">
@@ -102,8 +237,6 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links); });
           <div id="curMenu">
             <button data-currency="USD" class="active">USD $</button>
             <button data-currency="EUR">EUR €</button>
-            <button data-currency="GBP">GBP £</button>
-            <button data-currency="KES">KES</button>
           </div>
         </div>
       </div>
@@ -132,7 +265,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links); });
       </form>
       <button class="hdr-icon show-mob" type="button" data-open-search aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
       <a class="hdr-icon show-mob" href="trips.html?saved=1" aria-label="Saved trips"><i class="fa-regular fa-heart"></i></a>
-      <a class="btn btn-sm hide-sm" href="contact.html"><span>Get a Quote</span></a>
+      <a class="btn btn-sm hide-sm" href="plan.html"><span>Customise your trip</span></a>
     </div>
   </div>
 </header>
@@ -146,16 +279,16 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links); });
   <div class="drawer-body">
     <button class="drawer-search" type="button" data-open-search><i class="fa-solid fa-magnifying-glass"></i> Search trips, parks, articles…</button>
     <a class="plain" href="index.html"><i class="fa-solid fa-house"></i> Home</a>
-    <a class="plain" href="trips.html">All trips</a>
+    <a class="plain" href="trips.html">All packages</a>
     ${mobileMenu}
     <a class="plain" href="contact.html">Contact us</a>
     <div class="d-prefs">
       <div class="d-pref"><span>Language</span><div><button data-lang="en" class="active">EN</button><button data-lang="fr">FR</button><button data-lang="es">ES</button><button data-lang="de">DE</button></div></div>
-      <div class="d-pref"><span>Currency</span><div><button data-currency="USD" class="active">USD</button><button data-currency="EUR">EUR</button><button data-currency="GBP">GBP</button><button data-currency="KES">KES</button></div></div>
+      <div class="d-pref"><span>Currency</span><div><button data-currency="USD" class="active">USD</button><button data-currency="EUR">EUR</button></div></div>
     </div>
   </div>
   <div class="drawer-cta">
-    <a class="btn" href="contact.html">Get a Quote</a>
+    <a class="btn" href="plan.html">Customise your trip</a>
     <a class="btn btn-outline" href="tel:${s.phoneLink}"><i class="fa-solid fa-phone"></i> ${s.phone}</a>
   </div>
 </aside>
@@ -178,7 +311,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links); });
       </div>
       <div class="ft-col">
         <h4>Ways to Go</h4>
-        <a href="trips.html">All trips</a>
+        <a href="trips.html">All packages</a>
         <a href="destinations.html">Destinations</a>
         <a href="services.html#flash-deals">Flash deals</a>
         <a href="flights.html">Flights</a>
@@ -231,7 +364,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links); });
       <button class="chat-x" id="chatClose" aria-label="Close chat"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="chat-body chat-home">
-      <div class="chat-bubble">Jambo! 👋 Planning a safari? Ask Nomad, our AI assistant, for instant answers, or talk to one of our Nairobi-based specialists.</div>
+      <div class="chat-bubble">Jambo! 👋 Planning a trip? Ask Nomad, our AI travel expert, anything about safaris, visas, flights or travel anywhere, or talk to one of our Nairobi-based specialists.</div>
       <button type="button" class="chat-opt ai" id="aiOpen"><i class="fa-solid fa-wand-magic-sparkles"></i><span><b>Ask Nomad, our AI assistant</b><small>Instant answers, 24/7</small></span><i class="fa-solid fa-chevron-right go"></i></button>
       <a class="chat-opt wa" href="https://wa.me/${s.whatsapp}?text=${encodeURIComponent('Hi SafariNomad! I am planning a safari and have a question.')}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i><span><b>Chat on WhatsApp</b><small>Talk to a human expert</small></span><i class="fa-solid fa-chevron-right go"></i></a>
       <a class="chat-opt" href="tel:${s.phoneLink}"><i class="fa-solid fa-phone"></i><span><b>Call ${s.phone}</b><small>${s.hoursText}</small></span><i class="fa-solid fa-chevron-right go"></i></a>
@@ -262,7 +395,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links); });
 
 <nav class="tabbar" aria-label="Quick navigation">
   <a href="index.html" data-tab="home"><i class="fa-solid fa-house"></i><span>Home</span></a>
-  <a href="trips.html" data-tab="trips"><i class="fa-solid fa-compass"></i><span>Trips</span></a>
+  <a href="trips.html" data-tab="trips"><i class="fa-solid fa-compass"></i><span>Packages</span></a>
   <button type="button" data-open-search><i class="fa-solid fa-magnifying-glass"></i><span>Search</span></button>
   <a href="trips.html?saved=1" data-tab="saved"><i class="fa-regular fa-heart"></i><span>Saved</span><b class="tab-count" id="tabWishCount"></b></a>
   <button type="button" data-open-chat><i class="fa-regular fa-comments"></i><span>Chat</span></button>
@@ -365,14 +498,64 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links); });
     }, 5000);
   });
 
-  // Keep aria-expanded in sync for screen readers
-  document.querySelectorAll('.nav-item').forEach(item => {
-    if(!item.querySelector('.drop')) return;
-    const btn = item.querySelector('.nav-trigger');
-    const set = v => btn.setAttribute('aria-expanded', v);
-    item.addEventListener('mouseenter', () => set(true));
-    item.addEventListener('mouseleave', () => set(false));
-    item.addEventListener('focusin', () => set(true));
-    item.addEventListener('focusout', e => { if(!item.contains(e.relatedTarget)) set(false); });
+  // "Call us" links anywhere: <a data-phone>…<b data-phone-number></b></a> get the number from SITE
+  document.querySelectorAll('[data-phone]').forEach(a => {
+    a.href = `tel:${s.phoneLink}`;
+    a.querySelectorAll('[data-phone-number]').forEach(b => { b.textContent = s.phone; b.setAttribute('translate', 'no'); });
+  });
+
+  // Licences & partners strip (<div data-partners></div>): a slow, endless scroll of badges.
+  // The list is drawn twice so the loop is seamless; the copy is hidden from screen readers.
+  // Pauses on hover; with reduced motion it becomes a static, wrapping row.
+  if(typeof PARTNERS !== 'undefined') document.querySelectorAll('[data-partners]').forEach(el => {
+    const badge = p => `<li class="pt-badge">${p.brand ? `<i class="fa-brands ${p.brand}" aria-hidden="true"></i>` : `<i class="fa-solid ${p.icon}" aria-hidden="true"></i>`}<span><b>${esc(p.name)}</b><small>${esc(p.sub)}${p.no ? ` · No. ${esc(p.no)}` : ''}</small></span></li>`;
+    const items = [...PARTNERS.licences, ...PARTNERS.travel].map(badge).join('');
+    el.classList.add('partners');
+    el.innerHTML = `
+      <div class="wrap partners-head"><span>Licensed in Kenya</span><span class="dot" aria-hidden="true">·</span><span>Trusted travel partners</span></div>
+      <div class="marquee" tabindex="0" aria-label="Our licences and travel partners">
+        <ul class="marquee-track">${items}</ul><ul class="marquee-track" aria-hidden="true">${items}</ul>
+      </div>`;
+  });
+
+  // Dropdown panels. Hover intent: a short pause before the first panel opens (so passing the
+  // mouse over the menu doesn't flash it), instant switching once one is open, and a grace
+  // period on leaving. Keyboard focus opens a panel too; Escape closes it.
+  const dropItems = [...document.querySelectorAll('.nav-item.has-drop')];
+  let openItem = null, hoverTimer = 0;
+  // Cards in an open panel take turns every 3.5 s (not with reduced motion)
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let rotateTimer = 0;
+  const rotate = item => item.querySelectorAll('[data-rotate]').forEach(box => {
+    const kids = [...box.children].filter(k => k.matches('.df-slide, img'));
+    if(kids.length < 2) return;
+    const next = (kids.findIndex(k => k.classList.contains('on')) + 1) % kids.length;
+    kids.forEach((k, i) => {
+      k.classList.toggle('on', i === next);
+      if(k.tagName === 'A'){ k.tabIndex = i === next ? 0 : -1; k.toggleAttribute('aria-hidden', i !== next); }
+    });
+    box.querySelectorAll('.df-dots i').forEach((d, i) => d.classList.toggle('on', i === next));
+  });
+  const setOpen = item => {
+    clearInterval(rotateTimer);
+    if(item && !reduceMotion) rotateTimer = setInterval(() => rotate(item), 3500);
+    if(openItem === item) return;
+    if(openItem){ openItem.classList.remove('open'); openItem.querySelector('.nav-trigger').setAttribute('aria-expanded', false); }
+    openItem = item;
+    if(item){ item.classList.remove('shut'); item.classList.add('open'); item.querySelector('.nav-trigger').setAttribute('aria-expanded', true); }
+  };
+  dropItems.forEach(item => {
+    item.addEventListener('mouseenter', () => { clearTimeout(hoverTimer); hoverTimer = setTimeout(() => setOpen(item), openItem ? 0 : 90); });
+    item.addEventListener('mouseleave', () => { clearTimeout(hoverTimer); hoverTimer = setTimeout(() => setOpen(null), 160); item.classList.remove('shut'); });
+    item.addEventListener('focusin', () => { if(item.classList.contains('shut')) return; clearTimeout(hoverTimer); setOpen(item); });
+    item.addEventListener('focusout', e => { if(!item.contains(e.relatedTarget)){ item.classList.remove('shut'); if(openItem === item) setOpen(null); } });
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key !== 'Escape') return;
+    const item = openItem || (document.activeElement && document.activeElement.closest('.nav-item.has-drop'));
+    if(!item) return;
+    setOpen(null);
+    item.classList.add('shut');           // stays closed while focus is still inside, until the mouse or focus leaves
+    item.querySelector('.nav-trigger').focus();
   });
 })();

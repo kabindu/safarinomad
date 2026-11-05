@@ -8,6 +8,8 @@
      GET  /api/availability  seats already booked on each departure
      POST /api/bookings      a booking request from book.html
      POST /api/enquiries     quote, flight and newsletter forms
+     POST /api/leads         progress saved from the booking / customise forms (follow-ups)
+     POST /api/track         anonymous visit counts for the admin Insights page (daily totals only)
      /api/admin/...          the admin dashboard (admin.html), password protected,
                              including website content (prices, images, flash sales, flights)
 
@@ -36,17 +38,39 @@ import vm from 'node:vm';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenAI, ApiError as GeminiApiError } from '@google/genai';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PORT) || 3000;
 const MODEL = 'claude-opus-5-5';
 
 const client = new Anthropic(); // reads ANTHROPIC_API_KEY from the environment
+
+// Google Gemini (free tier in Google AI Studio). Used when GEMINI_API_KEY is set and no Anthropic key is.
+// GEMINI_MODEL picks the model; gemini-3.8-flash is the best model on Google's free tier (Nov 2026).
+// Note: on the free tier Google may use conversations to improve its products.
+// Measured 5 Nov 2026: gemini-3.6-flash with minimal thinking showed first words in ~3 s; gemini-3.8-flash
+// was often "high demand" (503 after 9-15 s), so it is the backup rather than the first choice.
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+// MINIMAL thinking answers fastest and was still detailed; set GEMINI_THINKING=LOW/MEDIUM/HIGH for deeper (slower) answers
+const GEMINI_THINKING = (process.env.GEMINI_THINKING || 'MINIMAL').toUpperCase();
+const GEMINI_FIRST_WORDS_MS = 8000;   // a model that hasn't started answering by then is skipped
+// When a model is busy (503) or over its free limit (429), try the next free model
+const GEMINI_MODELS = [...new Set([GEMINI_MODEL, 'gemini-3.8-flash', 'gemini-3.5-flash-lite'])];
+const geminiBusy = err => err instanceof GeminiApiError && (err.status === 503 || err.status === 429);
+const gemini = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
+// Which AI answers chat: AI_PROVIDER=claude|gemini forces one; otherwise Claude if its key is set, then Gemini
+function chatProvider(){
+  const want = (process.env.AI_PROVIDER || '').toLowerCase();
+  if(want === 'gemini') return gemini ? 'gemini' : null;
+  if(want === 'claude') return process.env.ANTHROPIC_API_KEY ? 'claude' : null;
+  return process.env.ANTHROPIC_API_KEY ? 'claude' : gemini ? 'gemini' : null;
+}
 const LANGUAGES = { en: 'English', fr: 'French', es: 'Spanish', de: 'German' };
 
 /* ---------- Brief the assistant from js/data.js ---------- */
 const DATA_FILE = path.join(ROOT, 'js', 'data.js');
-let briefing = { mtime: 0, text: '' };
+let briefing = { mtime: 0, text: '', plain: '' };
 
 // The site data with the admin's edits applied (flash sales start and end on their own,
 // so the result is rebuilt at least once a minute)
@@ -54,7 +78,7 @@ let dataCache = { key: '', value: null };
 function evalData(withContent){
   const code = fs.readFileSync(DATA_FILE, 'utf8');
   return new vm.Script(code + '\n;' + (withContent ? 'applyContent(__C);' : '') +
-    '({ SITE, TRIPS, LAST_MINUTE, FLIGHTS, AIRPORTS, KNOWLEDGE, BOOKING, BookingRules })').runInNewContext({ __C: JSON.parse(JSON.stringify(content)) });
+    '({ SITE, TRIPS, LAST_MINUTE, FLIGHTS, AIRPORTS, PLACES, PARTNERS, KNOWLEDGE, BOOKING, BookingRules })').runInNewContext({ __C: JSON.parse(JSON.stringify(content)) });
 }
 function dataKey(){ return fs.statSync(DATA_FILE).mtimeMs + '|' + contentVersion + '|' + Math.floor(Date.now() / 60_000); }
 function loadData(){
@@ -63,49 +87,80 @@ function loadData(){
   return dataCache.value;
 }
 
-function buildSystemPrompt(){
-  const { SITE, TRIPS, LAST_MINUTE, KNOWLEDGE } = loadData();
+function buildSystemPrompt(search = true){
+  const { SITE, TRIPS, LAST_MINUTE, FLIGHTS, AIRPORTS, PLACES, PARTNERS, KNOWLEDGE, BOOKING } = loadData();
   const trips = TRIPS.map(t =>
     `- ${t.title} | id: ${t.id} | ${t.countries} | ${t.days} days | from $${t.price}${t.was ? ` (was $${t.was})` : ''} | ` +
-    `styles: ${t.styles.join(', ')} | best months: ${(t.months || []).join(',')} | route: ${t.route || '-'} | ` +
-    `stays: ${t.stay} | group: ${t.group <= 2 ? 'private' : 'max ' + t.group} | rating ${t.rating} (${t.reviews} reviews)`
+    `styles: ${t.styles.join(', ')} | best months: ${(t.months || []).join(',') || 'any'} | route: ${t.route || '-'} | ` +
+    `stays: ${t.stay} | group: ${t.group <= 2 ? 'private' : 'max ' + t.group}${t.reviews ? ` | rating ${t.rating} (${t.reviews} reviews)` : ''}`
   ).join('\n');
-  const lastMinute = LAST_MINUTE.map(t =>
+  const lastMinute = LAST_MINUTE.length ? LAST_MINUTE.map(t =>
     `- ${t.title} | id: ${t.id} | ${t.countries} | ${t.days} days | departs ${t.departs} | ${t.spaces} spaces left | $${t.price} (was $${t.was})`
-  ).join('\n');
+  ).join('\n') : '(none at the moment)';
+  const places = PLACES.map(p => `${p.name} (${p.country})`).join(', ');
+  const routes = FLIGHTS.map(f => `${AIRPORTS[f.from] || f.from} (${f.from}) - ${AIRPORTS[f.to] || f.to} (${f.to}): about ${f.time}, ${f.stops ? '1 stop' : 'direct'}`).join('\n');
+  const partners = PARTNERS ? [...PARTNERS.licences, ...PARTNERS.travel].map(x => `${x.name} (${x.sub})`).join('; ') : '';
   const facts = KNOWLEDGE.map(k => `Q: ${k.q}\nA: ${k.a}`).join('\n\n');
 
-  return `You are Nomad, the friendly AI safari assistant on the SafariNomad website. SafariNomad is a Nairobi-based tour operator running small-group and tailor-made safaris in Kenya, Tanzania (including Zanzibar), Uganda and Rwanda.
+  return `You are Nomad, the AI travel expert on the SafariNomad website. SafariNomad is a Nairobi-based, licensed tour operator. It sells safari packages in Kenya, Tanzania (including Zanzibar), Uganda and Rwanda, plus beach, mountain, adventure and selected international holidays, and it helps travellers with flights, visas, places to stay and safari vehicles.
 
-Your job is to help visitors find the right safari and answer their questions, then guide them towards a free quote from a human safari expert.
+WHAT YOU DO
+Answer any travel and tourism question a visitor asks, about anywhere in the world, as thoroughly and accurately as an experienced travel consultant: destinations and when to go, itineraries, wildlife and national parks, visas and entry rules, flights and airlines, budgets and costs, health and vaccinations, safety, packing, culture and etiquette, money and payments, accessibility, travelling with children or older relatives, honeymoons, events and festivals. You also help visitors choose and book SafariNomad's packages.
 
-How to answer:
-- Keep replies short and warm: usually 2 to 5 sentences, or a few bullet points. Write like a knowledgeable friend who has been on these trips, not a brochure.
-- Only recommend trips from the list below, and only quote prices, durations and details exactly as listed. Prices are per person in US dollars. Never invent trips, prices, dates, availability or discounts.
-- When you recommend a trip, link it as a Markdown link in this exact form: [Trip title](book.html?trip=TRIP_ID). That page shows live departure dates and lets the visitor book. Recommend at most three trips at a time.
-- Useful pages you can link: [all trips](trips.html), [flash deals](services.html#flash-deals), [destination guides](destinations.html), [flights](flights.html), [our services: vehicles, stays & guides](services.html), [FAQs](about.html#faqs), [free quote](contact.html).
-- If you don't know something, or it depends on dates and availability, say so and suggest a free quote or contacting the team. Don't guess.
-- For visas, vaccinations and health, give the general guidance below and remind people to check official sources or a travel clinic.
-- You can't make bookings, take payments or see availability yourself. Visitors pick dates and book on the trip's booking page (book.html?trip=TRIP_ID) and a planner confirms within 24 hours. For anything custom, a human planner helps via the quote form, WhatsApp (+${SITE.whatsapp}), phone (${SITE.phone}) or email (${SITE.email}), ${SITE.hoursText}.
-- Stay on topic: travel in East Africa and SafariNomad's trips. Politely steer anything else back to safari planning.
-- Use plain text with light Markdown only (bold, bullet lists, links). No headings, tables or code.
+HOW TO ANSWER
+- Match the depth to the question. A quick question gets a direct answer in a few sentences. A planning question (for example "plan 10 days in Kenya and Zanzibar for a family of four") gets a complete answer: a day-by-day plan, where to stay, travel times between stops, a realistic budget, the best season and practical tips.
+- Lead with the answer, then the detail. For longer answers use short "## " headings or bold labels, numbered lists for days and steps, bullet lists for options, and bold for key facts. No tables and no code.
+- Be concrete: real place names, drive and flight times, months and seasons, typical price ranges with the currency. Say "about" for estimates.
+- Write warmly and plainly, for every age, including people who rarely use travel websites. Explain any jargon.
+- Reply in the visitor's language.
+
+CURRENT AND CHANGING INFORMATION
+${search ? `- Use web search for anything that changes over time or that you are not certain of: visa and entry rules, fees, travel advisories, health requirements, airline routes and schedules, festival and event dates, opening times, and prices outside SafariNomad.
+- Prefer official and primary sources: government immigration and embassy websites, ministries of health, WHO and CDC, national park and wildlife authorities, airline websites. Link the sources you relied on.
+- If you cannot confirm something, say so plainly and point to the official source. Never invent facts, rules, fees or dates.` : `- You cannot browse the web in this chat. Answer from your knowledge, and for anything that changes over time (visa and entry rules, fees, travel advisories, health requirements, airline routes and schedules, event dates, prices outside SafariNomad) say that it may have changed and link the official source to check: government immigration or embassy websites, ministries of health, WHO or CDC, national park authorities, airline websites.
+- Never invent facts, rules, fees or dates. If you are not sure, say so.`}
+
+SAFARINOMAD'S OWN OFFER (quote only what is listed; never invent)
+- Recommend SafariNomad packages whenever they fit what the visitor wants. Link each one as [Package title](book.html?trip=TRIP_ID), up to three at a time, and say why each fits. Quote prices, durations, routes and details exactly as listed below. Prices are per person in US dollars (visitors can switch the site to euros). Never invent packages, prices, discounts, dates or availability; the booking page shows live departure dates.
+- If nothing listed fits, suggest they [customise their own package](plan.html) with a live price estimate, or ask for a [free quote](contact.html).
+- Flights: SafariNomad's [flight search](flights.html) opens live fares on Google Flights, Skyscanner and Kayak and links to the official airline websites, or the team can book the flights for them.
+- Visas: give the general rules, link the official site, and point to the [visa guide](flights.html#visas). When they book, they can ask SafariNomad for help with their eTA or eVisa.
+- Booking: on a package's booking page the visitor picks a start date and travellers, adds their details plus visa and flight needs, and sends the request. No payment is taken then; a planner confirms within 24 hours. Deposit and balance rules are below. You cannot make bookings, take payments or see live availability yourself.
+- People: WhatsApp +${SITE.whatsapp}, phone ${SITE.phone}, email ${SITE.email}, ${SITE.hoursText}.
+- Pages you can link: [all packages](trips.html), [flash deals](services.html#flash-deals), [destinations](destinations.html), [flights](flights.html), [vehicles, stays and guides](services.html), [FAQs](about.html#faqs), [free quote](contact.html), [customise your trip](plan.html).
+
+STAYING SAFE AND HONEST
+- For medical, legal or immigration decisions, give general guidance and recommend the relevant professional or official office.
+- Decline anything illegal or harmful, and anything unrelated to travel that you are asked to do at length; offer travel help instead.
 
 Current offer: ${SITE.promo.text}.
 
-TRIPS
+PACKAGES
 ${trips}
 
 LAST-MINUTE DEPARTURES
 ${lastMinute}
 
+PLACES WE GO
+${places}
+
+POPULAR FLIGHT ROUTES (typical times)
+${routes}
+
+LICENCES AND PARTNERS
+${partners}
+
+BOOKING RULES
+Deposit $${BOOKING.deposit} per person (never more than the trip price), balance due ${BOOKING.balanceDays} days before departure, earliest start ${BOOKING.noticeDays} days from today, children 5 to 15 pay ${Math.round(BOOKING.childRate * 100)}% on family trips.
+
 FACTS AND POLICIES
 ${facts}`;
 }
 
-function getSystemPrompt(){
+function getSystemPrompt(search = true){
   const key = dataKey();
-  if(key !== briefing.mtime) briefing = { mtime: key, text: buildSystemPrompt() };
-  return briefing.text;
+  if(key !== briefing.mtime) briefing = { mtime: key, text: buildSystemPrompt(true), plain: buildSystemPrompt(false) };
+  return search ? briefing.text : briefing.plain;
 }
 
 /* ---------- Simple per-visitor rate limit ---------- */
@@ -123,7 +178,7 @@ function cleanMessages(input){
   if(!Array.isArray(input)) return null;
   const msgs = input.slice(-20)
     .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
-    .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }));
+    .map(m => ({ role: m.role, content: m.content.slice(0, m.role === 'assistant' ? 8000 : 4000) }));
   while(msgs.length && msgs[0].role !== 'user') msgs.shift();   // must start with the visitor
   if(!msgs.length || msgs[msgs.length - 1].role !== 'user') return null;
   return msgs;
@@ -145,7 +200,7 @@ async function handleChat(req, res){
 
   let messages, lang = 'en', body;
   try {
-    body = JSON.parse(await readBody(req));
+    body = JSON.parse(await readBody(req, 200_000));
     messages = cleanMessages(body.messages);
     if(LANGUAGES[body.lang]) lang = body.lang;
   }
@@ -166,34 +221,98 @@ async function handleChat(req, res){
   const send = obj => res.write(`data: ${JSON.stringify(obj)}\n\n`);
 
   // No API key: the browser shows its offline answer (the question is still recorded)
-  if(!process.env.ANTHROPIC_API_KEY){
+  const provider = chatProvider();
+  if(!provider){
     question.offline = true;
     save('questions');
     send({ error: 'The AI assistant is not configured yet (no API key).', fallback: true });
     return res.end();
   }
+  const today = new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 10);
+  const visitorNote = `Today is ${today} (Nairobi time). The visitor is browsing the site in ${LANGUAGES[lang]}. Reply in ${LANGUAGES[lang]}. Keep package links exactly as given.`;
+
+  // ---- Google Gemini ----
+  if(provider === 'gemini'){
+    let closed = false;
+    req.on('close', () => { closed = true; });
+    const request = {
+      contents: messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),
+      config: { systemInstruction: getSystemPrompt(false) + '\n\n' + visitorNote, maxOutputTokens: 8192, thinkingConfig: { thinkingLevel: GEMINI_THINKING } }
+    };
+    try {
+      for(let i = 0; i < GEMINI_MODELS.length && !closed; i++){
+        // Each model gets GEMINI_FIRST_WORDS_MS to start answering; busy or slow → quietly try the next one
+        const attempt = new AbortController();
+        const stop = () => attempt.abort();
+        req.on('close', stop);
+        let slow = false;
+        const timer = setTimeout(() => { slow = true; attempt.abort(); }, GEMINI_FIRST_WORDS_MS);
+        try {
+          const stream = await gemini.models.generateContentStream({ model: GEMINI_MODELS[i], ...request, config: { ...request.config, abortSignal: attempt.signal } });
+          for await (const chunk of stream){
+            const t = chunk.text;
+            if(t){ clearTimeout(timer); send({ t }); question.answer += t; }
+          }
+          clearTimeout(timer);
+          break;
+        } catch(err){
+          clearTimeout(timer);
+          if(closed) throw err;
+          const canRetry = !question.answer && i < GEMINI_MODELS.length - 1;
+          if((slow || geminiBusy(err)) && canRetry){ console.log(`[chat:gemini] ${GEMINI_MODELS[i]} ${slow ? 'too slow' : `busy (${err.status})`}, trying ${GEMINI_MODELS[i + 1]}`); continue; }
+          throw slow ? new Error('No model answered in time') : err;
+        } finally {
+          req.off('close', stop);
+        }
+      }
+      send({ done: true });
+    } catch(err){
+      let message = 'The assistant is unavailable right now.';
+      if(err instanceof GeminiApiError){
+        if(err.status === 429) message = 'The assistant has reached its free limit for now. Please try again later.';
+        else if(err.status === 400 || err.status === 401 || err.status === 403) message = 'The AI assistant is not configured yet (missing or invalid Gemini API key).';
+        else message = `The assistant hit an error (${err.status}).`;
+      }
+      if(!closed) console.error('[chat:gemini]', err.message);
+      question.offline = true;
+      send({ error: message, fallback: true });
+    }
+    save('questions');
+    return res.end();
+  }
+
+  // ---- Anthropic Claude ----
 
   try {
-    const stream = client.beta.messages.stream({
+    const params = {
       model: MODEL,
-      max_tokens: 4000,
-      output_config: { effort: 'low' },                 // quick, conversational replies
+      max_tokens: 16000,
+      output_config: { effort: 'medium' },               // thoughtful answers; short questions still get short replies
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',                             // if a reply is declined, Anthropic retries on a suitable model
+      tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 5 }],   // live facts: visas, advisories, events, airlines
       system: [
         { type: 'text', text: getSystemPrompt(), cache_control: { type: 'ephemeral' } },
-        { type: 'text', text: `The visitor is browsing the site in ${LANGUAGES[lang]}. Reply in ${LANGUAGES[lang]}. Keep trip links exactly as given.` }
+        { type: 'text', text: visitorNote }
       ],
       messages
-    });
-    req.on('close', () => stream.abort());
-
-    for await (const event of stream){
-      if(event.type === 'content_block_delta' && event.delta.type === 'text_delta'){ send({ t: event.delta.text }); question.answer += event.delta.text; }
+    };
+    let final, aborted = false;
+    req.on('close', () => { aborted = true; });
+    // A long web search can pause the turn; re-send it (with the partial answer) to let it finish
+    for(let round = 0; round < 3 && !aborted; round++){
+      const stream = client.beta.messages.stream(params);
+      req.on('close', () => stream.abort());
+      for await (const event of stream){
+        if(event.type === 'content_block_start' && event.content_block.type === 'server_tool_use') send({ status: 'searching' });
+        if(event.type === 'content_block_delta' && event.delta.type === 'text_delta'){ send({ t: event.delta.text }); question.answer += event.delta.text; }
+      }
+      final = await stream.finalMessage();
+      if(final.stop_reason !== 'pause_turn') break;
+      params.messages = [...messages, { role: 'assistant', content: final.content }];
     }
-    const final = await stream.finalMessage();
-    if(final.stop_reason === 'refusal'){
-      send({ t: "\n\nSorry, I can't help with that one. Our safari experts can, though: [request a free quote](contact.html)." });
+    if(final && final.stop_reason === 'refusal'){
+      send({ t: "\n\nSorry, I can't help with that one. Our travel experts can, though: [request a free quote](contact.html)." });
     }
     send({ done: true });
   } catch(err){
@@ -258,40 +377,47 @@ async function handleTranslate(req, res){
   const todo = [];
   strings.forEach(s => { if(cache[s] !== undefined) out[s] = cache[s]; else todo.push(s); });
 
-  if(todo.length){
-    try {
-      const response = await client.messages.create({
-        model: MODEL,
-        max_tokens: 16000,
-        output_config: {
-          effort: 'low',
-          format: { type: 'json_schema', schema: TRANSLATION_SCHEMA }
-        },
-        system: `You translate website text for SafariNomad, an East African safari company, from English into ${LANGUAGES[lang]}.
+  const provider = chatProvider();
+  if(todo.length && provider){
+    const system = `You translate website text for SafariNomad, an East African safari company, from English into ${LANGUAGES[lang]}.
 - Write natural, warm, concise ${LANGUAGES[lang]} that reads as if written by a native speaker for a travel website.
 - Keep placeholders exactly as they are: {n}, {name}, {max} and any other {word}.
 - Keep Markdown, links and URLs unchanged, e.g. [text](contact.html) keeps contact.html (translate only the link text).
 - Keep proper nouns as they are usually written in ${LANGUAGES[lang]}: park, place and brand names (SafariNomad, Maasai Mara, Serengeti...).
 - Keep the same punctuation style, capitalisation pattern and leading or trailing symbols.
-- Return every source string exactly as given, paired with its translation.`,
-        messages: [{ role: 'user', content: JSON.stringify(todo) }]
-      });
-      if(response.stop_reason !== 'refusal'){
-        const text = response.content.find(b => b.type === 'text')?.text || '{}';
-        const { translations = [] } = JSON.parse(text);
-        translations.forEach(({ source, translation }) => {
-          // only accept translations of strings we asked for, with placeholders intact
-          const keep = s => (s.match(/\{\w+\}|\]\([^)]*\)/g) || []).sort().join('|');
-          if(todo.includes(source) && translation && keep(source) === keep(translation)){
-            cache[source] = translation;
-            out[source] = translation;
-          }
+- Return every source string exactly as given, paired with its translation.`;
+    try {
+      let translations = [];
+      if(provider === 'gemini'){
+        let response;
+        for(const model of GEMINI_MODELS){
+          try { response = await gemini.models.generateContent({ model, contents: JSON.stringify(todo),
+            config: { systemInstruction: system, responseMimeType: 'application/json', responseJsonSchema: TRANSLATION_SCHEMA, thinkingConfig: { thinkingLevel: 'MINIMAL' } } }); break; }
+          catch(err){ if(!geminiBusy(err) || model === GEMINI_MODELS[GEMINI_MODELS.length - 1]) throw err; }
+        }
+        translations = JSON.parse(response.text || '{}').translations || [];
+      } else {
+        const response = await client.messages.create({
+          model: MODEL,
+          max_tokens: 16000,
+          output_config: { effort: 'low', format: { type: 'json_schema', schema: TRANSLATION_SCHEMA } },
+          system,
+          messages: [{ role: 'user', content: JSON.stringify(todo) }]
         });
-        fs.mkdirSync(TRANSLATION_DIR, { recursive: true });
-        fs.writeFileSync(path.join(TRANSLATION_DIR, lang + '.json'), JSON.stringify(cache, null, 1));
+        if(response.stop_reason !== 'refusal') translations = JSON.parse(response.content.find(b => b.type === 'text')?.text || '{}').translations || [];
       }
+      // only accept translations of strings we asked for, with placeholders intact
+      const keep = s => (s.match(/\{\w+\}|\]\([^)]*\)/g) || []).sort().join('|');
+      translations.forEach(({ source, translation }) => {
+        if(todo.includes(source) && translation && keep(source) === keep(translation)){
+          cache[source] = translation;
+          out[source] = translation;
+        }
+      });
+      fs.mkdirSync(TRANSLATION_DIR, { recursive: true });
+      fs.writeFileSync(path.join(TRANSLATION_DIR, lang + '.json'), JSON.stringify(cache, null, 1));
     } catch(err){
-      if(!(err instanceof Anthropic.AuthenticationError)) console.error('[translate]', err.message);
+      if(!(err instanceof Anthropic.AuthenticationError) && !(err instanceof GeminiApiError && [400, 401, 403].includes(err.status))) console.error('[translate]', err.message);
       if(!Object.keys(out).length) return sendJSON(res, 503, { error: 'Translation unavailable' });
     }
   }
@@ -302,7 +428,7 @@ async function handleTranslate(req, res){
    Saved data: bookings, enquiries and assistant questions
    ========================================================= */
 const DATA_DIR = path.join(ROOT, 'server', 'data');
-const KINDS = ['bookings', 'enquiries', 'questions'];
+const KINDS = ['bookings', 'enquiries', 'questions', 'leads'];   // leads = unfinished bookings / custom trips to follow up
 const db = {};
 KINDS.forEach(k => {
   try { db[k] = JSON.parse(fs.readFileSync(path.join(DATA_DIR, k + '.json'), 'utf8')); }
@@ -461,16 +587,110 @@ async function handleBooking(req, res){
     id: newId(), ref, created: new Date().toISOString(), status: 'pending',
     trip: found.trip.id, tripTitle: found.trip.title, days: found.trip.days,
     date, endDate: BookingRules.addDays(date, found.trip.days - 1), private: isPrivate,
-    adults, children, total: BookingRules.price(found.trip.id, adults, children), deposit: BOOKING.deposit * party,
+    adults, children, total: BookingRules.price(found.trip.id, adults, children), deposit: BookingRules.deposit(found.trip.id, adults, children),
     balanceDue: BookingRules.addDays(date, -BOOKING.balanceDays),
     name, email, phone: clean(b.phone, 40), country: clean(b.country, 80),
-    notes: clean(b.notes, 2000), lang: LANGUAGES[b.lang] ? b.lang : 'en', currency: clean(b.currency, 4), note: ''
+    notes: clean(b.notes, 2000), lang: LANGUAGES[b.lang] ? b.lang : 'en', currency: clean(b.currency, 4), note: '',
+    // Travel documents & flights (step 5 on the booking page)
+    nationality: clean(b.nationality, 80), visa: clean(b.visa, 40), flights: clean(b.flights, 40),
+    flightNo: clean(b.flightNo, 40), arrival: clean(b.arrival, 40), flyFrom: clean(b.flyFrom, 80)
   };
   db.bookings.push(booking);
   save('bookings');
+  closeLead(b.draft, `Booked ${ref}`);
   console.log(`[booking] ${ref} ${booking.tripTitle} on ${date} for ${party} (${email})`);
   const { note, ...forVisitor } = booking;
   sendJSON(res, 201, { ref, booking: forVisitor });
+}
+
+/* ---------- POST /api/track: anonymous visit counts (admin → Insights) ----------
+   Privacy first: no IP address, name, cookie or visitor ID is stored. Each page view only
+   adds 1 to today's totals: pages, packages opened, searches, where the visit came from
+   (another website's domain), the visitor's time zone (a rough region) and language.
+   A "session" is counted once per browser tab session. Bots and headless browsers are skipped. */
+let analytics;
+try { analytics = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'analytics.json'), 'utf8')); } catch { analytics = { since: new Date().toISOString().slice(0, 10), days: {} }; }
+db.analytics = analytics;
+let analyticsTimer = 0;
+const saveAnalytics = () => { if(!analyticsTimer) analyticsTimer = setTimeout(() => { analyticsTimer = 0; save('analytics'); }, 10_000); };
+const trackHits = new Map();
+const BOT = /bot|crawl|spider|slurp|headless|lighthouse|preview|facebookexternalhit|curl|wget|python|node-fetch/i;
+function bump(map, key, max = 300){
+  key = clean(String(key || ''), 80);
+  if(!key) return;
+  if(map[key] === undefined && Object.keys(map).length >= max) key = '(other)';
+  map[key] = (map[key] || 0) + 1;
+}
+async function handleTrack(req, res){
+  const ip = req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const recent = (trackHits.get(ip) || []).filter(t => now - t < 60_000);
+  recent.push(now); trackHits.set(ip, recent);
+  if(recent.length > 60 || BOT.test(req.headers['user-agent'] || '')) return sendJSON(res, 204, {});
+  let b;
+  try { b = JSON.parse(await readBody(req, 4_000)); } catch { return sendJSON(res, 400, { error: 'Bad request' }); }
+  const day = new Date(now + 3 * 3600_000).toISOString().slice(0, 10);              // Nairobi date
+  const d = analytics.days[day] = analytics.days[day] || { sessions: 0, views: 0, pages: {}, trips: {}, searches: {}, interests: {}, refs: {}, tz: {}, lang: {} };
+  if(b.t === 'search'){ bump(d.searches, String(b.q || '').toLowerCase().replace(/\s+/g, ' ').trim()); saveAnalytics(); return sendJSON(res, 204, {}); }
+  d.views++;
+  bump(d.pages, clean(b.page, 60) || 'index.html');
+  if(b.trip) bump(d.trips, clean(b.trip, 60));
+  if(b.q) bump(d.searches, String(b.q).toLowerCase().replace(/\s+/g, ' ').trim());
+  [].concat(b.interests || []).slice(0, 6).forEach(x => bump(d.interests, x));
+  if(b.s){
+    d.sessions++;
+    bump(d.refs, clean(b.ref, 80) || 'Direct / typed');
+    bump(d.tz, clean(b.tz, 60) || 'Unknown');
+    bump(d.lang, clean(b.lang, 12) || 'Unknown');
+  }
+  // Keep about a year and a bit
+  const keys = Object.keys(analytics.days).sort();
+  while(keys.length > 400) delete analytics.days[keys.shift()];
+  saveAnalytics();
+  sendJSON(res, 204, {});
+}
+
+/* ---------- POST /api/leads: progress saved from the booking and customise forms ----------
+   The page sends what the visitor has filled in so far, but only once there is a way to
+   reach them (an email or a phone number). If they leave without finishing, the team sees
+   them under "Unfinished" in admin.html and can email, call or WhatsApp them.
+   One lead per browser draft id; sending the booking/enquiry marks it "booked". */
+const leadHits = new Map();
+function leadLimited(ip){
+  const now = Date.now();
+  const recent = (leadHits.get(ip) || []).filter(t => now - t < 60_000);
+  recent.push(now); leadHits.set(ip, recent);
+  return recent.length > 40;                       // autosave is debounced; this only stops abuse
+}
+function closeLead(draft, outcome){
+  const lead = draft && db.leads.find(x => x.draft === clean(draft, 40));
+  if(!lead || lead.status === 'booked') return;
+  lead.status = 'booked'; lead.outcome = outcome; lead.updated = new Date().toISOString();
+  save('leads');
+}
+async function handleLead(req, res){
+  const ip = req.socket.remoteAddress || 'unknown';
+  if(leadLimited(ip)) return sendJSON(res, 429, { error: 'Too many requests.' });
+  let b;
+  try { b = JSON.parse(await readBody(req, 20_000)); } catch { return sendJSON(res, 400, { error: 'Bad request' }); }
+  const draft = clean(b.draft, 40);
+  if(!/^[a-z0-9-]{8,40}$/i.test(draft)) return sendJSON(res, 400, { error: 'Bad draft id' });
+  const fields = {};
+  Object.entries(b.fields && typeof b.fields === 'object' ? b.fields : {}).slice(0, 30)
+    .forEach(([k, v]) => { const key = clean(k, 60), val = clean(String(v ?? ''), 1500); if(key && val) fields[key] = val; });
+  const email = emailOk(fields.Email || '') ? fields.Email : '';
+  const phone = (fields.Phone || '').replace(/[^\d+]/g, '').length >= 7 ? fields.Phone : '';
+  if(!email && !phone) return sendJSON(res, 202, { saved: false });   // nobody to follow up with yet
+  const now = new Date().toISOString();
+  let lead = db.leads.find(x => x.draft === draft);
+  if(lead && lead.status === 'booked') return sendJSON(res, 200, { saved: false });
+  if(!lead){ lead = { id: newId(), draft, created: now, status: 'open', note: '' }; db.leads.push(lead); }
+  Object.assign(lead, {
+    source: b.source === 'custom' ? 'Custom trip' : 'Booking', page: clean(b.page, 120), step: clean(b.step, 80),
+    resume: clean(b.resume, 300), name: clean(fields.Name || '', 120), email, phone, fields, updated: now
+  });
+  save('leads');
+  sendJSON(res, 200, { saved: true });
 }
 
 /* ---------- POST /api/enquiries (quote, flight, newsletter, brochure…) ---------- */
@@ -487,6 +707,7 @@ async function handleEnquiry(req, res){
   const enquiry = { id: newId(), created: new Date().toISOString(), status: 'new', type: clean(b.type, 40) || 'Enquiry', page: clean(b.page, 120), fields, note: '' };
   db.enquiries.push(enquiry);
   save('enquiries');
+  closeLead(b.draft, `Sent: ${enquiry.type}`);
   console.log(`[enquiry] ${enquiry.type} from ${email}`);
   sendJSON(res, 201, { ok: true });
 }
@@ -544,14 +765,15 @@ async function handleAdmin(req, res){
     return sendJSON(res, 200, { ok: true });
   }
   if(route === 'data' && req.method === 'GET'){
-    const { TRIPS, LAST_MINUTE } = loadData();
-    const trips = [...TRIPS, ...LAST_MINUTE].map(t => ({ id: t.id, title: t.title, days: t.days, capacity: t.group || t.spaces, private: t.group <= 2 }));
-    return sendJSON(res, 200, { bookings: db.bookings, enquiries: db.enquiries, questions: db.questions.slice(-1500), trips, now: new Date().toISOString() });
+    const { TRIPS, LAST_MINUTE, PLACES } = loadData();
+    const trips = [...TRIPS, ...LAST_MINUTE].map(t => ({ id: t.id, title: t.title, days: t.days, capacity: t.group || t.spaces, private: t.group <= 2, country: t.country || '', countries: t.countries || '', img: t.img || '' }));
+    const places = PLACES.map(p => ({ name: p.name, country: p.country }));
+    return sendJSON(res, 200, { bookings: db.bookings, enquiries: db.enquiries, questions: db.questions.slice(-1500), leads: db.leads, trips, places, analytics, now: new Date().toISOString() });
   }
   if(route === 'update' && req.method === 'POST'){
     let b;
     try { b = JSON.parse(await readBody(req, 10_000)); } catch { return sendJSON(res, 400, { error: 'Bad request' }); }
-    const STATUSES = { bookings: ['pending', 'confirmed', 'completed', 'cancelled'], enquiries: ['new', 'replied', 'closed'], questions: ['new', 'reviewed'] };
+    const STATUSES = { bookings: ['pending', 'confirmed', 'completed', 'cancelled'], enquiries: ['new', 'replied', 'closed'], questions: ['new', 'reviewed'], leads: ['open', 'contacted', 'booked', 'lost'] };
     if(!STATUSES[b.kind]) return sendJSON(res, 400, { error: 'Unknown list' });
     const item = db[b.kind].find(x => x.id === b.id);
     if(!item) return sendJSON(res, 404, { error: 'Not found' });
@@ -654,6 +876,8 @@ async function route(req, res){
   if(path === '/api/availability') return handleAvailability(req, res);
   if(path === '/api/bookings') return post(handleBooking);
   if(path === '/api/enquiries') return post(handleEnquiry);
+  if(path === '/api/leads') return post(handleLead);
+  if(path === '/api/track') return post(handleTrack);
   if(path.startsWith('/api/admin/')) return handleAdmin(req, res);
   if(path.startsWith('/api/chat')) return post(handleChat);
   if(path.startsWith('/api/translate')) return post(handleTranslate);
@@ -671,5 +895,6 @@ http.createServer((req, res) => {
   console.log(`SafariNomad running at http://localhost:${PORT}`);
   console.log(`Admin dashboard:  http://localhost:${PORT}/admin.html`);
   if(!process.env.ADMIN_PASSWORD) console.log(`Admin password:   ${adminPassword()}   (edit server/data/admin-password.txt, or set ADMIN_PASSWORD, to change it)`);
-  if(!process.env.ANTHROPIC_API_KEY) console.log('Note: ANTHROPIC_API_KEY is not set, so the AI assistant will use its offline answers.');
+  const ai = chatProvider();
+  console.log(ai === 'claude' ? `AI assistant:     Claude (${MODEL})` : ai === 'gemini' ? `AI assistant:     Google Gemini (${GEMINI_MODELS.join(' → ')}, ${GEMINI_THINKING.toLowerCase()} thinking, no web search)` : 'Note: no AI key set (GEMINI_API_KEY or ANTHROPIC_API_KEY), so the assistant uses its offline answers.');
 });

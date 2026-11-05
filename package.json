@@ -5,12 +5,14 @@
   "description": "SafariNomad website with an AI safari assistant",
   "type": "module",
   "scripts": {
-    "start": "node server/server.mjs"
+    "start": "node --env-file-if-exists=.env server/server.mjs",
+    "dev": "node --env-file-if-exists=.env --watch server/server.mjs"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.9"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.132.1"
+    "@anthropic-ai/sdk": "^0.132.1",
+    "@google/genai": "^2.32.0"
   }
 }

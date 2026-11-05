@@ -77,30 +77,30 @@
     <!-- Results -->
     <div class="fs-results" id="fsResults" hidden>
       <div class="fs-summary" id="fsSummary"></div>
-      <div class="fs-dates" id="fsDates"></div>
-      <div class="fs-body">
-        <aside class="fs-filters" id="fsFilters">
-          <h4>Stops</h4>
-          <label><input type="checkbox" name="fsStops" value="0" checked> Direct</label>
-          <label><input type="checkbox" name="fsStops" value="1" checked> 1 stop</label>
-          <h4>Airlines</h4>
-          <div id="fsAirlines"></div>
-          <h4>Departure time</h4>
-          <label><input type="checkbox" name="fsTime" value="morning" checked> Morning (before 12:00)</label>
-          <label><input type="checkbox" name="fsTime" value="afternoon" checked> Afternoon (12:00 to 18:00)</label>
-          <label><input type="checkbox" name="fsTime" value="evening" checked> Evening (after 18:00)</label>
-        </aside>
-        <div class="fs-main">
-          <div class="fs-sort">
-            <button type="button" class="on" data-sort="best"><b>Best</b><span id="fsSortBest" data-usd=""></span></button>
-            <button type="button" data-sort="cheapest"><b>Cheapest</b><span id="fsSortCheap" data-usd=""></span></button>
-            <button type="button" data-sort="fastest"><b>Fastest</b><span id="fsSortFast" translate="no"></span></button>
-          </div>
-          <div class="fs-count" id="fsCount"></div>
-          <div class="fs-list" id="fsList"></div>
-          <p class="fs-note"><i class="fa-solid fa-circle-info"></i> Typical schedules and estimated fares. A planner confirms live seats and the final price before you pay.</p>
-        </div>
+
+      <!-- 1. Live prices on trusted comparison sites (links filled in with the search) -->
+      <div class="fs-block">
+        <h3><span class="fs-n">1</span> Compare live prices</h3>
+        <p class="fs-sub">Real fares from every airline, cheapest first. Opens in a new tab with your route, dates and travellers filled in.</p>
+        <div class="fs-sites" id="fsCompare"></div>
       </div>
+
+      <!-- 2. Airlines serving the route, linking to their official websites -->
+      <div class="fs-block">
+        <h3><span class="fs-n">2</span> Or book direct with the airline</h3>
+        <p class="fs-sub" id="fsRouteInfo"></p>
+        <div class="fs-airs" id="fsAirList"></div>
+      </div>
+
+      <!-- 3. Hand it to a planner -->
+      <div class="fs-block fs-ask">
+        <div>
+          <h3><span class="fs-n">3</span> Rather we book it for you?</h3>
+          <p class="fs-sub">We compare fares, book the tickets, match them to your safari and track your flights.</p>
+        </div>
+        <button type="button" class="btn" id="fsAskUs"><i class="fa-solid fa-headset"></i> Let us book it</button>
+      </div>
+      <p class="fs-note"><i class="fa-solid fa-circle-info"></i> Prices and tickets come from the airline or comparison site you choose. Routes change, so the comparison sites show exactly who flies on your dates.</p>
     </div>
 
     <h3 class="fs-popular">Popular routes</h3>

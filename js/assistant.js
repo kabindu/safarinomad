@@ -1,5 +1,5 @@
 /* =========================================================
-   SafariNomad: "Nomad" AI safari assistant (chat widget)
+   SafariNomad: "Nomad" AI travel expert (chat widget)
    ---------------------------------------------------------
    Live mode:    when the site runs on server/server.mjs
                  (npm start), questions go to /api/chat and
@@ -21,8 +21,8 @@
   const ENDPOINT = 'api/chat';
   // Translate a template (see js/i18n.js); {name} placeholders are filled from vars
   const T = (s, vars) => typeof SNI18N !== 'undefined' ? SNI18N.t(s, vars) : s.replace(/\{(\w+)\}/g, (m, k) => vars && k in vars ? vars[k] : m);
-  const SUGGESTIONS = ['Best safari for a honeymoon?', 'When can I see the Great Migration?', 'How much is a gorilla permit?', 'Safaris under $2,000'];
-  const GREETING = "Jambo! I'm **Nomad**, SafariNomad's AI safari assistant. Ask me anything about our trips, the best time to go, prices, visas or what to pack. What kind of safari are you dreaming of?";
+  const SUGGESTIONS = ['Plan 10 days in Kenya and Zanzibar', 'Do I need a visa for Tanzania?', 'When can I see the Great Migration?', 'How much is a gorilla permit?'];
+  const GREETING = "Jambo! I'm **Nomad**, SafariNomad's AI travel expert. Ask me anything about travel, anywhere in the world: where and when to go, a day-by-day plan, visas, flights, budgets or what to pack. Where would you like to go?";
 
   const store = {
     get(){ try{ return JSON.parse(sessionStorage.getItem('nomadChat')) || []; }catch(e){ return []; } },
@@ -50,7 +50,7 @@
     back.hidden = false;
     team.classList.add('ai-mode');
     team.innerHTML = '<span><i class="fa-solid fa-wand-magic-sparkles"></i></span>';
-    titleEl.textContent = 'Nomad · AI safari assistant';
+    titleEl.textContent = 'Nomad · AI travel expert';
     status.className = 'chat-status';
     status.innerHTML = `<i></i> <span>${live ? 'Instant answers, 24/7' : 'Quick answers from our safari guide'}</span>`;
     chat.classList.add('ai-open');
@@ -85,20 +85,26 @@
         return `<a href="${url}"${ext ? ' target="_blank" rel="noopener"' : ''}>${text}</a>`;
       });
   }
+  // Also: short headings (## Day 1) as bold lines, numbered steps as numbered lists
   function markdown(text){
     const out = [];
-    let list = null;
+    let list = null, tag = 'ul';
+    const close = () => { if(list){ out.push(`<${tag}>${list.join('')}</${tag}>`); list = null; } };
     text.split('\n').forEach(line => {
-      const item = line.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/);
-      if(item){
-        if(!list){ list = []; }
-        list.push(`<li>${inline(item[1])}</li>`);
+      const bullet = line.match(/^\s*[-*•]\s+(.*)$/), num = line.match(/^\s*\d+[.)]\s+(.*)$/);
+      if(bullet || num){
+        const t = num ? 'ol' : 'ul';
+        if(list && t !== tag) close();
+        if(!list){ list = []; tag = t; }
+        list.push(`<li>${inline((bullet || num)[1])}</li>`);
         return;
       }
-      if(list){ out.push(`<ul>${list.join('')}</ul>`); list = null; }
-      if(line.trim()) out.push(`<p>${inline(line)}</p>`);
+      close();
+      const head = line.match(/^\s*#{1,4}\s+(.*)$/);
+      if(head) out.push(`<p class="ai-h"><b>${inline(head[1].replace(/\*\*/g, ''))}</b></p>`);
+      else if(line.trim()) out.push(`<p>${inline(line)}</p>`);
     });
-    if(list) out.push(`<ul>${list.join('')}</ul>`);
+    close();
     return out.join('');
   }
 
@@ -201,6 +207,12 @@
         if(!line) continue;
         const data = JSON.parse(line.slice(6));
         if(data.error){ if(data.fallback && !text) throw new Error(data.error); continue; }
+        if(data.status === 'searching'){
+          // Nomad is looking something up on the web (visa rules, events, prices…)
+          el.innerHTML = (text ? markdown(text) : '') + `<span class="ai-searching"><i class="fa-solid fa-globe"></i> ${T('Searching the web…')}</span>`;
+          log.scrollTop = log.scrollHeight;
+          continue;
+        }
         if(data.t){
           text += data.t;
           el.innerHTML = markdown(text);

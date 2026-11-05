@@ -125,3 +125,30 @@ button.cal-day:hover{background:#CCE0FF;}
   #site-header,#site-footer,.breadcrumb,.bk-title,.bk-done-actions,.tabbar,.chat,.chat-launcher{display:none !important;}
   .bk-section{padding:0;}
 }
+
+/* Numbered steps, visible field labels and "book by phone" (clearer for every age) */
+.bk-h{display:flex;align-items:center;gap:10px;font-size:15px;text-transform:none;letter-spacing:0;color:var(--yt-text);}
+.bk-n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;}
+.bk-field{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--yt-text);}
+.bk-field small{font-weight:500;color:var(--yt-muted);}
+.bk-field.full{grid-column:1/-1;}
+.bk-input{font-size:16px;padding:13px 14px;}
+.bk-call{display:flex;align-items:center;gap:12px;margin-top:16px;padding:12px 14px;border-radius:12px;background:var(--box-bg);color:var(--yt-text);font-size:14px;}
+.bk-call i{width:36px;height:36px;flex:none;border-radius:50%;background:#fff;color:var(--orange-dark);display:flex;align-items:center;justify-content:center;}
+.bk-call span{display:flex;flex-direction:column;}
+.bk-call b{font-size:16px;}
+.bk-call:hover{background:var(--box-hover);}
+
+/* Step 5: visa & flights choices (big, tappable rows) */
+.bk-save-note{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:var(--yt-muted);}
+.bk-save-note i{color:var(--green);}
+.bk-choice{border:none;padding:0;margin:16px 0 0;display:grid;gap:8px;min-width:0;}
+.bk-choice legend{font-size:14px;font-weight:600;color:var(--yt-text);margin-bottom:8px;padding:0;}
+.bk-choice label{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid #d3d9e2;border-radius:12px;background:#fff;cursor:pointer;transition:border-color .15s,background .15s;}
+.bk-choice label:hover{border-color:#b9c3d0;}
+.bk-choice input{width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--orange);}
+.bk-choice b{display:block;font-size:15px;font-weight:600;color:var(--yt-text);}
+.bk-choice small{display:block;font-size:13px;color:var(--yt-muted);margin-top:2px;}
+.bk-choice label:has(input:checked){border-color:var(--orange);background:#F5F9FF;box-shadow:0 0 0 1px var(--orange);}
+#stepTravel .bk-fields{margin-top:12px;}
+textarea.bk-input{resize:vertical;font:inherit;font-size:16px;}

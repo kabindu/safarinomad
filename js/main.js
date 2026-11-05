@@ -52,18 +52,19 @@ const SN = (function(){
   $$('.menu-bar .drop a, .util-menu button').forEach(a => a.addEventListener('click', () => a.blur()));
 
   /* ---------- Currency ---------- */
-  const RATES = { USD:{r:1,s:'$'}, EUR:{r:0.92,s:'€'}, GBP:{r:0.79,s:'£'}, KES:{r:129,s:'KES '} };
-  let currency = store.get('currency') || 'USD';
+  // Prices are stored in USD and shown in US dollars or euros
+  const RATES = { USD:{r:1,s:'$'}, EUR:{r:0.92,s:'€'} };
+  let currency = RATES[store.get('currency')] ? store.get('currency') : 'USD';   // older visits may have saved GBP/KES
   function money(usd){
     const c = RATES[currency];
-    const v = currency === 'KES' ? Math.round(usd * c.r / 100) * 100 : Math.round(usd * c.r);
+    const v = Math.round(usd * c.r);
     return c.s + v.toLocaleString('en-US');
   }
   function applyCurrency(){
     $$('[data-usd]').forEach(el => el.textContent = money(+el.dataset.usd));
     $$('[data-save]').forEach(el => el.textContent = 'You save ' + money(+el.dataset.save));
     const label = $('#curLabel');
-    if(label) label.textContent = currency === 'KES' ? 'KES' : currency + ' ' + RATES[currency].s;
+    if(label) label.textContent = currency + ' ' + RATES[currency].s;
     $$('button[data-currency]').forEach(b => b.classList.toggle('active', b.dataset.currency === currency));
   }
   $$('button[data-currency]').forEach(b => b.addEventListener('click', () => {
@@ -112,12 +113,68 @@ const SN = (function(){
   /* ---------- Save a form on the server (admin dashboard) ----------
      Resolves true when saved; rejects when the server isn't available
      (for example when the site is opened straight from the folder). */
-  async function sendEnquiry(type, fields){
+  async function sendEnquiry(type, fields, extra){
     if(!/^https?:/.test(location.protocol)) throw new Error('offline');
     const r = await fetch('/api/enquiries', { method:'POST', headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({ type, fields, page: location.pathname.split('/').pop() || 'index.html' }) });
+      body: JSON.stringify(Object.assign({ type, fields, page: location.pathname.split('/').pop() || 'index.html' }, extra)) });
     if(!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'failed');
     return true;
+  }
+
+  /* ---------- Anonymous visit counts (admin → Insights) ----------
+     One small request per page view: the page, the package opened, what was browsed
+     (country / style / place from the link), where the visit came from (another site's
+     domain), and the time zone and language. Nothing that identifies a person; the server
+     only keeps daily totals. Not sent from the admin page or when opened from a file. */
+  function track(t, extra){
+    if(!/^https?:/.test(location.protocol) || !navigator.sendBeacon) return;
+    try{ navigator.sendBeacon('/api/track', new Blob([JSON.stringify(Object.assign({ t }, extra))], { type:'application/json' })); }catch(e){}
+  }
+  (function(){
+    const page = location.pathname.split('/').pop() || 'index.html';
+    if(page === 'admin.html') return;
+    let s = false;                                    // first page of this tab's visit = one session
+    try{ if(!sessionStorage.getItem('sn-s')){ sessionStorage.setItem('sn-s', '1'); s = true; } }catch(e){}
+    let ref = '';
+    try{ const r = document.referrer && new URL(document.referrer); if(r && r.host !== location.host) ref = r.host.replace(/^www\./, ''); }catch(e){}
+    const interests = [
+      params.get('country') && 'country:' + params.get('country'),
+      ...(params.get('style') || '').split(',').filter(Boolean).map(x => 'style:' + x),
+      page === 'trips.html' && params.get('q') && 'place:' + params.get('q')
+    ].filter(Boolean);
+    let tz = '';
+    try{ tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; }catch(e){}
+    track('view', { page, trip: page === 'book.html' ? (params.get('trip') || '') : '', interests, s, ref, tz, lang: navigator.language || '' });
+  })();
+
+  /* ---------- Follow-up leads (booking and customise forms) ----------
+     lead('booking', 'book') gives { draft, save(data), done() }.
+     save() sends what the visitor has filled in so far, 2 s after they stop typing,
+     and again when the tab is hidden or closed. The server keeps it only once there
+     is an email or phone, so the team can follow up if they leave midway.
+     data = { step, resume (link to continue), fields:{ Name, Email, Phone, … } } */
+  function lead(source, key){
+    const storeKey = 'draft-' + key;
+    let draft = store.get(storeKey);
+    if(!draft){ draft = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 12); store.set(storeKey, draft); }
+    const online = /^https?:/.test(location.protocol);
+    let pending = null, timer = 0, lastSent = '', finished = false;
+    function flush(beacon){
+      clearTimeout(timer);
+      if(!pending || !online || finished) return;
+      const body = JSON.stringify(Object.assign({ draft, source, page: location.pathname.split('/').pop() }, pending));
+      if(body === lastSent) return;
+      lastSent = body;
+      if(beacon && navigator.sendBeacon) navigator.sendBeacon('/api/leads', new Blob([body], { type:'application/json' }));
+      else fetch('/api/leads', { method:'POST', headers:{ 'Content-Type':'application/json' }, body, keepalive:true }).catch(() => {});
+    }
+    window.addEventListener('pagehide', () => flush(true));
+    document.addEventListener('visibilitychange', () => { if(document.hidden) flush(true); });
+    return {
+      draft,
+      save(data){ pending = data; clearTimeout(timer); timer = setTimeout(flush, 2000); },
+      done(){ finished = true; pending = null; clearTimeout(timer); store.set(storeKey, null); }
+    };
   }
 
   /* ---------- Carousels (buttons with data-car="carouselId") ---------- */
@@ -277,5 +334,5 @@ const SN = (function(){
   /* ---------- Start ---------- */
   document.addEventListener('DOMContentLoaded', () => { refresh(); showLanguage(SNI18N.lang); });
 
-  return { $, $$, store, params, toast, money, emailOk, tripCard, lastMinuteCard, refresh, wish, updateCarNav, sendEnquiry, LANDS, inLand };
+  return { $, $$, store, params, toast, money, emailOk, tripCard, lastMinuteCard, refresh, wish, updateCarNav, sendEnquiry, lead, track, LANDS, inLand };
 })();

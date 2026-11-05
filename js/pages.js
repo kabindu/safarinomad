@@ -28,8 +28,12 @@
     const sec = el.closest('section'); if(sec) sec.hidden = !list.length;
   });
 
+  // Past departures are removed automatically (data.js), so this can be empty: say so instead of leaving a gap
   $$('[data-last-minute]').forEach(el => {
-    el.innerHTML = LAST_MINUTE.map(SN.lastMinuteCard).join('');
+    if(LAST_MINUTE.length){ el.innerHTML = LAST_MINUTE.map(SN.lastMinuteCard).join(''); return; }
+    el.classList.remove('card-grid');
+    el.innerHTML = `<div class="empty-state show"><p><strong>No last-minute seats right now.</strong> We release them a few weeks before departure.</p>
+      <p style="margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;"><a class="btn" href="trips.html">Browse all packages</a><a class="btn btn-outline" href="https://wa.me/${SITE.whatsapp}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Ask on WhatsApp</a></p></div>`;
   });
 
   /* ---------- Flight routes (flights page) and hotels (services page), from js/data.js ---------- */

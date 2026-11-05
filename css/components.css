@@ -288,3 +288,29 @@ a.contact-meta-item:hover{background:var(--yt-hover);}
 .ct-way small{font-size:12.5px;color:var(--yt-muted);}
 .ct-way .go{font-size:11px;color:var(--yt-muted);}
 @media (max-width:900px){ .ct-layout{grid-template-columns:1fr;} .ct-side{position:static;} .ct-form-card{padding:20px;} }
+
+/* ---------- Licences & partners strip (js/layout.js, data in PARTNERS) ---------- */
+.partners{padding:34px 0 38px;border-top:1px solid var(--yt-line);border-bottom:1px solid var(--yt-line);background:#fff;}
+.partners-head{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 10px;margin-bottom:18px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yt-muted);}
+.partners-head .dot{color:var(--line);}
+.marquee{display:flex;overflow:hidden;outline:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);}
+.marquee-track{flex:none;display:flex;gap:12px;padding:2px 12px 2px 0;margin:0;list-style:none;animation:marqueeScroll 60s linear infinite;}
+.marquee:hover .marquee-track,.marquee:focus-visible .marquee-track{animation-play-state:paused;}
+.marquee:focus-visible{box-shadow:0 0 0 2px var(--orange);border-radius:12px;}
+@keyframes marqueeScroll{to{transform:translateX(-100%);}}
+.pt-badge{flex:none;display:flex;align-items:center;gap:12px;padding:12px 18px 12px 12px;border:1px solid var(--yt-line);border-radius:14px;background:#fff;}
+.pt-badge > i{width:40px;height:40px;border-radius:10px;background:var(--box-bg);color:var(--orange-dark);display:flex;align-items:center;justify-content:center;font-size:17px;}
+.pt-badge > i.fa-brands{font-size:24px;background:none;color:var(--navy);}
+.pt-badge b{display:block;font-size:15px;font-weight:700;color:var(--yt-text);white-space:nowrap;}
+.pt-badge small{display:block;font-size:12.5px;color:var(--yt-muted);white-space:nowrap;}
+@media (prefers-reduced-motion:reduce){
+  .marquee{-webkit-mask-image:none;mask-image:none;}
+  .marquee-track{animation:none;flex-wrap:wrap;justify-content:center;flex:1;padding:0 16px;}
+  .marquee-track[aria-hidden]{display:none;}
+}
+
+/* ---------- Readability: slightly larger small print on cards (easier for every age) ---------- */
+.tc-rating{font-size:14px;}
+.trip-price,.trip-price small{font-size:14px;}
+.tc-label,.trip-img .chip{font-size:12px;}
+@media (max-width:620px){.partners-head{flex-direction:column;align-items:center;gap:4px;}.partners-head .dot{display:none;}}

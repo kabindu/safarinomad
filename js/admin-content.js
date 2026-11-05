@@ -16,8 +16,8 @@ window.AdminContent = (function(){
     lastminute: { title:'Last-minute deals', sub:'Fixed departures with a few seats left, shown on the home page and in Flash deals.' },
     flights:    { title:'Flights', sub:'Routes, flight times and from-fares used by the flight search.' }
   };
-  const COUNTRIES = { kenya:'Kenya', tanzania:'Tanzania', uganda:'Uganda', rwanda:'Rwanda', multi:'Multi-country' };
-  const STYLES = { wildlife:'Wildlife', gorilla:'Gorillas & primates', beach:'Safari & beach', trek:'Trekking', camping:'Camping', family:'Family', luxury:'Luxury' };
+  const COUNTRIES = { kenya:'Kenya', tanzania:'Tanzania', uganda:'Uganda', rwanda:'Rwanda', multi:'Multi-country', world:'Beyond Africa' };
+  const STYLES = { wildlife:'Wildlife', gorilla:'Gorillas & primates', beach:'Safari & beach', trek:'Trekking', camping:'Camping', family:'Family', luxury:'Luxury', adventure:'Adventure & sport', abroad:'Holidays abroad' };
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   let ctx, el, view;

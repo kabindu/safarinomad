@@ -22,7 +22,7 @@
 
 <section class="bk-section">
   <div class="wrap">
-    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i class="fa-solid fa-chevron-right"></i><a href="trips.html">Trips</a><i class="fa-solid fa-chevron-right"></i><span>Book</span></nav>
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i class="fa-solid fa-chevron-right"></i><a href="trips.html">Packages</a><i class="fa-solid fa-chevron-right"></i><span>Book</span></nav>
     <h1 class="bk-title">Book your safari</h1>
   </div>
 
@@ -32,14 +32,14 @@
 
       <!-- Trip -->
       <div class="bk-block">
-        <label for="bkTrip" class="bk-h">Trip</label>
+        <label for="bkTrip" class="bk-h"><span class="bk-n">1</span> Choose your package</label>
         <select id="bkTrip" name="trip" class="bk-input"></select>
       </div>
 
       <!-- Date -->
       <div class="bk-block" id="stepDate">
         <div class="bk-row">
-          <span class="bk-h">Start date</span>
+          <span class="bk-h"><span class="bk-n">2</span> Pick a start date</span>
           <label class="bk-switch" id="privateWrap" hidden>
             <input type="checkbox" id="bkPrivate"><span class="bk-slider"></span><span>Private</span>
           </label>
@@ -58,7 +58,7 @@
 
       <!-- Travellers -->
       <div class="bk-block" id="stepPeople">
-        <span class="bk-h">Travellers</span>
+        <span class="bk-h"><span class="bk-n">3</span> Who's travelling?</span>
         <div class="bk-people">
           <div class="bk-counter">
             <div><strong>Adults</strong><small>16+</small></div>
@@ -73,11 +73,43 @@
 
       <!-- Details -->
       <div class="bk-block" id="stepDetails">
-        <span class="bk-h">Your details</span>
+        <span class="bk-h"><span class="bk-n">4</span> Your details</span>
         <div class="bk-fields">
-          <input id="bkName" name="name" class="bk-input" type="text" placeholder="Full name" aria-label="Full name" autocomplete="name" required>
-          <input id="bkEmail" name="email" class="bk-input" type="email" placeholder="Email" aria-label="Email" autocomplete="email" required>
-          <input id="bkPhone" name="phone" class="bk-input full" type="tel" placeholder="Phone / WhatsApp (optional)" aria-label="Phone or WhatsApp (optional)" autocomplete="tel">
+          <label class="bk-field"><span>Full name</span><input id="bkName" name="name" class="bk-input" type="text" autocomplete="name" required></label>
+          <label class="bk-field"><span>Email</span><input id="bkEmail" name="email" class="bk-input" type="email" autocomplete="email" required></label>
+          <label class="bk-field"><span>Phone or WhatsApp <small>(optional)</small></span><input id="bkPhone" name="phone" class="bk-input" type="tel" autocomplete="tel"></label>
+          <label class="bk-field"><span>Country you live in</span><input id="bkCountry" name="country" class="bk-input" type="text" autocomplete="country-name"></label>
+        </div>
+        <p class="bk-save-note"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> We save your details as you go, so a planner can help if you get stuck. We never share them.</p>
+      </div>
+
+      <!-- Visa & flights: what the traveller has, or wants help with -->
+      <div class="bk-block" id="stepTravel">
+        <span class="bk-h"><span class="bk-n">5</span> Visa &amp; flights</span>
+        <div class="bk-fields">
+          <label class="bk-field full"><span>Passport nationality</span><input id="bkNationality" name="nationality" class="bk-input" type="text" placeholder="e.g. German"></label>
+        </div>
+        <fieldset class="bk-choice">
+          <legend>Visa or eTA</legend>
+          <label><input type="radio" name="visa" value="help" checked><span><b>Please help me get it</b><small>We tell you exactly what you need and guide you through the eTA or eVisa</small></span></label>
+          <label><input type="radio" name="visa" value="own"><span><b>I'll arrange it myself</b><small>We'll send you the official links</small></span></label>
+          <label><input type="radio" name="visa" value="none"><span><b>Not needed</b><small>East African citizens</small></span></label>
+        </fieldset>
+        <fieldset class="bk-choice">
+          <legend>Flights</legend>
+          <label><input type="radio" name="flights" value="help" checked><span><b>Please find flights for me</b><small>We compare fares and book them with you</small></span></label>
+          <label><input type="radio" name="flights" value="booked"><span><b>I've booked my flights</b><small>Tell us when you land so we can meet you</small></span></label>
+          <label><input type="radio" name="flights" value="later"><span><b>I'll decide later</b><small>You can tell us any time before you travel</small></span></label>
+        </fieldset>
+        <div class="bk-fields" id="flyHelp">
+          <label class="bk-field full"><span>Flying from (city or airport)</span><input name="flyFrom" class="bk-input" type="text" placeholder="e.g. Frankfurt"></label>
+        </div>
+        <div class="bk-fields" id="flyBooked" hidden>
+          <label class="bk-field"><span>Arrival flight number</span><input name="flightNo" class="bk-input" type="text" placeholder="e.g. KQ 117"></label>
+          <label class="bk-field"><span>Landing date &amp; time</span><input name="arrival" class="bk-input" type="datetime-local"></label>
+        </div>
+        <div class="bk-fields">
+          <label class="bk-field full"><span>Anything we should know? <small>(optional)</small></span><textarea name="notes" class="bk-input" rows="3" placeholder="Diet, medical needs, a birthday on the trip…"></textarea></label>
         </div>
       </div>
 
@@ -100,6 +132,7 @@
       <label class="bk-agree"><input type="checkbox" id="bkAgree" required> <span>I accept the <a href="about.html#faqs" target="_blank">booking terms</a></span></label>
       <button class="btn bk-submit" type="submit" form="bookForm" id="bookBtn">Request booking</button>
       <p class="rc-note"><i class="fa-solid fa-lock"></i> No payment today</p>
+<a class="bk-call" data-phone><i class="fa-solid fa-phone" aria-hidden="true"></i><span>Prefer to book by phone?<b data-phone-number></b></span></a>
     </aside>
 
     <!-- Phones: total and button always in reach -->
@@ -124,6 +157,8 @@
 </section>
 
 </main>
+
+<div data-partners></div>
 
 <div id="site-footer"></div>
 

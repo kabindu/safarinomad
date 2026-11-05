@@ -196,13 +196,44 @@
     $('#sumPP').textContent = money(info.price);
     const total = R.price(t.id, state.adults, state.children);
     $('#sumTotal').textContent = money(total) + (isPrivate() && info.kind === 'group' ? '*' : '');
-    $('#sumDeposit').textContent = money(BOOKING.deposit * party());
+    $('#sumDeposit').textContent = money(R.deposit(t.id, state.adults, state.children));
     $('#bookBtn').disabled = !state.date;
 
     $('#barTotal').textContent = $('#sumTotal').textContent;
     $('#barDates').textContent = state.date ? shortRange(state.date, end) : T('Choose a date');
+    if(typeof saveProgress === 'function') saveProgress();
   }
   form.addEventListener('input', () => render());
+
+  /* ---------- Visa & flights (step 5) ---------- */
+  const VISA = { help:'Wants help with visa / eTA', own:'Arranging own visa', none:'No visa needed (East African citizen)' };
+  const FLIGHTS = { help:'Wants us to find flights', booked:'Flights already booked', later:'Will decide on flights later' };
+  function showFlightFields(){
+    const v = (form.querySelector('input[name=flights]:checked') || {}).value;
+    $('#flyHelp').hidden = v !== 'help';
+    $('#flyBooked').hidden = v !== 'booked';
+  }
+  form.addEventListener('change', e => { if(e.target.name === 'flights') showFlightFields(); });
+  showFlightFields();
+
+  /* ---------- Follow-up: save progress so a planner can help if the traveller leaves ---------- */
+  const lead = SN.lead('booking', 'book');
+  function saveProgress(){
+    if(!state.trip) return;
+    const d = Object.fromEntries(new FormData(form).entries());
+    const step = !state.date ? 'Picking a date' : !(d.name || '').trim() || !SN.emailOk((d.email || '').trim()) ? 'Entering details' : 'Filled in, booking not sent';
+    lead.save({
+      step,
+      resume: `book.html?trip=${state.trip.id}${state.date ? `&date=${state.date}` : ''}`,
+      fields: {
+        Name: d.name, Email: (d.email || '').trim(), Phone: d.phone, Country: d.country,
+        Trip: state.trip.title, Date: state.date || '', Travellers: `${state.adults} adults, ${state.children} children`,
+        Nationality: d.nationality, Visa: VISA[d.visa], Flights: FLIGHTS[d.flights],
+        'Flying from': d.flights === 'help' ? d.flyFrom : '', 'Arrival flight': d.flights === 'booked' ? [d.flightNo, d.arrival].filter(Boolean).join(' · ') : '',
+        Notes: d.notes
+      }
+    });
+  }
 
   const shortRange = (a, b) => `${fmt(a, { day:'numeric', month:'short' })} – ${fmt(b, { day:'numeric', month:'short', year:'numeric' })}`;
 
@@ -226,7 +257,9 @@
 
     const payload = { trip:state.trip.id, date:state.date, private:isPrivate(), adults:state.adults, children:state.children,
       name:d.name.trim(), email:d.email.trim(), phone:(d.phone || '').trim(), country:(d.country || '').trim(), notes:(d.notes || '').trim(),
-      lang:SNI18N.lang, currency:(SN.store.get('currency') || 'USD') };
+      nationality:(d.nationality || '').trim(), visa:d.visa || '', flights:d.flights || '',
+      flyFrom:d.flights === 'help' ? (d.flyFrom || '').trim() : '', flightNo:d.flights === 'booked' ? (d.flightNo || '').trim() : '', arrival:d.flights === 'booked' ? (d.arrival || '') : '',
+      lang:SNI18N.lang, currency:(SN.store.get('currency') || 'USD'), draft:lead.draft };
 
     if(!ONLINE) return emailFallback(payload);
     const buttons = [$('#bookBtn'), $('#barBtn')];
@@ -234,7 +267,7 @@
     try{
       const r = await fetch('/api/bookings', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(payload) });
       const data = await r.json().catch(() => ({}));
-      if(r.ok) return showDone(data.ref, payload);
+      if(r.ok){ lead.done(); return showDone(data.ref, payload); }
       if(r.status === 409 || r.status === 400){ say(data.error || 'That date is no longer available. Please pick another.', true); loadAvailability(); }
       else throw new Error(data.error || r.status);
     }catch(err){
@@ -252,8 +285,10 @@
       'Trip: ' + state.trip.title,
       'Dates: ' + p.date + ' to ' + R.addDays(p.date, state.trip.days - 1) + (p.private ? ' (private)' : ''),
       'Travellers: ' + p.adults + ' adults, ' + p.children + ' children',
-      'Total: $' + R.price(p.trip, p.adults, p.children).toLocaleString('en-US') + ' (deposit $' + (BOOKING.deposit * (p.adults + p.children)) + ')',
+      'Total: $' + R.price(p.trip, p.adults, p.children).toLocaleString('en-US') + ' (deposit $' + R.deposit(p.trip, p.adults, p.children).toLocaleString('en-US') + ')',
       'Name: ' + p.name, 'Email: ' + p.email, 'Phone: ' + (p.phone || '-'), 'Country: ' + (p.country || '-'),
+      'Nationality: ' + (p.nationality || '-'), 'Visa: ' + (VISA[p.visa] || '-'), 'Flights: ' + (FLIGHTS[p.flights] || '-'),
+      p.flyFrom ? 'Flying from: ' + p.flyFrom : '', p.flightNo || p.arrival ? 'Arrival: ' + [p.flightNo, p.arrival].filter(Boolean).join(' · ') : '',
       p.notes ? '\nNotes:\n' + p.notes : ''
     ].filter(Boolean).join('\n');
   }

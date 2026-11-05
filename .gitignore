@@ -5,3 +5,4 @@ server/data/admin-password.txt
 server/data/*.json
 .env
 .env.*
+!.env.example

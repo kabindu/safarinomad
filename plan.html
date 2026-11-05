@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customise Your Own Safari Package | SafariNomad</title>
+<meta name="description" content="Build your own East Africa safari: pick the parks, the nights in each, what you want to do and how you like to travel. See a live price estimate and get a tailored quote within 24 hours.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/plan.css">
+</head>
+<body data-page="plan">
+
+<div id="site-header"></div>
+
+<main>
+<!-- Trip builder (js/plan.js). Steps on the left, a live summary and estimate on the right.
+     Places come from PLACES in js/data.js; prices are worked out from TRIPS. -->
+<section class="pl-section">
+  <div class="wrap">
+    <nav class="breadcrumb ct-crumb" aria-label="Breadcrumb"><a href="index.html">Home</a><i class="fa-solid fa-chevron-right"></i><span>Customise your trip</span></nav>
+    <header class="pl-head">
+      <h1>Customise your own package</h1>
+      <p>Build your route, choose what matters to you and see a price as you go. A planner sends your tailored quote within 24 hours.</p>
+      <div class="contact-status show pl-notice" id="plNotice" hidden></div>
+    </header>
+
+    <form class="pl-layout" id="planForm" novalidate>
+
+      <div class="pl-steps">
+        <!-- 1. Places -->
+        <fieldset class="pl-step" id="stepWhere">
+          <legend><span class="pl-num">1</span> Where do you want to go?</legend>
+          <p class="pl-hint">Pick as many places as you like. They become your route below.</p>
+          <div class="pl-tabs" id="plCountries" role="tablist"></div>
+          <div class="pl-places" id="plPlaces"></div>
+          <label class="pl-check"><input type="checkbox" id="plUnsure"> <span>I'm not sure yet. Suggest a route for me.</span></label>
+        </fieldset>
+
+        <!-- 2. Route -->
+        <fieldset class="pl-step" id="stepRoute">
+          <legend><span class="pl-num">2</span> Your route</legend>
+          <p class="pl-hint" id="plRouteHint">Add places above to build your route. Set the nights in each and change the order with the arrows.</p>
+          <ol class="pl-route" id="plRoute"></ol>
+        </fieldset>
+
+        <!-- 3. Experiences -->
+        <fieldset class="pl-step">
+          <legend><span class="pl-num">3</span> What would you love to do?</legend>
+          <div class="pl-chips" id="plExperiences"></div>
+          <div class="pl-tips" id="plTips" aria-live="polite"></div>
+        </fieldset>
+
+        <!-- 4. When -->
+        <fieldset class="pl-step">
+          <legend><span class="pl-num">4</span> When do you want to travel?</legend>
+          <div class="pl-months" id="plMonths"></div>
+        </fieldset>
+
+        <!-- 5. Who -->
+        <fieldset class="pl-step">
+          <legend><span class="pl-num">5</span> Who's travelling?</legend>
+          <div class="pl-pax">
+            <div class="pl-pax-row"><div><b>Adults</b><small>Age 16+</small></div>
+              <div class="pl-stepper" data-pax="adults"><button type="button" data-step="-1" aria-label="Fewer adults"><i class="fa-solid fa-minus"></i></button><output>2</output><button type="button" data-step="1" aria-label="More adults"><i class="fa-solid fa-plus"></i></button></div></div>
+            <div class="pl-pax-row"><div><b>Children</b><small>Age 5–15</small></div>
+              <div class="pl-stepper" data-pax="children"><button type="button" data-step="-1" aria-label="Fewer children"><i class="fa-solid fa-minus"></i></button><output>0</output><button type="button" data-step="1" aria-label="More children"><i class="fa-solid fa-plus"></i></button></div></div>
+          </div>
+          <div class="pl-sub-label">Is it a special trip?</div>
+          <div class="pl-chips small" id="plOccasion"></div>
+        </fieldset>
+
+        <!-- 6. Comfort -->
+        <fieldset class="pl-step">
+          <legend><span class="pl-num">6</span> How do you like to travel?</legend>
+          <div class="pl-levels" id="plLevels"></div>
+          <div class="pl-sub-label">Vehicle and guide</div>
+          <div class="pl-seg" id="plVehicle"></div>
+        </fieldset>
+      </div>
+
+      <!-- Live summary (sticky on wide screens) -->
+      <aside class="pl-summary" aria-label="Your trip so far">
+        <div class="pl-card">
+          <h2>Your trip</h2>
+          <div class="pl-sum-route" id="sumRoute">No places yet</div>
+          <dl class="pl-sum" id="sumList"></dl>
+          <div class="pl-est">
+            <span>Estimated price per person</span>
+            <b id="sumPrice">–</b>
+            <small id="sumTotal"></small>
+          </div>
+          <a class="btn pl-go" href="#stepDetails">Get my free quote <i class="fa-solid fa-arrow-right"></i></a>
+          <p class="pl-fine">Estimate based on our current trip prices. Your quote confirms the exact price, with no obligation.</p>
+          <a class="pl-call" data-phone><i class="fa-solid fa-phone" aria-hidden="true"></i><span>Rather tell us by phone?<b data-phone-number></b></span></a>
+        </div>
+        <div class="pl-similar" id="plSimilar" hidden>
+          <h3>Ready-made trips like yours</h3>
+          <div id="plSimilarList"></div>
+        </div>
+      </aside>
+
+      <!-- 7. Contact details -->
+      <fieldset class="pl-step pl-details" id="stepDetails">
+        <legend><span class="pl-num">7</span> Where should we send your quote?</legend>
+        <div class="contact-form">
+          <div class="form-field"><label for="plName">Full name <span class="req" aria-hidden="true">*</span></label><input id="plName" name="name" type="text" autocomplete="name" placeholder="Your full name" required aria-required="true"></div>
+          <div class="form-field"><label for="plEmail">Email <span class="req" aria-hidden="true">*</span></label><input id="plEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required aria-required="true"></div>
+          <div class="form-field"><label for="plPhone">Phone / WhatsApp</label><input id="plPhone" name="phone" type="tel" autocomplete="tel" placeholder="+1 555 123 4567"></div>
+          <div class="form-field"><label for="plReply">Best way to reach you</label>
+            <select id="plReply" name="reply"><option>Email</option><option>WhatsApp</option><option>Phone call</option></select></div>
+          <div class="form-field full"><label for="plNotes">Anything else?</label><textarea id="plNotes" name="notes" rows="3" placeholder="Dietary needs, a lodge you've heard about, mobility, a birthday on the trip…"></textarea></div>
+        </div>
+        <button class="btn pl-send" type="submit">Send my trip for a quote <i class="fa-solid fa-paper-plane"></i></button>
+        <small class="ct-privacy"><i class="fa-solid fa-lock"></i> We save your trip as you go, so a planner can help if you get stuck. Never shared · Free, no obligation · <span class="req">*</span> required</small>
+        <div id="plStatus" class="contact-status" aria-live="polite"></div>
+      </fieldset>
+
+    </form>
+  </div>
+</section>
+
+<!-- Phone: the estimate stays in view while scrolling the steps -->
+<div class="pl-bar" id="plBar">
+  <div><small>Estimate per person</small><b id="barPrice">–</b></div>
+  <a class="btn btn-sm" href="#stepDetails">Get quote</a>
+</div>
+</main>
+
+<div data-partners></div>
+
+<div id="site-footer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/content.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/main.js"></script>
+<script src="js/search.js"></script>
+<script src="js/assistant.js"></script>
+<script src="js/plan.js"></script>
+</body>
+</html>
