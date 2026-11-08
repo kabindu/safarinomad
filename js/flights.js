@@ -24,25 +24,7 @@
   /* ---------- Airports and airlines ---------- */
   const EAST_AFRICA = ['NBO', 'MBA', 'KIS', 'JRO', 'ARK', 'DAR', 'ZNZ', 'EBB', 'KGL'];
   const isEA = c => EAST_AFRICA.includes(c);
-  // Official websites (book direct). hub = where the airline connects.
-  const AIRLINES = {
-    KQ:{ name:'Kenya Airways',      hub:'Nairobi',       url:'https://www.kenya-airways.com' },
-    EK:{ name:'Emirates',           hub:'Dubai',         url:'https://www.emirates.com' },
-    MS:{ name:'EgyptAir',           hub:'Cairo',         url:'https://www.egyptair.com' },
-    QR:{ name:'Qatar Airways',      hub:'Doha',          url:'https://www.qatarairways.com' },
-    ET:{ name:'Ethiopian Airlines', hub:'Addis Ababa',   url:'https://www.ethiopianairlines.com' },
-    TK:{ name:'Turkish Airlines',   hub:'Istanbul',      url:'https://www.turkishairlines.com' },
-    KL:{ name:'KLM',                hub:'Amsterdam',     url:'https://www.klm.com' },
-    AF:{ name:'Air France',         hub:'Paris',         url:'https://www.airfrance.com' },
-    BA:{ name:'British Airways',    hub:'London',        url:'https://www.britishairways.com' },
-    SN:{ name:'Brussels Airlines',  hub:'Brussels',      url:'https://www.brusselsairlines.com' },
-    DE:{ name:'Condor',             hub:'Frankfurt',     url:'https://www.condor.com' },
-    WB:{ name:'RwandAir',           hub:'Kigali',        url:'https://www.rwandair.com' },
-    UR:{ name:'Uganda Airlines',    hub:'Entebbe',       url:'https://www.ugandairlines.com' },
-    TC:{ name:'Air Tanzania',       hub:'Dar es Salaam', url:'https://www.airtanzania.co.tz' },
-    PW:{ name:'Precision Air',      hub:'Dar es Salaam', url:'https://www.precisionairtz.com' },
-    JM:{ name:'Jambojet',           hub:'Nairobi',       url:'https://www.jambojet.com' }
-  };
+  // AIRLINES (names, hubs, official sites) lives in js/data.js, shared with the flight-status tracker
   // Airlines that usually fly a route non-stop (either direction)
   const DIRECT = {
     'LHR-NBO':['KQ','BA'], 'LGW-EBB':['UR'], 'AMS-NBO':['KL','KQ'], 'AMS-JRO':['KL'], 'CDG-NBO':['AF','KQ'], 'BRU-KGL':['SN','WB'],

@@ -576,6 +576,34 @@ const AIRPORTS = {
   NBO:'Nairobi', MBA:'Mombasa', KIS:'Kisumu', JRO:'Kilimanjaro', ARK:'Arusha', DAR:'Dar es Salaam', ZNZ:'Zanzibar',
   EBB:'Entebbe', KGL:'Kigali'
 };
+/* Airlines serving East Africa: name, home airport, official website (book direct, check flight status).
+   Used by the flight search and the flight-status tracker on flights.html. */
+const AIRLINES = {
+  KQ:{ name:'Kenya Airways',      hub:'Nairobi',       url:'https://www.kenya-airways.com' },
+  EK:{ name:'Emirates',           hub:'Dubai',         url:'https://www.emirates.com' },
+  MS:{ name:'EgyptAir',           hub:'Cairo',         url:'https://www.egyptair.com' },
+  QR:{ name:'Qatar Airways',      hub:'Doha',          url:'https://www.qatarairways.com' },
+  ET:{ name:'Ethiopian Airlines', hub:'Addis Ababa',   url:'https://www.ethiopianairlines.com' },
+  TK:{ name:'Turkish Airlines',   hub:'Istanbul',      url:'https://www.turkishairlines.com' },
+  KL:{ name:'KLM',                hub:'Amsterdam',     url:'https://www.klm.com' },
+  AF:{ name:'Air France',         hub:'Paris',         url:'https://www.airfrance.com' },
+  BA:{ name:'British Airways',    hub:'London',        url:'https://www.britishairways.com' },
+  SN:{ name:'Brussels Airlines',  hub:'Brussels',      url:'https://www.brusselsairlines.com' },
+  DE:{ name:'Condor',             hub:'Frankfurt',     url:'https://www.condor.com' },
+  WB:{ name:'RwandAir',           hub:'Kigali',        url:'https://www.rwandair.com' },
+  UR:{ name:'Uganda Airlines',    hub:'Entebbe',       url:'https://www.ugandairlines.com' },
+  TC:{ name:'Air Tanzania',       hub:'Dar es Salaam', url:'https://www.airtanzania.co.tz' },
+  PW:{ name:'Precision Air',      hub:'Dar es Salaam', url:'https://www.precisionairtz.com' },
+  JM:{ name:'Jambojet',           hub:'Nairobi',       url:'https://www.jambojet.com' }
+};
+
+/* Official airport operators (flight information on their own websites) */
+const AIRPORT_SITES = {
+  NBO:['Kenya Airports Authority', 'https://www.kaa.go.ke'], MBA:['Kenya Airports Authority', 'https://www.kaa.go.ke'], KIS:['Kenya Airports Authority', 'https://www.kaa.go.ke'],
+  DAR:['Tanzania Airports Authority', 'https://www.taa.go.tz'], ARK:['Tanzania Airports Authority', 'https://www.taa.go.tz'],
+  ZNZ:['Zanzibar Airports Authority', 'https://www.zaa.go.tz'], EBB:['Uganda Civil Aviation Authority', 'https://www.caa.go.ug'],
+  KGL:['Rwanda Airports Company', 'https://www.rac.co.rw']
+};
 const ARRIVAL_IMG = { NBO:'giraffe-sunset', MBA:'resort-pool', KIS:'flamingo', JRO:'kilimanjaro', ARK:'misty-acacia', DAR:'coast-resort',
   ZNZ:'zanzibar-palms', EBB:'forest-canopy-walk', KGL:'lake-kivu-sunset' };
 const FLIGHTS = [

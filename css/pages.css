@@ -273,3 +273,63 @@
 @media (max-width:900px){.fs-sites{grid-template-columns:1fr;}}
 @media (max-width:560px){.fs-block{padding:16px;}.fs-ask .btn{width:100%;justify-content:center;}}
 
+/* ---------- Flights page: Book flights / Flight status switch and the live tracker ---------- */
+.fl-modes{display:inline-flex;gap:4px;padding:4px;margin-bottom:16px;border-radius:14px;background:var(--box-bg);}
+.fl-modes button{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border:none;border-radius:10px;background:none;font:inherit;font-size:15px;font-weight:600;color:var(--yt-muted);cursor:pointer;}
+.fl-modes button.on{background:#fff;color:var(--yt-text);box-shadow:0 1px 4px rgba(11,31,58,.14);}
+.fl-modes button i{color:var(--orange-dark);}
+.st-fields{display:contents;}
+.st-fields[hidden]{display:none;}
+.st-dir{display:flex;gap:6px;height:48px;align-items:center;}
+.st-dir label{display:inline-flex;align-items:center;gap:6px;padding:10px 12px;border-radius:10px;background:#fff;font-size:14px;cursor:pointer;}
+.st-dir input{accent-color:var(--orange);}
+.st-msg{margin-top:16px;padding:16px 18px;border-radius:12px;background:var(--box-bg);font-size:15px;}
+.st-msg a{color:var(--orange-dark);font-weight:600;text-decoration:underline;}
+.st-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:18px 0 10px;}
+.st-head b{font-size:18px;}
+.st-head span{font-size:13.5px;color:var(--yt-muted);}
+.st-refresh{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:none;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--orange-dark);cursor:pointer;}
+.st-card{margin-top:10px;padding:16px 18px;border:1px solid var(--yt-line);border-radius:14px;background:#fff;}
+.st-card header{display:flex;align-items:center;gap:12px;}
+.st-card header div{flex:1;min-width:0;display:flex;flex-direction:column;}
+.st-card header b{font-size:17px;}
+.st-card header small{font-size:13px;color:var(--yt-muted);}
+.st-legs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:16px;align-items:start;margin-top:14px;}
+.st-arrow{margin-top:34px;color:var(--yt-muted);}
+.st-end > small{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--yt-muted);}
+.st-place{display:flex;align-items:baseline;gap:8px;margin-top:2px;}
+.st-place b{font-size:22px;}
+.st-place span{font-size:14px;color:var(--yt-muted);}
+.st-time{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.st-time b{font-size:20px;font-variant-numeric:tabular-nums;}
+.st-time s{font-size:14px;color:var(--yt-muted);}
+.st-time span{font-size:13px;color:var(--yt-muted);}
+.st-time.late b,.st-board small.late{color:#B45309;}
+.st-end p{margin-top:6px;font-size:13.5px;color:var(--yt-text);}
+.st-pill{flex:none;display:inline-flex;align-items:center;padding:5px 11px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;}
+.st-pill.ok{background:#E8F1FF;color:#1557B0;}
+.st-pill.air,.st-pill.done{background:#E6F4EA;color:#1D6D39;}
+.st-pill.late{background:#FEF3C7;color:#92400E;}
+.st-pill.bad{background:#FDE8E8;color:#9B1C1C;}
+.st-pill.unk{background:var(--box-bg);color:var(--yt-muted);}
+.st-board{margin-top:6px;}
+.st-board table{width:100%;border-collapse:collapse;font-size:14px;}
+.st-board th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--yt-muted);padding:8px 10px;border-bottom:1px solid var(--yt-line);}
+.st-board td{padding:10px;border-bottom:1px solid var(--yt-line);vertical-align:top;}
+.st-board td small{display:block;font-size:12.5px;color:var(--yt-muted);}
+.st-link{border:none;background:none;padding:0;font:inherit;font-weight:700;color:var(--orange-dark);cursor:pointer;text-decoration:underline;}
+.st-official{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px;font-size:13.5px;color:var(--yt-muted);}
+.st-off{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--yt-line);border-radius:20px;background:#fff;color:var(--yt-text);font-weight:600;}
+.st-off:hover{border-color:var(--orange);}
+.st-off i:last-child{font-size:10px;color:var(--yt-muted);}
+@media (max-width:640px){
+  .fl-modes{display:flex;}
+  .fl-modes button{flex:1;justify-content:center;padding:10px 8px;font-size:14px;}
+  .st-legs{grid-template-columns:1fr;}
+  .st-arrow{display:none;}
+  .st-board thead{display:none;}
+  .st-board tr{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--yt-line);}
+  .st-board td{border:none;padding:2px 0;}
+  .st-board td::before{content:attr(data-l);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--yt-muted);}
+}
+

@@ -10,6 +10,7 @@
      POST /api/enquiries     quote, flight and newsletter forms
      POST /api/leads         progress saved from the booking / customise forms (follow-ups)
      POST /api/track         anonymous visit counts for the admin Insights page (daily totals only)
+     GET  /api/flight-status live flight status, airport boards, routes (server/flights.mjs)
      /api/admin/...          the admin dashboard (admin.html), password protected,
                              including website content (prices, images, flash sales, flights)
 
@@ -41,6 +42,7 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenAI, ApiError as GeminiApiError } from '@google/genai';
+import { flightStatusConfigured, flightByNumber, airportBoard, routeSearch, FlightApiError } from './flights.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PORT) || 3000;
@@ -710,6 +712,53 @@ async function handleLead(req, res){
   sendJSON(res, 200, { saved: true });
 }
 
+/* ---------- GET /api/flight-status ----------
+   ?type=flight&number=KQ117&date=2026-11-08
+   ?type=board&airport=NBO&dir=dep|arr&date=…&slot=0-3
+   ?type=route&from=NBO&to=ZNZ&date=…&slot=0-3
+   Answers come from server/flights.mjs (cached, shared between visitors). */
+const statusHits = new Map();
+LIMITERS.push(statusHits);
+async function handleFlightStatus(req, res){
+  const ip = req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const recent = (statusHits.get(ip) || []).filter(t => now - t < 60_000);
+  recent.push(now); statusHits.set(ip, recent);
+  if(recent.length > 30) return sendJSON(res, 429, { error: 'Too many searches. Please wait a minute.' });
+  if(!flightStatusConfigured()) return sendJSON(res, 200, { configured: false });
+
+  const q = new URL(req.url, 'http://x').searchParams;
+  const type = q.get('type'), date = q.get('date') || '', slot = Number(q.get('slot'));
+  // Dates from yesterday to two days ahead (what flight status is useful for)
+  const day = n => new Date(now + n * 864e5).toISOString().slice(0, 10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < day(-2) || date > day(3)) return sendJSON(res, 400, { error: 'Please pick a date from yesterday to two days ahead.' });
+  const airport = v => /^[A-Za-z]{3}$/.test(v || '');
+  const okSlot = Number.isInteger(slot) && slot >= 0 && slot <= 3;
+  try {
+    let flights;
+    if(type === 'flight'){
+      const number = (q.get('number') || '').replace(/\s+/g, '');
+      if(!/^[A-Za-z0-9]{2,3}\d{1,4}[A-Za-z]?$/.test(number)) return sendJSON(res, 400, { error: 'Please enter a flight number like KQ 117.' });
+      flights = await flightByNumber(number, date);
+    } else if(type === 'board'){
+      if(!airport(q.get('airport')) || !okSlot) return sendJSON(res, 400, { error: 'Please choose an airport and a time.' });
+      flights = await airportBoard(q.get('airport'), q.get('dir') === 'arr' ? 'arr' : 'dep', date, slot);
+    } else if(type === 'route'){
+      if(!airport(q.get('from')) || !airport(q.get('to')) || !okSlot) return sendJSON(res, 400, { error: 'Please choose both airports and a time.' });
+      flights = await routeSearch(q.get('from'), q.get('to'), date, slot);
+    } else return sendJSON(res, 400, { error: 'Unknown search' });
+    sendJSON(res, 200, { configured: true, flights, checked: new Date().toISOString() });
+  } catch(err){
+    if(err instanceof FlightApiError){
+      if(err.code === 'key') return sendJSON(res, 200, { configured: false });
+      console.error('[flight-status]', err.message);
+      return sendJSON(res, 503, { error: err.code === 'limit' ? 'Live flight status has reached today\'s limit. Please use the airline\'s official site below.' : 'Live flight status is busy right now. Please try again in a minute.' });
+    }
+    console.error('[flight-status]', err.message);
+    sendJSON(res, 503, { error: 'Live flight status is unavailable right now.' });
+  }
+}
+
 /* ---------- POST /api/enquiries (quote, flight, newsletter, brochure…) ---------- */
 async function handleEnquiry(req, res){
   const ip = req.socket.remoteAddress || 'unknown';
@@ -946,6 +995,7 @@ async function route(req, res){
   if(path === '/api/enquiries') return post(handleEnquiry);
   if(path === '/api/leads') return post(handleLead);
   if(path === '/api/track') return post(handleTrack);
+  if(path === '/api/flight-status') return req.method === 'GET' ? handleFlightStatus(req, res) : sendJSON(res, 405, { error: 'Use GET' });
   if(path.startsWith('/api/admin/')) return handleAdmin(req, res);
   if(path.startsWith('/api/chat')) return post(handleChat);
   if(path.startsWith('/api/translate')) return post(handleTranslate);
@@ -964,6 +1014,7 @@ http.createServer((req, res) => {
   console.log(`SafariNomad running at http://localhost:${PORT}`);
   console.log(`Admin dashboard:  http://localhost:${PORT}/admin.html`);
   if(!process.env.ADMIN_PASSWORD) console.log(`Admin password:   ${adminPassword()}   (edit server/data/admin-password.txt, or set ADMIN_PASSWORD, to change it)`);
+  console.log(flightStatusConfigured() ? 'Flight status:    live (AeroDataBox)' : 'Flight status:    no AERODATABOX_KEY, so searches link to official airline/airport sites');
   const ai = chatProvider();
   console.log(ai === 'claude' ? `AI assistant:     Claude (${MODEL})` : ai === 'gemini' ? `AI assistant:     Google Gemini (${GEMINI_MODELS.join(' → ')}, ${GEMINI_THINKING.toLowerCase()} thinking, no web search)` : 'Note: no AI key set (GEMINI_API_KEY or ANTHROPIC_API_KEY), so the assistant uses its offline answers.');
 });
