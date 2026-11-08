@@ -73,6 +73,8 @@
     try{
       data = await api('data');
       $('#updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+      $('#demoBar').hidden = !data.demo;
+      $('#demoBtn span').textContent = data.demo ? 'Clear demo data' : 'Load demo data';
       counts(); if(!(VIEWS[view].custom || VIEWS[view].manual) || !quiet) render();   // content and Insights refresh on demand
       if(openItem) openDetail(openItem.kind, openItem.id, true);
     }catch(err){ if(!quiet && err.message !== 'Signed out') toast(err.message, true); }
@@ -84,6 +86,18 @@
     start.timer = setInterval(() => load(true), 30000);   // keep it fresh
   }
   $('#refresh').addEventListener('click', () => { load(); toast('Refreshed'); });
+
+  // Demo data: fictional records for presenting the dashboard (each flagged on the server, so clearing removes only those)
+  async function setDemo(on){
+    if(!on && !confirm('Remove all demo records? Real bookings and enquiries stay.')) return;
+    try{
+      await api('demo', { method:'POST', body:JSON.stringify({ action: on ? 'load' : 'clear' }) });
+      await load();
+      toast(on ? 'Demo data loaded' : 'Demo data cleared');
+    }catch(err){ if(err.message !== 'Signed out') toast(err.message, true); }
+  }
+  $('#demoBtn').addEventListener('click', () => setDemo(!data.demo));
+  $('#demoClear').addEventListener('click', () => setDemo(false));
 
   function counts(){
     const set = (id, n) => { $(id).textContent = n || ''; };

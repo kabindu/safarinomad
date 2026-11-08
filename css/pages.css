@@ -333,3 +333,33 @@
   .st-board td::before{content:attr(data-l);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--yt-muted);}
 }
 
+
+/* ---------- Groups page ---------- */
+.grp-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
+.svc-card p.grp-text{margin-bottom:12px;}
+.grp-steps{list-style:none;counter-reset:step;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;padding:0;margin:0;}
+.grp-steps li{counter-increment:step;background:var(--box-bg);border-radius:var(--box-radius);padding:20px;display:flex;flex-direction:column;gap:6px;}
+.grp-steps li::before{content:counter(step);width:34px;height:34px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;display:grid;place-items:center;margin-bottom:6px;}
+.grp-steps b{font-size:16px;color:var(--yt-text);}
+.grp-steps span{font-size:14.5px;color:#4a4a4a;line-height:1.5;}
+.grp-form-card{max-width:860px;margin:0 auto;}
+.grp-form-card h2{font-size:clamp(24px,2.6vw,32px);}
+.opt{font-weight:400;color:var(--yt-muted);}
+@media (max-width:1100px){.grp-grid,.grp-steps{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:600px){.grp-grid,.grp-steps{grid-template-columns:minmax(0,1fr);}.grp-form-card{padding:20px;}}
+
+/* ---------- Privacy & terms ---------- */
+.legal .wrap{max-width:780px;}
+.legal h1{font-size:clamp(30px,3.6vw,42px);margin-top:10px;}
+.legal-date{color:var(--yt-muted);font-size:14px;margin:6px 0 24px;}
+.legal h2{font-family:var(--font-body);font-size:20px;font-weight:700;margin:30px 0 10px;color:var(--yt-text);}
+.legal p,.legal li{font-size:16px;line-height:1.7;color:#333;}
+.legal ul{padding-left:20px;display:grid;gap:8px;}
+.legal a{color:var(--orange);text-decoration:underline;overflow-wrap:anywhere;}
+
+/* ---------- 404 ---------- */
+.nf{text-align:center;padding:90px 0 110px;}
+.nf-icon{font-size:56px;color:var(--orange);margin-bottom:18px;}
+.nf h1{font-size:clamp(28px,4vw,44px);}
+.nf p{color:var(--yt-muted);font-size:17px;margin:10px auto 26px;max-width:520px;}
+.nf-links{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}

@@ -145,6 +145,7 @@ const MENU = (function(f){
         ] },
         { title:'Book & ask', links:[
           ['Book your dates', 'book.html', 'Live departures and seats left', 'fa-calendar-check'],
+          ['Group & school trips', 'groups.html', 'Schools, companies and celebrations', 'fa-people-group'],
           ['FAQ', 'about.html#faqs', 'Deposits, visas, packing and more', 'fa-circle-question'],
           ['Contact us', 'contact.html', 'A free tailored plan within 24 hours', 'fa-envelope']
         ] }
@@ -315,6 +316,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
         <a href="destinations.html">Destinations</a>
         <a href="services.html#flash-deals">Flash deals</a>
         <a href="flights.html">Flights</a>
+        <a href="groups.html">Group &amp; school trips</a>
       </div>
       <div class="ft-col">
         <h4>Help &amp; Info</h4>
@@ -340,7 +342,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
       </form>
     </div>
     <div class="ft-bottom">
-      <div><span>© 2026 SafariNomad Ltd. All rights reserved.</span><a href="about.html#faqs">Privacy Policy</a><a href="about.html#faqs">Terms of Use</a></div>
+      <div><span>© 2026 SafariNomad Ltd. All rights reserved.</span><a href="privacy.html">Privacy Policy</a><a href="terms.html">Booking Terms</a></div>
       <ul class="pay-row" aria-label="Payment methods">
         <li class="pay visa" title="Visa" translate="no"><i class="fa-brands fa-cc-visa" aria-label="Visa"></i></li>
         <li class="pay mc" title="Mastercard" translate="no"><i class="fa-brands fa-cc-mastercard" aria-label="Mastercard"></i></li>
@@ -502,6 +504,20 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
   document.querySelectorAll('[data-phone]').forEach(a => {
     a.href = `tel:${s.phoneLink}`;
     a.querySelectorAll('[data-phone-number]').forEach(b => { b.textContent = s.phone; b.setAttribute('translate', 'no'); });
+  });
+
+  // Contact details and booking rules in page text: <a data-site="email|phone"></a>, <span data-site="address"></span>,
+  // <b data-rule="deposit|balance|notice|child"></b>. One source of truth (js/data.js), so pages never go stale.
+  document.querySelectorAll('[data-site]').forEach(el => {
+    const k = el.dataset.site;
+    el.setAttribute('translate', 'no');
+    if(k === 'email'){ el.textContent = s.email; el.href = `mailto:${s.email}`; }
+    else if(k === 'phone'){ el.textContent = s.phone; el.href = `tel:${s.phoneLink}`; }
+    else el.textContent = s[k] || '';
+  });
+  if(typeof BOOKING !== 'undefined') document.querySelectorAll('[data-rule]').forEach(el => {
+    const v = { deposit: `$${BOOKING.deposit}`, balance: BOOKING.balanceDays, notice: BOOKING.noticeDays, child: Math.round((1 - BOOKING.childRate) * 100) }[el.dataset.rule];
+    if(v != null) el.textContent = v;
   });
 
   // Licences & partners strip (<div data-partners></div>): a slow, endless scroll of badges.

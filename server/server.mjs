@@ -43,6 +43,7 @@ import { promisify } from 'node:util';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenAI, ApiError as GeminiApiError } from '@google/genai';
 import { flightStatusConfigured, flightByNumber, airportBoard, routeSearch, FlightApiError } from './flights.mjs';
+import { makeDemo } from './demo.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PORT) || 3000;
@@ -560,7 +561,7 @@ function saveContent(c){
 // Travellers already booked on each departure of a trip (private trips don't share seats)
 function bookedSeats(tripId){
   const out = {};
-  db.bookings.filter(b => b.trip === tripId && b.status !== 'cancelled' && !b.private)
+  db.bookings.filter(b => b.trip === tripId && b.status !== 'cancelled' && !b.private && !b.demo)
     .forEach(b => { out[b.date] = (out[b.date] || 0) + b.adults + b.children; });
   return out;
 }
@@ -629,6 +630,22 @@ let analytics;
 try { analytics = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'analytics.json'), 'utf8')); } catch { analytics = { since: new Date().toISOString().slice(0, 10), days: {} }; }
 db.analytics = analytics;
 let analyticsTimer = 0;
+// Demo visit numbers (admin → Load demo data), kept apart from the real counts
+const DEMO_ANALYTICS = path.join(DATA_DIR, 'demo-analytics.json');
+let demoAnalytics = null;
+try { demoAnalytics = JSON.parse(fs.readFileSync(DEMO_ANALYTICS, 'utf8')); } catch {}
+function mergeAnalytics(a, b){
+  const days = structuredClone(a.days);
+  Object.entries(b.days).forEach(([day, v]) => {
+    const d = days[day] = days[day] || { sessions: 0, views: 0 };
+    d.sessions += v.sessions; d.views += v.views;
+    ['pages', 'trips', 'searches', 'interests', 'refs', 'tz', 'lang'].forEach(k => {
+      d[k] = d[k] || {};
+      Object.entries(v[k] || {}).forEach(([key, n]) => { d[k][key] = (d[k][key] || 0) + n; });
+    });
+  });
+  return { since: a.since < b.since ? a.since : b.since, days };
+}
 const saveAnalytics = () => { if(!analyticsTimer) analyticsTimer = setTimeout(() => { analyticsTimer = 0; save('analytics'); }, 10_000); };
 const trackHits = new Map();
 LIMITERS.push(trackHits);
@@ -705,7 +722,7 @@ async function handleLead(req, res){
   if(lead && lead.status === 'booked') return sendJSON(res, 200, { saved: false });
   if(!lead){ lead = { id: newId(), draft, created: now, status: 'open', note: '' }; db.leads.push(lead); }
   Object.assign(lead, {
-    source: b.source === 'custom' ? 'Custom trip' : 'Booking', page: clean(b.page, 120), step: clean(b.step, 80),
+    source: { custom:'Custom trip', group:'Group trip' }[b.source] || 'Booking', page: clean(b.page, 120), step: clean(b.step, 80),
     resume: clean(b.resume, 300), name: clean(fields.Name || '', 120), email, phone, fields, updated: now
   });
   saveSoon('leads');
@@ -835,7 +852,27 @@ async function handleAdmin(req, res){
     const { TRIPS, LAST_MINUTE, PLACES } = loadData();
     const trips = [...TRIPS, ...LAST_MINUTE].map(t => ({ id: t.id, title: t.title, days: t.days, capacity: t.group || t.spaces, private: t.group <= 2, country: t.country || '', countries: t.countries || '', img: t.img || '' }));
     const places = PLACES.map(p => ({ name: p.name, country: p.country }));
-    return sendJSON(res, 200, { bookings: db.bookings, enquiries: db.enquiries, questions: db.questions.slice(-1500), leads: db.leads, trips, places, analytics, now: new Date().toISOString() });
+    const demo = KINDS.some(k => db[k].some(x => x.demo));
+    return sendJSON(res, 200, { bookings: db.bookings, enquiries: db.enquiries, questions: db.questions.slice(-1500), leads: db.leads, trips, places,
+      analytics: demoAnalytics ? mergeAnalytics(analytics, demoAnalytics) : analytics, demo, now: new Date().toISOString() });
+  }
+  // Demo data for presenting the dashboard: added alongside real records (each flagged demo:true)
+  // and removed again by "clear". Visit numbers live in their own file and are only added on screen.
+  if(route === 'demo' && req.method === 'POST'){
+    let b = {};
+    try { b = JSON.parse(await readBody(req, 1000)); } catch {}
+    KINDS.forEach(k => { db[k] = db[k].filter(x => !x.demo); });
+    demoAnalytics = null;
+    fs.rmSync(DEMO_ANALYTICS, { force: true });
+    if(b.action === 'load'){
+      const d = makeDemo(loadData());
+      KINDS.forEach(k => db[k].push(...d[k]));
+      demoAnalytics = d.analytics;
+      fs.writeFileSync(DEMO_ANALYTICS, JSON.stringify(demoAnalytics));
+    }
+    KINDS.forEach(save);
+    console.log(`[admin] demo data ${b.action === 'load' ? 'loaded' : 'cleared'}`);
+    return sendJSON(res, 200, { demo: b.action === 'load' });
   }
   if(route === 'update' && req.method === 'POST'){
     let b;
@@ -891,7 +928,7 @@ async function handleAdmin(req, res){
 
 /* ---------- Static files ---------- */
 const TYPES = { '.html':'text/html; charset=utf-8', '.css':'text/css', '.js':'text/javascript', '.mjs':'text/javascript', '.json':'application/json',
-  '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.png':'image/png', '.svg':'image/svg+xml', '.webp':'image/webp', '.ico':'image/x-icon', '.md':'text/plain; charset=utf-8',
+  '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.png':'image/png', '.svg':'image/svg+xml', '.webp':'image/webp', '.ico':'image/x-icon', '.md':'text/plain; charset=utf-8', '.txt':'text/plain; charset=utf-8',
   '.mp4':'video/mp4', '.webm':'video/webm' };
 
 function serveStatic(req, res){
@@ -922,8 +959,14 @@ function serveStatic(req, res){
       fs.createReadStream(file, { start, end }).pipe(res);
     });
   }
-  cachedFile(file).then(f => {
-    if(!f){ res.writeHead(404, { 'Content-Type':'text/plain' }); return res.end('Not found'); }
+  cachedFile(file).then(async f => {
+    if(!f){
+      // A missing page gets the friendly "page not found" page; a missing image or script stays a plain 404
+      const page = /(\.html?|\/[^./]*)$/i.test(urlPath) && await cachedFile(path.join(ROOT, '404.html'));
+      if(!page){ res.writeHead(404, { 'Content-Type':'text/plain' }); return res.end('Not found'); }
+      res.writeHead(404, { 'Content-Type': page.type, 'Cache-Control': 'no-cache' });
+      return res.end(req.method === 'HEAD' ? undefined : page.raw);
+    }
     const headers = { 'Content-Type': f.type, 'ETag': f.etag, 'Vary': 'Accept-Encoding',
       // Pages, styles and scripts: always check for a newer version (a quick 304 when unchanged), so edits show at once.
       // Photos, fonts: keep for a week (uploads get new file names, so they never go stale).
