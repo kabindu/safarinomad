@@ -19,14 +19,16 @@
 <div class="adm-login" id="login">
   <form class="adm-login-card" id="loginForm">
     <a class="adm-logo" href="index.html"><i class="fa-solid fa-paw"></i> SafariNomad</a>
-    <h1>Admin sign in</h1>
-    <p>Bookings, enquiries, and the packages, prices and deals on the website.</p>
+    <h1>Team sign in</h1>
+    <p>Bookings, enquiries, follow-ups and the packages, prices and deals on the website.</p>
+    <label for="user">Username</label>
+    <input class="adm-input" id="user" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus>
     <label for="pw">Password</label>
-    <div class="adm-pw"><input id="pw" type="password" autocomplete="current-password" required autofocus><button type="button" id="pwShow" aria-label="Show password"><i class="fa-regular fa-eye"></i></button></div>
+    <div class="adm-pw"><input id="pw" type="password" autocomplete="current-password" required><button type="button" id="pwShow" aria-label="Show password"><i class="fa-regular fa-eye"></i></button></div>
     <div class="adm-caps" id="capsWarn" hidden><i class="fa-solid fa-triangle-exclamation"></i> Caps Lock is on</div>
     <button class="btn" type="submit">Sign in <i class="fa-solid fa-arrow-right"></i></button>
     <div class="adm-err" id="loginErr"></div>
-    <small class="adm-tip"><i class="fa-solid fa-circle-info"></i> The password is shown in the server window when it starts, and saved in <code>server/data/admin-password.txt</code>.</small>
+    <small class="adm-tip"><i class="fa-solid fa-circle-info"></i> Forgot your password? Ask the owner to reset it under Team.</small>
   </form>
 </div>
 
@@ -43,14 +45,17 @@
       <button data-view="enquiries"><i class="fa-solid fa-envelope-open-text"></i> Enquiries <b id="cntEnquiries"></b></button>
       <button data-view="leads"><i class="fa-solid fa-user-clock"></i> Unfinished <b id="cntLeads"></b></button>
       <button data-view="questions"><i class="fa-solid fa-comments"></i> Chat questions <b id="cntQuestions"></b></button>
-      <span class="adm-nav-label">Website</span>
-      <button data-view="packages"><i class="fa-solid fa-suitcase-rolling"></i> Packages</button>
-      <button data-view="deals"><i class="fa-solid fa-bolt"></i> Deals</button>
-      <button data-view="flights"><i class="fa-solid fa-plane"></i> Flights</button>
+      <span class="adm-nav-label" data-perm="website">Website</span>
+      <button data-view="packages" data-perm="website"><i class="fa-solid fa-suitcase-rolling"></i> Packages</button>
+      <button data-view="deals" data-perm="website"><i class="fa-solid fa-bolt"></i> Deals</button>
+      <button data-view="flights" data-perm="website"><i class="fa-solid fa-plane"></i> Flights</button>
+      <span class="adm-nav-label" data-perm="team">Admin</span>
+      <button data-view="team" data-perm="team"><i class="fa-solid fa-users-gear"></i> Team &amp; activity</button>
     </nav>
     <div class="adm-side-foot">
+      <button id="meBtn" class="adm-me" title="Your account and password"><i class="fa-solid fa-circle-user"></i> <span><b id="meName"></b><small id="meRole"></small></span></button>
       <span id="updated"></span>
-      <button id="demoBtn" title="Fill the dashboard with fictional sample records for a presentation"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>Load demo data</span></button>
+      <button id="demoBtn" data-perm="demo" title="Fill the dashboard with fictional sample records for a presentation"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>Load demo data</span></button>
       <button id="logout"><i class="fa-solid fa-right-from-bracket"></i> Sign out</button>
     </div>
   </aside>
@@ -64,6 +69,7 @@
         <button class="adm-btn" id="export" title="Download as CSV"><i class="fa-solid fa-file-arrow-down"></i> CSV</button>
       </div>
     </header>
+    <div class="adm-demo adm-warn" id="pwBar" hidden><i class="fa-solid fa-shield-halved"></i> <span>Your password is short. Choose a longer one before the site goes live.</span> <button type="button" class="adm-btn" data-account>Change password</button></div>
     <div class="adm-demo" id="demoBar" hidden><i class="fa-solid fa-wand-magic-sparkles"></i> <span>Demo data is showing: sample bookings, enquiries and visits with fictional names. Real records are kept as they are.</span> <button type="button" class="adm-btn" id="demoClear">Clear demo data</button></div>
     <div class="adm-filters" id="filters"></div>
     <section id="view"></section>
@@ -79,8 +85,23 @@
 
 <div class="adm-toast" id="toast"></div>
 
+<!-- Your account: change password -->
+<dialog class="adm-dialog" id="acct">
+  <form id="acctForm" method="dialog" novalidate>
+    <h2>Your account</h2>
+    <p class="muted" id="acctWho"></p>
+    <p class="tip" id="acctForce" hidden><i class="fa-solid fa-key"></i> Welcome! Please choose your own password to continue.</p>
+    <label for="pwCur">Current password</label><input class="adm-input" id="pwCur" type="password" autocomplete="current-password" required>
+    <label for="pwNew">New password <small>(at least 8 characters)</small></label><input class="adm-input" id="pwNew" type="password" autocomplete="new-password" minlength="8" required>
+    <label for="pwNew2">New password again</label><input class="adm-input" id="pwNew2" type="password" autocomplete="new-password" minlength="8" required>
+    <div class="adm-err" id="acctErr"></div>
+    <div class="adm-dialog-actions"><button type="button" class="adm-btn" id="acctCancel">Cancel</button><button type="submit" class="adm-btn primary">Save new password</button></div>
+  </form>
+</dialog>
+
 <script src="js/admin-content.js"></script>
 <script src="js/admin-insights.js"></script>
+<script src="js/admin-team.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>

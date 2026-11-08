@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node --env-file-if-exists=.env server/server.mjs",
-    "dev": "node --env-file-if-exists=.env --watch server/server.mjs"
+    "dev": "node --env-file-if-exists=.env --watch server/server.mjs",
+    "reset-password": "node server/reset-password.mjs"
   },
   "engines": {
     "node": ">=22.9"

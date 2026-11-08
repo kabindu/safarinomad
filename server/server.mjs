@@ -27,9 +27,15 @@
    Open:  http://localhost:3000              the website
           http://localhost:3000/admin.html   bookings & questions
 
-   Admin password: ADMIN_PASSWORD if set; otherwise one is created
-   on first run, saved in server/data/admin-password.txt and
-   printed when the server starts.
+   Admin team: each person signs in with their own username and
+   password (server/team.mjs). The first start creates the owner
+   from ADMIN_USERNAME / ADMIN_PASSWORD; the owner then adds
+   people under Team & activity. Locked out? Run
+   npm run reset-password -- <username> <new password>
+
+   Hosting: everything is saved in server/data, so give the host a
+   persistent disk for that folder, and set TRUST_PROXY=1 behind
+   the host's proxy (see .env.example).
    ========================================================= */
 
 import http from 'node:http';
@@ -44,6 +50,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenAI, ApiError as GeminiApiError } from '@google/genai';
 import { flightStatusConfigured, flightByNumber, airportBoard, routeSearch, FlightApiError } from './flights.mjs';
 import { makeDemo } from './demo.mjs';
+import { createTeam, TeamError } from './team.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PORT) || 3000;
@@ -172,6 +179,10 @@ function getSystemPrompt(search = true){
 const hits = new Map();
 // The rate limiters remember recent requests per visitor; every 5 minutes, forget anyone quiet for 2 minutes
 const LIMITERS = [];
+// The visitor's address. Behind a hosting proxy every request comes from the proxy, so with
+// TRUST_PROXY=1 the first address in X-Forwarded-For is used instead (only set it behind a proxy).
+const TRUST_PROXY = /^(1|true|yes)$/i.test(process.env.TRUST_PROXY || '');
+const clientIp = req => ((TRUST_PROXY && String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()) || req.socket.remoteAddress || 'unknown').replace(/^::ffff:/, '').replace(/^::1$/, 'this computer');
 setInterval(() => {
   const cutoff = Date.now() - 120_000;
   LIMITERS.forEach(m => { for(const [k, times] of m){ if(!times.length || times[times.length - 1] < cutoff) m.delete(k); } });
@@ -206,7 +217,7 @@ function readBody(req, limit = 50_000){
 
 /* ---------- POST /api/chat ---------- */
 async function handleChat(req, res){
-  const ip = req.socket.remoteAddress || 'unknown';
+  const ip = clientIp(req);
   if(rateLimited(ip)) return sendJSON(res, 429, { error: 'Too many messages. Please wait a minute.' });
 
   let messages, lang = 'en', body;
@@ -372,7 +383,7 @@ const TRANSLATION_SCHEMA = {
 };
 
 async function handleTranslate(req, res){
-  const ip = req.socket.remoteAddress || 'unknown';
+  const ip = clientIp(req);
   if(rateLimited(ip)) return sendJSON(res, 429, { error: 'Too many requests' });
 
   let lang, strings;
@@ -576,7 +587,7 @@ function handleAvailability(req, res){
 
 /* ---------- POST /api/bookings ---------- */
 async function handleBooking(req, res){
-  const ip = req.socket.remoteAddress || 'unknown';
+  const ip = clientIp(req);
   if(rateLimited(ip)) return sendJSON(res, 429, { error: 'Too many requests. Please wait a minute.' });
   let b;
   try { b = JSON.parse(await readBody(req)); } catch { return sendJSON(res, 400, { error: 'Bad request' }); }
@@ -657,7 +668,7 @@ function bump(map, key, max = 300){
   map[key] = (map[key] || 0) + 1;
 }
 async function handleTrack(req, res){
-  const ip = req.socket.remoteAddress || 'unknown';
+  const ip = clientIp(req);
   const now = Date.now();
   const recent = (trackHits.get(ip) || []).filter(t => now - t < 60_000);
   recent.push(now); trackHits.set(ip, recent);
@@ -705,7 +716,7 @@ function closeLead(draft, outcome){
   saveSoon('leads');
 }
 async function handleLead(req, res){
-  const ip = req.socket.remoteAddress || 'unknown';
+  const ip = clientIp(req);
   if(leadLimited(ip)) return sendJSON(res, 429, { error: 'Too many requests.' });
   let b;
   try { b = JSON.parse(await readBody(req, 20_000)); } catch { return sendJSON(res, 400, { error: 'Bad request' }); }
@@ -737,7 +748,7 @@ async function handleLead(req, res){
 const statusHits = new Map();
 LIMITERS.push(statusHits);
 async function handleFlightStatus(req, res){
-  const ip = req.socket.remoteAddress || 'unknown';
+  const ip = clientIp(req);
   const now = Date.now();
   const recent = (statusHits.get(ip) || []).filter(t => now - t < 60_000);
   recent.push(now); statusHits.set(ip, recent);
@@ -778,7 +789,7 @@ async function handleFlightStatus(req, res){
 
 /* ---------- POST /api/enquiries (quote, flight, newsletter, brochure…) ---------- */
 async function handleEnquiry(req, res){
-  const ip = req.socket.remoteAddress || 'unknown';
+  const ip = clientIp(req);
   if(rateLimited(ip)) return sendJSON(res, 429, { error: 'Too many requests. Please wait a minute.' });
   let b;
   try { b = JSON.parse(await readBody(req)); } catch { return sendJSON(res, 400, { error: 'Bad request' }); }
@@ -798,55 +809,89 @@ async function handleEnquiry(req, res){
 /* =========================================================
    Admin: sign in, read everything, update status and notes
    ========================================================= */
-// The admin password: ADMIN_PASSWORD if set, otherwise server/data/admin-password.txt.
-// The file is read on every sign-in, so editing it takes effect straight away (no restart).
+// Team accounts (server/team.mjs). On the very first run one owner account is created from
+// ADMIN_USERNAME (default "kelvin") and ADMIN_PASSWORD, or the old server/data/admin-password.txt.
 const PASSWORD_FILE = path.join(DATA_DIR, 'admin-password.txt');
-function adminPassword(){
+function firstPassword(){
   if(process.env.ADMIN_PASSWORD) return process.env.ADMIN_PASSWORD.trim();
   try { return fs.readFileSync(PASSWORD_FILE, 'utf8').trim(); }
   catch {
     // Easy to read and type: no look-alike characters (I l 1 O 0), e.g. "k7mp-x4tr-9qwe"
     const abc = 'abcdefghjkmnpqrstuvwxyz23456789';
-    const pw = [0, 1, 2].map(() => [...crypto.randomBytes(4)].map(b => abc[b % abc.length]).join('')).join('-');
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-    fs.writeFileSync(PASSWORD_FILE, pw);
-    return pw;
+    return [0, 1, 2].map(() => [...crypto.randomBytes(4)].map(b => abc[b % abc.length]).join('')).join('-');
   }
 }
-const sessions = new Map();                     // token → expiry time
-const SESSION_MS = 12 * 3600_000;
+const team = createTeam({ dir: DATA_DIR, firstOwner: () => {
+  const username = (process.env.ADMIN_USERNAME || 'kelvin').trim().toLowerCase();
+  return { username, name: username[0].toUpperCase() + username.slice(1), password: firstPassword() };
+} });
+['SIGINT', 'SIGTERM'].forEach(sig => process.prependListener(sig, () => team.flush()));
 const loginHits = new Map();
 LIMITERS.push(hits, loginHits);
 const tokenOf = req => (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-
-function isAdmin(req){
-  const exp = sessions.get(tokenOf(req));
-  if(!exp || exp < Date.now()){ sessions.delete(tokenOf(req)); return false; }
-  return true;
-}
+const tooMany = (key, max) => {
+  const recent = (loginHits.get(key) || []).filter(t => Date.now() - t < 15 * 60_000);
+  recent.push(Date.now()); loginHits.set(key, recent);
+  return recent.length > max;
+};
+// What a record is called in the activity log
+const label = (kind, x) => kind === 'bookings' ? `booking ${x.ref} (${x.name})`
+  : kind === 'enquiries' ? `${String(x.type).toLowerCase()} from ${Object.entries(x.fields || {}).find(([k]) => /name/i.test(k))?.[1] || Object.entries(x.fields || {}).find(([k]) => /e-?mail/i.test(k))?.[1] || 'someone'}`
+  : kind === 'leads' ? `follow-up ${x.name || x.email || x.phone}` : 'chat question';
+// Which parts of the website an edit touched
+const CONTENT_PARTS = { trips: 'packages', added: 'new packages', flash: 'flash sales', lastMinute: 'last-minute deals', flights: 'flights' };
+const asText = v => { const t = JSON.stringify(v ?? null); return t === '{}' || t === '[]' ? 'null' : t; };   // empty = not set
+const contentChanges = (a, b) => Object.keys({ ...a, ...b }).filter(k => asText(a[k]) !== asText(b[k])).map(k => CONTENT_PARTS[k] || k);
+const readJSON = async (req, limit) => { try { return JSON.parse(await readBody(req, limit)); } catch { return null; } };
 
 async function handleAdmin(req, res){
   const route = new URL(req.url, 'http://x').pathname.replace('/api/admin/', '');
+  const ip = clientIp(req);
 
   if(route === 'login' && req.method === 'POST'){
-    const ip = req.socket.remoteAddress || 'unknown';
-    const recent = (loginHits.get(ip) || []).filter(t => Date.now() - t < 60_000);
-    recent.push(Date.now()); loginHits.set(ip, recent);
-    if(recent.length > 5) return sendJSON(res, 429, { error: 'Too many attempts. Please wait a minute.' });
-    let pw = '';
-    try { pw = String(JSON.parse(await readBody(req, 2000)).password || '').trim(); } catch {}   // ignore stray spaces from copy-paste
-    const hash = v => crypto.createHash('sha256').update(v).digest();
-    if(!crypto.timingSafeEqual(hash(pw), hash(adminPassword()))) return sendJSON(res, 401, { error: 'Wrong password.' });
-    const token = crypto.randomBytes(32).toString('hex');
-    sessions.set(token, Date.now() + SESSION_MS);
-    return sendJSON(res, 200, { token });
+    const b = await readJSON(req, 2000) || {};
+    const username = String(b.username || '').trim().toLowerCase();
+    // 10 tries per address and 8 per username every 15 minutes
+    if(tooMany('ip:' + ip, 10) || tooMany('user:' + username, 8)) return sendJSON(res, 429, { error: 'Too many attempts. Please wait 15 minutes and try again.' });
+    try {
+      const r = team.login(username, String(b.password || '').trim(), { ip, agent: req.headers['user-agent'] });   // ignore stray spaces from copy-paste
+      if(!r) return sendJSON(res, 401, { error: 'Wrong username or password.' });
+      return sendJSON(res, 200, r);
+    } catch(err){ return sendJSON(res, err.status || 400, { error: err.message }); }
   }
 
-  if(!isAdmin(req)) return sendJSON(res, 401, { error: 'Please sign in.' });
+  const me = team.userOf(tokenOf(req));
+  if(!me) return sendJSON(res, 401, { error: 'Please sign in.' });
+  const allow = what => team.can(me, what) ? true : (sendJSON(res, 403, { error: 'Your role doesn\'t allow this. Ask the owner.' }), false);
 
   if(route === 'logout' && req.method === 'POST'){
-    sessions.delete(tokenOf(req));
+    team.logout(tokenOf(req));
     return sendJSON(res, 200, { ok: true });
+  }
+  if(route === 'me' && req.method === 'GET') return sendJSON(res, 200, { user: team.publicUser(me), can: team.ROLES[me.role].can });
+  if(route === 'password' && req.method === 'POST'){
+    const b = await readJSON(req, 2000) || {};
+    try { team.changePassword(me, String(b.current || ''), String(b.next || '')); return sendJSON(res, 200, { ok: true, user: team.publicUser(me) }); }
+    catch(err){ return sendJSON(res, err.status || 400, { error: err.message }); }
+  }
+  // Things done in the browser that are worth a line in the log (e.g. downloading customer data)
+  if(route === 'log' && req.method === 'POST'){
+    const b = await readJSON(req, 2000) || {};
+    if(b.action === 'export') team.log(me, 'Downloaded CSV', clean(String(b.detail || ''), 80));
+    return sendJSON(res, 200, { ok: true });
+  }
+  // Team: the owner adds people, changes roles, resets passwords and sees everyone's activity
+  if(route.startsWith('team')){
+    if(!allow('team')) return;
+    if(route === 'team' && req.method === 'GET') return sendJSON(res, 200, { users: team.users(), activity: team.activity(5000), roles: Object.fromEntries(Object.entries(team.ROLES).map(([k, v]) => [k, v.label])) });
+    const b = await readJSON(req, 4000);
+    if(!b) return sendJSON(res, 400, { error: 'Bad request' });
+    try {
+      if(route === 'team/add' && req.method === 'POST') return sendJSON(res, 201, { user: team.addUser(b, me) });
+      if(route === 'team/update' && req.method === 'POST') return sendJSON(res, 200, { user: team.updateUser(String(b.id), b, me) });
+      if(route === 'team/remove' && req.method === 'POST'){ team.removeUser(String(b.id), me); return sendJSON(res, 200, { ok: true }); }
+    } catch(err){ return sendJSON(res, err instanceof TeamError ? err.status : 500, { error: err.message }); }
+    return sendJSON(res, 404, { error: 'Not found' });
   }
   if(route === 'data' && req.method === 'GET'){
     const { TRIPS, LAST_MINUTE, PLACES } = loadData();
@@ -854,11 +899,13 @@ async function handleAdmin(req, res){
     const places = PLACES.map(p => ({ name: p.name, country: p.country }));
     const demo = KINDS.some(k => db[k].some(x => x.demo));
     return sendJSON(res, 200, { bookings: db.bookings, enquiries: db.enquiries, questions: db.questions.slice(-1500), leads: db.leads, trips, places,
-      analytics: demoAnalytics ? mergeAnalytics(analytics, demoAnalytics) : analytics, demo, now: new Date().toISOString() });
+      analytics: demoAnalytics ? mergeAnalytics(analytics, demoAnalytics) : analytics, demo, now: new Date().toISOString(),
+      me: team.publicUser(me), can: team.ROLES[me.role].can, team: team.directory() });
   }
   // Demo data for presenting the dashboard: added alongside real records (each flagged demo:true)
   // and removed again by "clear". Visit numbers live in their own file and are only added on screen.
   if(route === 'demo' && req.method === 'POST'){
+    if(!allow('demo')) return;
     let b = {};
     try { b = JSON.parse(await readBody(req, 1000)); } catch {}
     KINDS.forEach(k => { db[k] = db[k].filter(x => !x.demo); });
@@ -867,9 +914,11 @@ async function handleAdmin(req, res){
     if(b.action === 'load'){
       const d = makeDemo(loadData());
       KINDS.forEach(k => db[k].push(...d[k]));
+      team.setDemo(d.staff, d.activity);
       demoAnalytics = d.analytics;
       fs.writeFileSync(DEMO_ANALYTICS, JSON.stringify(demoAnalytics));
-    }
+    } else team.setDemo([], []);
+    team.log(me, b.action === 'load' ? 'Loaded demo data' : 'Cleared demo data');
     KINDS.forEach(save);
     console.log(`[admin] demo data ${b.action === 'load' ? 'loaded' : 'cleared'}`);
     return sendJSON(res, 200, { demo: b.action === 'load' });
@@ -881,20 +930,35 @@ async function handleAdmin(req, res){
     if(!STATUSES[b.kind]) return sendJSON(res, 400, { error: 'Unknown list' });
     const item = db[b.kind].find(x => x.id === b.id);
     if(!item) return sendJSON(res, 404, { error: 'Not found' });
-    if(b.status !== undefined){
+    const when = new Date().toISOString(), what = [];
+    if(b.status !== undefined && b.status !== item.status){
       if(!STATUSES[b.kind].includes(b.status)) return sendJSON(res, 400, { error: 'Unknown status' });
       // Re-opening a cancelled booking must still fit in the departure
       if(b.kind === 'bookings' && item.status === 'cancelled' && b.status !== 'cancelled' && !item.private){
         const cap = loadData().BookingRules.find(item.trip)?.capacity || 0;
         if((bookedSeats(item.trip)[item.date] || 0) + item.adults + item.children > cap) return sendJSON(res, 409, { error: 'Not enough seats left on that departure to restore this booking.' });
       }
-      item.status = b.status;
+      what.push(`marked ${b.status}`);
+      item.status = b.status; item.statusBy = me.id; item.statusAt = when;
+      // Credit for the work, used in Team → sales and follow-ups
+      if(b.kind === 'bookings' && b.status === 'confirmed') item.confirmedBy = me.id;
+      if(b.kind === 'enquiries' && b.status === 'replied') item.repliedBy = me.id;
+      if(b.kind === 'leads' && ['contacted', 'booked'].includes(b.status)) item.handledBy = me.id;
     }
-    if(typeof b.note === 'string') item.note = b.note.slice(0, 4000);
-    item.updated = new Date().toISOString();
+    if(typeof b.note === 'string' && b.note.slice(0, 4000) !== (item.note || '')){ item.note = b.note.slice(0, 4000); item.noteBy = me.id; what.push('edited the note'); }
+    if(b.assignedTo !== undefined && b.assignedTo !== (item.assignedTo || '')){
+      const to = b.assignedTo ? team.byId(String(b.assignedTo)) : null;
+      if(b.assignedTo && (!to || to.disabled)) return sendJSON(res, 400, { error: 'Pick an active team member.' });
+      item.assignedTo = to ? to.id : '';
+      what.push(to ? `assigned to ${to.name}` : 'unassigned');
+    }
+    if(!what.length) return sendJSON(res, 200, { item });
+    item.updated = when; item.updatedBy = me.id;
     save(b.kind);
+    if(!b.auto) team.log(me, `${what.join(', ')[0].toUpperCase()}${what.join(', ').slice(1)}`, label(b.kind, item), { fields: { kind: b.kind, ref: item.id } });
     return sendJSON(res, 200, { item });
   }
+  if(route === 'content' || route === 'upload'){ if(!allow('website')) return; }
   if(route === 'content' && req.method === 'GET'){
     const base = evalData(false);
     let images = [];
@@ -906,7 +970,9 @@ async function handleAdmin(req, res){
     let b;
     try { b = JSON.parse(await readBody(req, 2_000_000)); } catch { return sendJSON(res, 400, { error: 'Bad request' }); }
     const next = cleanContent(b.content && typeof b.content === 'object' ? b.content : {});
+    const changed = contentChanges(content, next);
     saveContent(next);
+    team.log(me, 'Edited the website', changed.length ? changed.join(', ') : 'saved without changes');
     console.log('[content] website content updated');
     return sendJSON(res, 200, { content: next });
   }
@@ -921,6 +987,7 @@ async function handleAdmin(req, res){
     const name = (slug(String(b.name || '').replace(/\.\w+$/, '')) || 'photo').slice(0, 40) + '-' + crypto.randomBytes(3).toString('hex') + '.' + (m[1] === 'jpeg' ? 'jpg' : m[1]);
     fs.mkdirSync(UPLOAD_DIR, { recursive: true });
     fs.writeFileSync(path.join(UPLOAD_DIR, name), buf);
+    team.log(me, 'Uploaded a photo', name);
     return sendJSON(res, 201, { path: 'images/uploads/' + name });
   }
   sendJSON(res, 404, { error: 'Not found' });
@@ -1047,6 +1114,12 @@ async function route(req, res){
 }
 
 http.createServer((req, res) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  if(TRUST_PROXY && req.headers['x-forwarded-proto'] === 'https') res.setHeader('Strict-Transport-Security', 'max-age=15552000');
+  if(req.url.startsWith('/api/admin/')) res.setHeader('Cache-Control', 'no-store');
   Promise.resolve().then(() => route(req, res)).catch(err => {
     console.error('[server]', req.method, req.url, err);
     if(!res.headersSent) sendJSON(res, 500, { error: 'Server error' });
@@ -1056,7 +1129,8 @@ http.createServer((req, res) => {
   warmCache();
   console.log(`SafariNomad running at http://localhost:${PORT}`);
   console.log(`Admin dashboard:  http://localhost:${PORT}/admin.html`);
-  if(!process.env.ADMIN_PASSWORD) console.log(`Admin password:   ${adminPassword()}   (edit server/data/admin-password.txt, or set ADMIN_PASSWORD, to change it)`);
+  if(team.created) console.log(`Admin sign-in:    username "${team.created.username}", password "${team.created.password}"   (first run: change it in the dashboard under your name)`);
+  else console.log(`Admin team:       ${team.users().filter(u => !u.demo).length} account(s). Forgot a password? npm run reset-password -- <username> <new password>`);
   console.log(flightStatusConfigured() ? 'Flight status:    live (AeroDataBox)' : 'Flight status:    no AERODATABOX_KEY, so searches link to official airline/airport sites');
   const ai = chatProvider();
   console.log(ai === 'claude' ? `AI assistant:     Claude (${MODEL})` : ai === 'gemini' ? `AI assistant:     Google Gemini (${GEMINI_MODELS.join(' → ')}, ${GEMINI_THINKING.toLowerCase()} thinking, no web search)` : 'Note: no AI key set (GEMINI_API_KEY or ANTHROPIC_API_KEY), so the assistant uses its offline answers.');

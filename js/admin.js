@@ -56,14 +56,16 @@
     e.preventDefault();
     $('#loginErr').textContent = '';
     try{
-      const r = await api('login', { method:'POST', body:JSON.stringify({ password:$('#pw').value }) });
+      const r = await api('login', { method:'POST', body:JSON.stringify({ username:$('#user').value, password:$('#pw').value }) });
       token = r.token; sessionStorage.setItem('sn-admin', token);
+      try{ sessionStorage.setItem('sn-weak', r.weak ? '1' : ''); }catch(e){}
       $('#pw').value = '';
       start();
-    }catch(err){ $('#loginErr').textContent = err.message === 'Failed to fetch' ? 'Can\'t reach the server. Is it running?' : err.message; }
+    }catch(err){ $('#loginErr').textContent = err.message === 'Failed to fetch' ? 'Can\'t reach the server. Is it running?' : err.message; $('#pw').select(); }
   });
   function signOut(){
-    token = ''; sessionStorage.removeItem('sn-admin');
+    token = ''; sessionStorage.removeItem('sn-admin'); sessionStorage.removeItem('sn-weak');
+    data = { bookings:[], enquiries:[], questions:[], trips:[] }; AdminTeam.reset(); closeDetail();
     $('#app').hidden = true; $('#login').hidden = false;
     clearInterval(start.timer);
   }
@@ -73,12 +75,29 @@
     try{
       data = await api('data');
       $('#updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+      applyRole();
       $('#demoBar').hidden = !data.demo;
       $('#demoBtn span').textContent = data.demo ? 'Clear demo data' : 'Load demo data';
       counts(); if(!(VIEWS[view].custom || VIEWS[view].manual) || !quiet) render();   // content and Insights refresh on demand
       if(openItem) openDetail(openItem.kind, openItem.id, true);
     }catch(err){ if(!quiet && err.message !== 'Signed out') toast(err.message, true); }
   }
+  // Show only what this person's role allows (the server checks too)
+  const can = what => (data.can || []).includes(what);
+  function applyRole(){
+    const me = data.me || {};
+    $('#meName').textContent = me.name || '';
+    $('#meRole').textContent = me.roleLabel || '';
+    $$('[data-perm]').forEach(el => { el.hidden = !can(el.dataset.perm); });
+    let weak = ''; try{ weak = sessionStorage.getItem('sn-weak'); }catch(e){}
+    $('#pwBar').hidden = !weak;
+    if(me.mustChange) openAccount(true);
+    const need = { packages:'website', flights:'website', deals:'website', flash:'website', lastminute:'website', team:'team' }[view];
+    if(need && !can(need)) go('overview');
+  }
+  // Every person and their name, for "assigned to" and "done by"
+  const who = id => ((data.team || []).find(u => u.id === id) || {}).name || '';
+
   function start(){
     $('#login').hidden = true; $('#app').hidden = false;
     load();
@@ -116,7 +135,8 @@
     deals:      { title:'Deals', sub:'Flash sales and last-minute departures shown on the website.', filters:null, manual:true },
     enquiries:  { title:'Enquiries', sub:'Quote requests, flight requests, guide requests and sign-ups.', filters:['all','new','replied','closed'] },
     leads:      { title:'Unfinished', sub:'Travellers who started a booking or custom trip and left before sending it. Email, call or WhatsApp them to help finish.', filters:['open','contacted','booked','lost','all'] },
-    questions:  { title:'Chat questions', sub:'What travellers asked Nomad, the AI assistant, and how it answered.', filters:['all','new','reviewed'] }
+    questions:  { title:'Chat questions', sub:'What travellers asked Nomad, the AI assistant, and how it answered.', filters:['all','new','reviewed'] },
+    team:       { title:'Team & activity', sub:'Who is on the team, what each person has done, and every sign-in and change.', filters:null, manual:true }
   };
   // Website content pages live in js/admin-content.js
   Object.entries(AdminContent.VIEWS).forEach(([k, v]) => { VIEWS[k] = Object.assign({ filters:null, custom:true }, v); });
@@ -149,8 +169,9 @@
     const v = VIEWS[view];
     $('#viewTitle').textContent = v.title;
     $('#viewSub').textContent = v.sub;
-    $('#export').hidden = view === 'overview' || view === 'insights' || view === 'deals' || !!v.custom;
-    $('.adm-search').hidden = view === 'insights' || view === 'overview';
+    $('#export').hidden = ['overview', 'insights', 'deals', 'team'].includes(view) || !!v.custom;
+    $('.adm-search').hidden = ['insights', 'overview', 'team'].includes(view);
+    if(view === 'team'){ $('#filters').innerHTML = ''; return AdminTeam.render($('#view'), { api, toast, esc, data, me: data.me || {}, fmtWhen, usd, openDetail, reload: true }); }
     // Deals: one page, two tabs (the editors come from js/admin-content.js)
     if(view === 'deals'){
       $('#filters').innerHTML = [['flash', 'Flash sales'], ['lastminute', 'Last-minute departures']]
@@ -257,7 +278,7 @@
           <td data-l="Start date">${fmtDate(b.date)}<small>${b.days} days</small></td>
           <td data-l="Party">${b.adults} ad${b.children ? ` + ${b.children} ch` : ''}</td>
           <td data-l="Total"><b>${usd(b.total)}</b></td>
-          <td data-l="Status">${pill(b.status)}</td>
+          <td data-l="Status">${pill(b.status)}${b.assignedTo && who(b.assignedTo) ? `<small><i class="fa-solid fa-user"></i> ${esc(who(b.assignedTo))}</small>` : ''}</td>
           <td data-l="Received">${fmtWhen(b.created)}</td>
         </tr>`).join('')}</tbody></table></div>`;
   }
@@ -305,7 +326,7 @@
     return `<div class="cards">${list.map(e => {
       const msg = e.fields.message || e.fields.Message || e.fields['Trip details'] || Object.entries(e.fields).filter(([k]) => !/e-?mail|name|phone/i.test(k)).map(([k, v]) => `${k}: ${v}`).join(' · ');
       return `<article class="card ${e.status === 'new' ? 'unread' : ''}" data-open="enquiries:${e.id}">
-        <header><span class="type">${esc(e.type)}</span>${pill(e.status)}<small>${fmtWhen(e.created)}</small></header>
+        <header><span class="type">${esc(e.type)}</span>${pill(e.status)}${e.assignedTo && who(e.assignedTo) ? `<span class="assignee"><i class="fa-solid fa-user"></i> ${esc(who(e.assignedTo))}</span>` : ''}<small>${fmtWhen(e.created)}</small></header>
         <h3>${esc(nameOf(e))}</h3><p class="muted">${esc(emailOf(e))}</p>
         <p class="clip">${esc(msg)}</p>
       </article>`;
@@ -333,7 +354,7 @@
     if(!list.length) return empty('fa-user-clock', query ? 'No one matches your search.' : filter === 'open' ? 'Nobody to follow up right now. When someone leaves a booking or custom trip halfway (after typing an email or phone), they appear here.' : 'Nothing here yet.');
     return `<div class="cards">${list.map(l => `
       <article class="card ${l.status === 'open' ? 'unread' : ''}" data-open="leads:${l.id}">
-        <header><span class="type">${esc(l.source || 'Booking')}</span>${pill(l.status)}<small>${fmtWhen(l.updated || l.created)}</small></header>
+        <header><span class="type">${esc(l.source || 'Booking')}</span>${pill(l.status)}${l.assignedTo && who(l.assignedTo) ? `<span class="assignee"><i class="fa-solid fa-user"></i> ${esc(who(l.assignedTo))}</span>` : ''}<small>${fmtWhen(l.updated || l.created)}</small></header>
         <h3>${esc(l.name || 'No name yet')}</h3>
         <p class="muted">${[l.email, l.phone].filter(Boolean).map(esc).join(' · ')}</p>
         <p class="clip"><b>${esc(leadWhat(l) || 'Not chosen yet')}</b>${l.fields && l.fields.Date ? ' · ' + fmtDate(l.fields.Date) : ''}<br>Stopped at: ${esc(l.step || '')}</p>
@@ -413,6 +434,11 @@
         <p class="tip"><i class="fa-solid fa-lightbulb"></i> Asked often? Add the answer to <code>KNOWLEDGE</code> in js/data.js so Nomad answers it perfectly.</p>`;
     }
     body += `<h4>Status</h4><div class="seg">${STATUS[kind].map(s => `<button data-status="${s}" class="${item.status === s ? 'on' : ''}">${s}</button>`).join('')}</div>`;
+    if(item.statusBy && who(item.statusBy)) body += `<p class="muted dr-by"><i class="fa-solid fa-user-check"></i> Marked <b>${esc(item.status)}</b> by ${esc(who(item.statusBy))}${item.statusAt ? ` · ${fmtWhen(item.statusAt)}` : ''}</p>`;
+    if(kind !== 'questions'){
+      const people = (data.team || []).filter(u => !u.demo || u.id === item.assignedTo);
+      body += `<h4>Assigned to</h4><select class="adm-input" id="assign"><option value="">Nobody yet</option>${people.map(u => `<option value="${esc(u.id)}" ${u.id === item.assignedTo ? 'selected' : ''}>${esc(u.name)}${data.me && u.id === data.me.id ? ' (me)' : ''}</option>`).join('')}</select>`;
+    }
     if(kind !== 'questions') body += `<h4>Private team note</h4><textarea id="note" rows="4" placeholder="Only the team sees this…">${esc(item.note || '')}</textarea><button class="adm-btn" id="saveNote"><i class="fa-solid fa-floppy-disk"></i> Save note</button>`;
     $('#drawerBody').innerHTML = body;
     $('#drawer').classList.add('open'); $('#drawerBg').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false');
@@ -420,8 +446,10 @@
     $$('#drawerBody [data-status]').forEach(btn => btn.addEventListener('click', () => update(kind, id, { status:btn.dataset.status })));
     const sn = $('#saveNote');
     if(sn) sn.addEventListener('click', () => update(kind, id, { note:$('#note').value }));
+    const as = $('#assign');
+    if(as) as.addEventListener('change', () => update(kind, id, { assignedTo:as.value }));
     // Opening a new item marks it as seen
-    if(!keep && kind === 'questions' && item.status === 'new') update(kind, id, { status:'reviewed' }, true);
+    if(!keep && kind === 'questions' && item.status === 'new') update(kind, id, { status:'reviewed', auto:true }, true);
   }
   function closeDetail(){
     openItem = null;
@@ -437,7 +465,7 @@
       const i = data[kind].findIndex(x => x.id === id);
       data[kind][i] = item;
       counts(); render(); openDetail(kind, id, false);
-      if(!quiet) toast(change.status ? `Marked as ${change.status}` : 'Note saved');
+      if(!quiet) toast(change.status ? `Marked as ${change.status}` : change.assignedTo !== undefined ? (change.assignedTo ? `Assigned to ${who(change.assignedTo)}` : 'Unassigned') : 'Note saved');
     }catch(err){ if(err.message !== 'Signed out') toast(err.message, true); }
   }
 
@@ -464,6 +492,37 @@
     a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
     a.download = `safarinomad-${view}-${today()}.csv`;
     a.click();
+    api('log', { method:'POST', body:JSON.stringify({ action:'export', detail:`${view} (${filter}), ${rows.length - 1} rows` }) }).catch(() => {});
+  });
+
+  /* ---------- Your account: change password ---------- */
+  function openAccount(force){
+    const d = $('#acct');
+    if(d.open) return;
+    $('#acctWho').textContent = data.me ? `${data.me.name} · @${data.me.username} · ${data.me.roleLabel}` : '';
+    $('#acctForce').hidden = !force; $('#acctCancel').hidden = !!force;
+    d.dataset.force = force ? '1' : '';
+    $('#acctErr').textContent = ''; $('#acctForm').reset();
+    d.showModal(); $('#pwCur').focus();
+  }
+  $('#meBtn').addEventListener('click', () => openAccount(false));
+  document.addEventListener('click', e => { if(e.target.closest('[data-account]')) openAccount(false); });
+  $('#acctCancel').addEventListener('click', () => $('#acct').close());
+  $('#acct').addEventListener('cancel', e => { if($('#acct').dataset.force) e.preventDefault(); });   // first sign-in: must choose a password
+  $('#acctForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const next = $('#pwNew').value;
+    if(next.length < 8){ $('#acctErr').textContent = 'Use at least 8 characters.'; return; }
+    if(next !== $('#pwNew2').value){ $('#acctErr').textContent = 'The two new passwords don\'t match.'; return; }
+    try{
+      const r = await api('password', { method:'POST', body:JSON.stringify({ current:$('#pwCur').value, next }) });
+      data.me = r.user;
+      try{ sessionStorage.removeItem('sn-weak'); }catch(e){}
+      $('#pwBar').hidden = true;
+      $('#acct').dataset.force = '';
+      $('#acct').close();
+      toast('Password changed');
+    }catch(err){ $('#acctErr').textContent = err.message; }
   });
 
   if(token) start();

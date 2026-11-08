@@ -126,5 +126,34 @@ export function makeDemo({ TRIPS, PLACES, BookingRules, BOOKING }){
       interests: spread([['country:kenya', 10], ['country:tanzania', 7], ['country:uganda', 3], ['country:rwanda', 2], ['style:wildlife', 8], ['style:beach', 5], ['style:gorilla', 3], ['style:family', 3],
         ...PLACES.slice(0, 6).map((p, k) => ['place:' + p.name, 6 - k])], Math.round(sessions * 0.3)) };
   }
-  return { bookings, enquiries, leads, questions, analytics: { since: BookingRules.addDays(today, -89), days } };
+  /* Team: two demo staff (they can't sign in) with credit for some of the work, and their activity */
+  const staff = [
+    { id: 'demo-u1', username: 'amina.demo', name: 'Amina Otieno', role: 'agent', created: ago(80 * D), createdBy: 'Demo', logins: 41, lastLogin: ago(3 * H), lastSeen: ago(40 * 60_000) },
+    { id: 'demo-u2', username: 'brian.demo', name: 'Brian Mwangi', role: 'manager', created: ago(120 * D), createdBy: 'Demo', logins: 63, lastLogin: ago(26 * H), lastSeen: ago(20 * H) }
+  ];
+  const activity = [];
+  const act = (u, at, action, detail, kind, ref) => activity.push({ id: 'demo-a' + activity.length, at, uid: u.id, name: u.name, action, detail, kind, ref });
+  staff.forEach(u => { for(let i = 0; i < 12; i++) act(u, ago(int(1, 30) * D + int(0, 9) * H), 'Signed in', 'from 41.90.x.x'); });
+  bookings.forEach((b, i) => {
+    if(!['confirmed', 'completed'].includes(b.status)) return;
+    const u = staff[i % 2], at = new Date(Date.parse(b.created) + int(2, 20) * H).toISOString();
+    Object.assign(b, { confirmedBy: u.id, statusBy: u.id, statusAt: at, assignedTo: u.id });
+    act(u, at, 'Marked confirmed', `booking ${b.ref} (${b.name})`, 'bookings', b.id);
+  });
+  enquiries.forEach((e, i) => {
+    if(e.status !== 'replied') return;
+    const u = staff[i % 2], at = new Date(Date.parse(e.created) + int(1, 8) * H).toISOString();
+    Object.assign(e, { repliedBy: u.id, statusBy: u.id, statusAt: at });
+    act(u, at, 'Marked replied', `${e.type.toLowerCase()} from ${e.fields.Name || e.fields.Email}`, 'enquiries', e.id);
+  });
+  leads.forEach(l => {
+    if(l.status !== 'contacted') return;
+    const u = staff[0], at = new Date(Date.parse(l.updated) + 2 * H).toISOString();
+    Object.assign(l, { handledBy: u.id, statusBy: u.id, statusAt: at });
+    act(u, at, 'Marked contacted', `follow-up ${l.name}`, 'leads', l.id);
+  });
+  act(staff[1], ago(5 * D), 'Edited the website', 'flash sales');
+  act(staff[1], ago(9 * D), 'Downloaded CSV', 'bookings (all)');
+
+  return { bookings, enquiries, leads, questions, staff, activity, analytics: { since: BookingRules.addDays(today, -89), days } };
 }
