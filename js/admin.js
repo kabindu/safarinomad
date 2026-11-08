@@ -124,6 +124,8 @@
     set('#cntEnquiries', data.enquiries.filter(e => e.status === 'new').length);
     set('#cntQuestions', data.questions.filter(q => q.status === 'new').length);
     set('#cntLeads', (data.leads || []).filter(l => l.status === 'open').length);
+    // Total waiting, on the phone Menu button
+    set('#menuCount', ['#cntBookings', '#cntEnquiries', '#cntLeads'].reduce((n, id) => n + (Number($(id).textContent) || 0), 0));
   }
 
   /* ---------- Navigation ---------- */
@@ -146,8 +148,17 @@
   const contentCtx = { api, toast, esc, query: () => query };
   $('#nav').addEventListener('click', e => {
     const b = e.target.closest('[data-view]');
-    if(b) go(b.dataset.view);
+    if(b){ go(b.dataset.view); menu(false); }
   });
+  // Phones & tablets: the menu slides in from the left
+  function menu(open){
+    $('#app').classList.toggle('menu-open', open);
+    $('#menuBtn').setAttribute('aria-expanded', open);
+    if(open) ($('#nav button.on') || $('#nav button')).focus({ preventScroll:true });
+  }
+  $('#menuBtn').addEventListener('click', () => menu(!$('#app').classList.contains('menu-open')));
+  $('#sideBg').addEventListener('click', () => menu(false));
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('#app').classList.contains('menu-open')) menu(false); });
   // go(view, filter, search) — Insights uses the search to open e.g. one package's bookings
   function go(v, f, q){
     view = v; filter = f || (VIEWS[v].filters || ['all'])[0]; query = (q || '').toLowerCase(); $('#search').value = q || '';
@@ -168,6 +179,7 @@
   function render(){
     const v = VIEWS[view];
     $('#viewTitle').textContent = v.title;
+    $('#mbarTitle').textContent = v.title;
     $('#viewSub').textContent = v.sub;
     $('#export').hidden = ['overview', 'insights', 'deals', 'team'].includes(view) || !!v.custom;
     $('.adm-search').hidden = ['insights', 'overview', 'team'].includes(view);
