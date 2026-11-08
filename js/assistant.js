@@ -91,6 +91,7 @@
     let list = null, tag = 'ul';
     const close = () => { if(list){ out.push(`<${tag}>${list.join('')}</${tag}>`); list = null; } };
     text.split('\n').forEach(line => {
+      if(/^\s*([-*_])(\s*\1){2,}\s*$/.test(line)){ close(); out.push('<hr>'); return; }   // --- divider
       const bullet = line.match(/^\s*[-*•]\s+(.*)$/), num = line.match(/^\s*\d+[.)]\s+(.*)$/);
       if(bullet || num){
         const t = num ? 'ol' : 'ul';
@@ -121,8 +122,11 @@
     log.appendChild(bubble({ role:'assistant', content: T(GREETING) }));
     history.forEach(m => log.appendChild(bubble(m)));
     renderSuggestions();
-    log.scrollTop = log.scrollHeight;
+    const asked = log.querySelectorAll('.ai-msg.me');
+    if(asked.length) pin(asked[asked.length - 1]); else log.scrollTop = 0;
   }
+  // Put a question at the top of the panel, so its answer reads from the start, top to bottom
+  function pin(el){ log.scrollTop = Math.max(0, el.offsetTop - 14); }
   function renderSuggestions(){
     const chips = history.length ? [] : SUGGESTIONS.map(q => `<button type="button" class="ai-chip" data-q="${esc(q)}">${esc(q)}</button>`);
     if(history.length >= 2 && history.length < 8) chips.push('<button type="button" class="ai-chip" data-action="quote">Get a free quote</button>');
@@ -144,7 +148,7 @@
   });
   input.addEventListener('input', () => {
     input.style.height = 'auto';
-    input.style.height = Math.min(input.scrollHeight, 110) + 'px';
+    input.style.height = Math.min(input.scrollHeight, 140) + 'px';
   });
 
   async function ask(text, matchText){
@@ -153,7 +157,8 @@
     busy = true; sendBtn.disabled = true;
     input.value = ''; input.style.height = 'auto';
     history.push({ role:'user', content:text });
-    log.appendChild(bubble({ role:'user', content:text }));
+    log.querySelectorAll('.ai-spacer').forEach(x => x.remove());
+    const askedEl = log.appendChild(bubble({ role:'user', content:text }));
     suggest.innerHTML = '';
 
     const reply = document.createElement('div');
@@ -161,7 +166,12 @@
     reply.setAttribute('translate', 'no');
     reply.innerHTML = '<span class="ai-typing"><i></i><i></i><i></i></span>';
     log.appendChild(reply);
-    log.scrollTop = log.scrollHeight;
+    // Room below the question so it can sit at the top while the answer fills in underneath
+    const spacer = log.appendChild(document.createElement('div'));
+    spacer.className = 'ai-spacer';
+    const fit = () => { spacer.style.height = Math.max(0, log.clientHeight - (reply.offsetTop + reply.offsetHeight - askedEl.offsetTop) - 40) + 'px'; };
+    fit(); pin(askedEl);
+    const grow = new ResizeObserver(fit); grow.observe(reply);
 
     let answer = '', offline = false;
     if(live){
@@ -181,7 +191,7 @@
     store.set(history);
     renderSuggestions();
     if(typeof SN !== 'undefined') SN.refresh();
-    log.scrollTop = log.scrollHeight;
+    grow.disconnect(); fit();
     busy = false; sendBtn.disabled = false;
     input.focus();
   }
@@ -210,13 +220,11 @@
         if(data.status === 'searching'){
           // Nomad is looking something up on the web (visa rules, events, prices…)
           el.innerHTML = (text ? markdown(text) : '') + `<span class="ai-searching"><i class="fa-solid fa-globe"></i> ${T('Searching the web…')}</span>`;
-          log.scrollTop = log.scrollHeight;
           continue;
         }
         if(data.t){
           text += data.t;
           el.innerHTML = markdown(text);
-          log.scrollTop = log.scrollHeight;
         }
       }
     }
