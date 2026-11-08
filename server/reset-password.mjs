@@ -4,8 +4,8 @@
 
      npm run reset-password -- <username> <new password>
 
-   The account is switched back on, signed out everywhere,
-   and asked to choose a new password at the next sign-in.
+   The account is switched back on and signed out everywhere;
+   they sign in with the new password.
    Stop the server first, or restart it afterwards.
    ========================================================= */
 import path from 'node:path';

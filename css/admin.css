@@ -465,3 +465,11 @@ button.ins-r:hover,a.ins-r:hover{background:var(--box-bg);}
 .team-table th:nth-child(n+3),.team-table td:nth-child(n+3){white-space:nowrap;}
 .team-actions .adm-btn{padding:.45rem .65rem !important;margin-left:2px;}
 @media (min-width:861px){.team-table th,.team-table td{padding-left:10px;padding-right:10px;}}
+
+/* Sign-in details to send a team member */
+.team-notice-body{flex:1;min-width:0;}
+.team-login{white-space:pre-wrap;word-break:break-word;background:#fff;color:var(--yt-text);border-radius:10px;padding:12px 14px;margin:10px 0;font:14px/1.55 ui-monospace,Menlo,Consolas,monospace;}
+.team-notice-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.team-notice-actions .adm-btn.wa{color:#128C4B;}
+.team-check{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-top:12px;cursor:pointer;}
+.team-check input{width:17px;height:17px;accent-color:var(--orange);}

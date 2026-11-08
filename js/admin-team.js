@@ -5,8 +5,8 @@
      active, with the work credited to them in a period:
      bookings confirmed (and their value), enquiries replied,
      follow-ups contacted.
-   - Add people with a username and a one-time password; they
-     choose their own password at first sign-in.
+   - Add people with the username and password you choose, then
+     copy or WhatsApp them their sign-in details.
    - Change roles, reset passwords, switch accounts off, remove.
    - The activity log: every sign-in, status change, note,
      website edit and CSV download, filterable by person.
@@ -18,7 +18,12 @@ const AdminTeam = (function(){
   const PERIODS = [['7', '7 days'], ['30', '30 days'], ['90', '90 days'], ['all', 'All time']];
   const KINDS = [['all', 'Everything'], ['signin', 'Sign-ins'], ['bookings', 'Bookings'], ['enquiries', 'Enquiries'], ['leads', 'Follow-ups'], ['website', 'Website'], ['team', 'Team'], ['export', 'Downloads'], ['security', 'Security']];
   const ROLE_HELP = { owner: 'Everything, including the team', manager: 'Everything except the team', agent: 'Bookings, enquiries, follow-ups and chat' };
-  let state = { period: '30', who: 'all', kind: 'all', shown: 60, team: null, adding: false, editing: '', notice: null };
+  let state = { period: '30', who: 'all', kind: 'all', shown: 60, team: null, adding: false, editing: '', focusPw: false, notice: null };
+  // The message you send a team member with their sign-in details
+  const loginText = n => `Hi ${n.name.split(' ')[0]}, here are your SafariNomad admin details:\n\nLink: ${location.origin}/admin.html\nUsername: ${n.username}\nPassword: ${n.password}${n.mustChange ? '\n\nYou will be asked to choose your own password when you first sign in.' : ''}\n\nPlease keep them private.`;
+  // Password box with show/hide and "make one for me"
+  const pwField = (name, value, placeholder) => `<span class="team-pw"><input class="adm-input" name="${name}" type="text" autocomplete="new-password" spellcheck="false" minlength="8" maxlength="200" value="${value}" placeholder="${placeholder}"><button type="button" class="adm-btn" data-regen title="Make a strong password for me"><i class="fa-solid fa-wand-magic-sparkles"></i></button></span>`;
+  const mustBox = `<label class="team-check"><input type="checkbox" name="mustChange"> Ask them to choose their own password when they first sign in</label>`;
 
   const kindOf = a => a.kind || (/sign-in/i.test(a.action) && /fail|block/i.test(a.action) ? 'security'
     : /^Signed/.test(a.action) ? 'signin' : /website|photo/i.test(a.action) ? 'website'
@@ -64,7 +69,10 @@ const AdminTeam = (function(){
     const failed = activity.filter(a => kindOf(a) === 'security' && Date.now() - Date.parse(a.at) < 7 * DAY).length;
 
     el.innerHTML = `
-      ${state.notice ? `<div class="team-notice"><i class="fa-solid fa-key"></i><div><b>${esc(state.notice.title)}</b><p>Username <code>${esc(state.notice.username)}</code> · one-time password <code id="tmpPw">${esc(state.notice.password)}</code> <button type="button" class="adm-btn" data-copy>Copy</button></p><small>Send these to ${esc(state.notice.name)} privately (not by email if you can avoid it). They will choose their own password when they sign in. This password is not shown again.</small></div><button type="button" class="adm-drawer-x" data-dismiss aria-label="Dismiss"><i class="fa-solid fa-xmark"></i></button></div>` : ''}
+      ${state.notice ? `<div class="team-notice"><i class="fa-solid fa-key"></i><div class="team-notice-body"><b>${esc(state.notice.title)}</b>
+        <pre class="team-login" id="loginText">${esc(loginText(state.notice))}</pre>
+        <div class="team-notice-actions"><button type="button" class="adm-btn primary" data-copy><i class="fa-regular fa-copy"></i> Copy details</button><a class="adm-btn wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(loginText(state.notice))}"><i class="fa-brands fa-whatsapp"></i> Send on WhatsApp</a></div>
+        <small>Send them privately. For safety the password is only shown here, once; you can always set a new one with the key button.</small></div><button type="button" class="adm-drawer-x" data-dismiss aria-label="Dismiss"><i class="fa-solid fa-xmark"></i></button></div>` : ''}
       <div class="team-bar">
         ${seg('period', PERIODS, state.period)}
         <button type="button" class="adm-btn primary" data-add><i class="fa-solid fa-user-plus"></i> Add team member</button>
@@ -76,8 +84,9 @@ const AdminTeam = (function(){
           <label>Full name<input class="adm-input" name="name" required maxlength="60" placeholder="e.g. Amina Otieno"></label>
           <label>Username<input class="adm-input" name="username" required maxlength="30" autocapitalize="none" spellcheck="false" placeholder="e.g. amina"></label>
           <label>Role<select class="adm-input" name="role">${roleOpts('agent')}</select><small class="role-help">${esc(ROLE_HELP.agent)}</small></label>
-          <label>One-time password<span class="team-pw"><input class="adm-input" name="password" required minlength="8" value="${tempPassword()}"><button type="button" class="adm-btn" data-regen title="New password"><i class="fa-solid fa-rotate"></i></button></span></label>
+          <label>Password <small class="role-help">at least 8 characters</small>${pwField('password', '', 'Type one, or tap the wand')}</label>
         </div>
+        ${mustBox}
         <div class="adm-err" id="addErr"></div>
         <div class="adm-dialog-actions"><button type="button" class="adm-btn" data-cancel>Cancel</button><button type="submit" class="adm-btn primary">Add</button></div>
       </form>` : ''}
@@ -87,21 +96,24 @@ const AdminTeam = (function(){
           <tr class="team-edit"><td colspan="7"><form class="team-form inline" data-edit="${u.id}" novalidate>
             <div class="team-fields">
               <label>Full name<input class="adm-input" name="name" value="${esc(u.name)}" maxlength="60"></label>
+              <label>Username<input class="adm-input" name="username" value="${esc(u.username)}" maxlength="30" autocapitalize="none" spellcheck="false"></label>
               <label>Role<select class="adm-input" name="role" ${u.id === me.id ? 'disabled' : ''}>${roleOpts(u.role)}</select>${u.id === me.id ? '<small class="role-help">You can\'t change your own role</small>' : ''}</label>
+              <label>New password <small class="role-help">leave empty to keep it</small>${pwField('password', '', 'Type a new one, or tap the wand')}</label>
             </div>
+            ${u.id === me.id ? '' : mustBox}
             <div class="adm-err"></div>
             <div class="adm-dialog-actions"><button type="button" class="adm-btn" data-cancel>Cancel</button><button type="submit" class="adm-btn primary">Save</button></div>
           </form></td></tr>` : `
           <tr class="${u.disabled ? 'off' : ''}">
-            <td data-l="Person"><b>${esc(u.name)}${u.id === me.id ? ' <span class="tag">You</span>' : ''}${u.demo ? ' <span class="tag">Demo</span>' : ''}</b><small>@${esc(u.username)} · <span class="role ${u.role}">${esc(u.roleLabel)}</span>${u.disabled ? ' · <b class="off-tag">Switched off</b>' : ''}${u.mustChange && !u.demo ? ' · waiting for first sign-in' : ''}</small></td>
+            <td data-l="Person"><b>${esc(u.name)}${u.id === me.id ? ' <span class="tag">You</span>' : ''}${u.demo ? ' <span class="tag">Demo</span>' : ''}</b><small>@${esc(u.username)} · <span class="role ${u.role}">${esc(u.roleLabel)}</span>${u.disabled ? ' · <b class="off-tag">Switched off</b>' : ''}${!u.logins && !u.demo ? ' · hasn\'t signed in yet' : ''}</small></td>
             <td data-l="Last active">${u.lastSeen ? fmtWhen(u.lastSeen) : '<span class="muted">Never</span>'}<small>${u.logins || 0} sign-in${u.logins === 1 ? '' : 's'}</small></td>
             <td data-l="Sales"><b>${s.sales}</b> · ${usd(s.value)}<span class="team-meter"><i style="width:${Math.round(s.value / top * 100)}%"></i></span></td>
             <td data-l="Replied"><b>${s.replied}</b></td>
             <td data-l="Follow-ups"><b>${s.followed}</b></td>
             <td data-l="Assigned">${s.open ? `<b>${s.open}</b> open` : '<span class="muted">–</span>'}</td>
             <td class="team-actions">${u.demo ? '' : `
-              <button type="button" class="adm-btn" data-edit-user="${u.id}" title="Edit name or role"><i class="fa-solid fa-pen"></i></button>
-              <button type="button" class="adm-btn" data-reset="${u.id}" title="Reset password"><i class="fa-solid fa-key"></i></button>
+              <button type="button" class="adm-btn" data-edit-user="${u.id}" title="Edit name, username or role"><i class="fa-solid fa-pen"></i></button>
+              <button type="button" class="adm-btn" data-reset="${u.id}" title="Set a new password"><i class="fa-solid fa-key"></i></button>
               ${u.id === me.id ? '' : `<button type="button" class="adm-btn" data-toggle="${u.id}" title="${u.disabled ? 'Switch on' : 'Switch off (blocks sign-in)'}"><i class="fa-solid ${u.disabled ? 'fa-toggle-off' : 'fa-toggle-on'}"></i></button>
               <button type="button" class="adm-btn danger" data-remove="${u.id}" title="Remove"><i class="fa-solid fa-trash"></i></button>`}`}
             </td>
@@ -127,7 +139,7 @@ const AdminTeam = (function(){
   }
 
   function wire(el, ctx){
-    const { api, toast } = ctx;
+    const { api, toast, me } = ctx;
     const $ = s => el.querySelector(s);
     const redraw = () => draw(el, ctx);
     const refresh = async () => { state.team = await api('team'); redraw(); };
@@ -141,14 +153,19 @@ const AdminTeam = (function(){
     $('[data-add]').onclick = () => { state.adding = !state.adding; redraw(); if(state.adding) $('#teamAdd [name=name]').focus(); };
     el.querySelectorAll('[data-cancel]').forEach(b => b.onclick = () => { state.adding = false; state.editing = ''; redraw(); });
     const dismiss = $('[data-dismiss]'); if(dismiss) dismiss.onclick = () => { state.notice = null; redraw(); };
-    const copy = $('[data-copy]'); if(copy) copy.onclick = () => { navigator.clipboard && navigator.clipboard.writeText(state.notice.password).then(() => toast('Password copied')); };
+    const copy = $('[data-copy]');
+    if(copy) copy.onclick = () => {
+      const text = loginText(state.notice);
+      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => toast('Sign-in details copied'))
+        .catch(() => { const r = document.createRange(); r.selectNodeContents($('#loginText')); getSelection().removeAllRanges(); getSelection().addRange(r); toast('Selected: press Ctrl+C to copy'); });
+    };
+    el.querySelectorAll('[data-regen]').forEach(b => b.onclick = () => { const i = b.previousElementSibling; i.value = tempPassword(); i.focus(); });
     el.querySelectorAll('[data-open]').forEach(li => li.onclick = () => { const [k, id] = li.dataset.open.split(':'); ctx.openDetail(k, id); });
 
     const add = $('#teamAdd');
     if(add){
       const role = add.querySelector('[name=role]'), help = add.querySelector('.role-help');
       role.onchange = () => { help.textContent = ROLE_HELP[role.value]; };
-      add.querySelector('[data-regen]').onclick = () => { add.querySelector('[name=password]').value = tempPassword(); };
       add.querySelector('[name=name]').oninput = e => {
         const un = add.querySelector('[name=username]');
         if(!un.dataset.touched) un.value = e.target.value.trim().toLowerCase().split(/\s+/)[0].replace(/[^a-z0-9._-]/g, '');
@@ -156,27 +173,29 @@ const AdminTeam = (function(){
       add.querySelector('[name=username]').oninput = e => { e.target.dataset.touched = '1'; };
       add.onsubmit = async e => {
         e.preventDefault();
-        const f = Object.fromEntries(new FormData(add));
+        const f = Object.fromEntries(new FormData(add)); f.mustChange = !!f.mustChange;
+        if((f.password || '').length < 8){ fail($('#addErr'), new Error('Passwords need at least 8 characters. Tap the wand for a strong one.')); return; }
         try {
           const { user: u } = await api('team/add', { method: 'POST', body: JSON.stringify(f) });
-          state.adding = false; state.notice = { title: `${u.name} can now sign in`, name: u.name, username: u.username, password: f.password };
+          state.adding = false; state.notice = { title: `${u.name} can now sign in`, name: u.name, username: u.username, password: f.password, mustChange: f.mustChange };
           await refresh();
         } catch(err){ fail($('#addErr'), err); }
       };
     }
-    el.querySelectorAll('[data-edit-user]').forEach(b => b.onclick = () => { state.editing = b.dataset.editUser; redraw(); });
+    el.querySelectorAll('[data-edit-user]').forEach(b => b.onclick = () => { state.editing = b.dataset.editUser; state.adding = false; redraw(); });
+    el.querySelectorAll('[data-reset]').forEach(b => b.onclick = () => { state.editing = b.dataset.reset; state.adding = false; state.focusPw = true; redraw(); });
+    if(state.focusPw){ state.focusPw = false; const i = $('[data-edit] [name=password]'); if(i){ i.focus(); i.scrollIntoView({ block: 'center' }); } }
     el.querySelectorAll('[data-edit]').forEach(form => form.onsubmit = async e => {
       e.preventDefault();
-      const f = Object.fromEntries(new FormData(form));
-      try { await api('team/update', { method: 'POST', body: JSON.stringify({ id: form.dataset.edit, ...f }) }); state.editing = ''; toast('Saved'); await refresh(); }
-      catch(err){ fail(form.querySelector('.adm-err'), err); }
-    });
-    el.querySelectorAll('[data-reset]').forEach(b => b.onclick = async () => {
-      const u = user(b.dataset.reset);
-      if(!confirm(`Reset ${u.name}'s password? They will be signed out and get a new one-time password.`)) return;
-      const password = tempPassword();
-      try { await api('team/update', { method: 'POST', body: JSON.stringify({ id: u.id, password }) }); state.notice = { title: `New password for ${u.name}`, name: u.name, username: u.username, password }; await refresh(); }
-      catch(err){ fail(null, err); }
+      const f = Object.fromEntries(new FormData(form)); f.mustChange = !!f.mustChange;
+      if(!f.password) delete f.password;
+      else if(f.password.length < 8){ fail(form.querySelector('.adm-err'), new Error('Passwords need at least 8 characters. Tap the wand for a strong one.')); return; }
+      try {
+        const { user: u } = await api('team/update', { method: 'POST', body: JSON.stringify({ id: form.dataset.edit, ...f }) });
+        state.editing = '';
+        if(f.password && u.id !== me.id) state.notice = { title: `New sign-in details for ${u.name}`, name: u.name, username: u.username, password: f.password, mustChange: f.mustChange };
+        toast(f.password ? 'Password changed' : 'Saved'); await refresh();
+      } catch(err){ fail(form.querySelector('.adm-err'), err); }
     });
     el.querySelectorAll('[data-toggle]').forEach(b => b.onclick = async () => {
       const u = user(b.dataset.toggle);

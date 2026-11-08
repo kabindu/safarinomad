@@ -118,8 +118,9 @@ export function createTeam({ dir, firstOwner }){
     if(!USERNAME.test(username)) throw new TeamError('Usernames are 3 to 30 characters: letters, numbers, dots, dashes or underscores.');
     if(users.some(u => u.username === username && !u.demo)) throw new TeamError('That username is taken.');
     if(!ROLES[role]) throw new TeamError('Please choose a role.');
-    const u = { id: newId(), username, name, role, created: now(), createdBy: by.name, logins: 0, mustChange: true };
-    setPassword(u, b.password); u.mustChange = true;       // they choose their own at first sign-in
+    const u = { id: newId(), username, name, role, created: now(), createdBy: by.name, logins: 0 };
+    setPassword(u, b.password);
+    u.mustChange = !!b.mustChange;                          // optional: they pick their own at first sign-in
     users.push(u); saveUsers();
     log(by, 'Added team member', `${name} (${username}) as ${ROLES[role].label}`);
     return publicUser(u);
@@ -129,6 +130,12 @@ export function createTeam({ dir, firstOwner }){
     if(!u) throw new TeamError('Team member not found.', 404);
     const changes = [];
     if(b.name !== undefined && clean(b.name, 60) && clean(b.name, 60) !== u.name){ changes.push(`name → ${clean(b.name, 60)}`); u.name = clean(b.name, 60); }
+    if(b.username !== undefined && cleanUsername(b.username) !== u.username){
+      const un = cleanUsername(b.username);
+      if(!USERNAME.test(un)) throw new TeamError('Usernames are 3 to 30 characters: letters, numbers, dots, dashes or underscores.');
+      if(users.some(x => x.username === un && x !== u && !x.demo)) throw new TeamError('That username is taken.');
+      changes.push(`username → ${un}`); u.username = un;
+    }
     if(b.role !== undefined && b.role !== u.role){
       if(!ROLES[b.role]) throw new TeamError('Unknown role.');
       if(u.role === 'owner' && owners().length <= 1) throw new TeamError('There must always be at least one owner.');
@@ -140,7 +147,7 @@ export function createTeam({ dir, firstOwner }){
       u.disabled = !!b.disabled; changes.push(u.disabled ? 'switched off' : 'switched on');
       if(u.disabled) dropSessions(u.id);
     }
-    if(b.password){ setPassword(u, b.password); u.mustChange = true; dropSessions(u.id); changes.push('password reset'); }
+    if(b.password){ setPassword(u, b.password); u.mustChange = !!b.mustChange; if(u.id !== by.id) dropSessions(u.id); changes.push('password changed'); }
     if(!changes.length) return publicUser(u);
     saveUsers();
     log(by, 'Changed team member', `${u.name}: ${changes.join(', ')}`);
@@ -164,7 +171,7 @@ export function createTeam({ dir, firstOwner }){
   function resetFromCli(username, pw){
     const u = users.find(x => x.username === cleanUsername(username) && !x.demo);
     if(!u) throw new TeamError(`No team member called "${username}".`);
-    setPassword(u, pw); u.disabled = false; u.mustChange = true; saveUsers(); dropSessions(u.id);
+    setPassword(u, pw); u.disabled = false; u.mustChange = false; saveUsers(); dropSessions(u.id);
     log(null, 'Password reset from server', u.name, { name: 'Server' });
     return u;
   }
