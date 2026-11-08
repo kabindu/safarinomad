@@ -36,7 +36,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import crypto from 'node:crypto';
+import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenAI, ApiError as GeminiApiError } from '@google/genai';
 
@@ -165,6 +167,12 @@ function getSystemPrompt(search = true){
 
 /* ---------- Simple per-visitor rate limit ---------- */
 const hits = new Map();
+// The rate limiters remember recent requests per visitor; every 5 minutes, forget anyone quiet for 2 minutes
+const LIMITERS = [];
+setInterval(() => {
+  const cutoff = Date.now() - 120_000;
+  LIMITERS.forEach(m => { for(const [k, times] of m){ if(!times.length || times[times.length - 1] < cutoff) m.delete(k); } });
+}, 300_000).unref();
 function rateLimited(ip){
   const now = Date.now();
   const recent = (hits.get(ip) || []).filter(t => now - t < 60_000);
@@ -215,7 +223,7 @@ async function handleChat(req, res){
   };
   db.questions.push(question);
   if(db.questions.length > 5000) db.questions.splice(0, db.questions.length - 5000);
-  save('questions');
+  saveSoon('questions');
 
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' });
   const send = obj => res.write(`data: ${JSON.stringify(obj)}\n\n`);
@@ -224,7 +232,7 @@ async function handleChat(req, res){
   const provider = chatProvider();
   if(!provider){
     question.offline = true;
-    save('questions');
+    saveSoon('questions');
     send({ error: 'The AI assistant is not configured yet (no API key).', fallback: true });
     return res.end();
   }
@@ -277,7 +285,7 @@ async function handleChat(req, res){
       question.offline = true;
       send({ error: message, fallback: true });
     }
-    save('questions');
+    saveSoon('questions');
     return res.end();
   }
 
@@ -324,7 +332,7 @@ async function handleChat(req, res){
     question.offline = true;   // the visitor was shown the assistant's offline answer
     send({ error: message, fallback: true });
   }
-  save('questions');
+  saveSoon('questions');
   res.end();
 }
 
@@ -439,6 +447,13 @@ KINDS.forEach(k => {
 // antivirus, backup) has the file open, so retry briefly and then write in place.
 // A failed save is logged but never stops the server: the data stays in memory
 // and is written with the next save.
+// Bookings and enquiries are written at once; frequent, low-stakes data is batched (a few seconds at most)
+const saveTimers = {};
+function saveSoon(kind, ms = 3000){
+  if(!saveTimers[kind]) saveTimers[kind] = setTimeout(() => { saveTimers[kind] = 0; save(kind); }, ms);
+}
+// Write anything still pending when the server stops
+['SIGINT', 'SIGTERM'].forEach(sig => process.on(sig, () => { Object.keys(saveTimers).forEach(k => { if(saveTimers[k]){ clearTimeout(saveTimers[k]); save(k); } }); if(analyticsTimer) save('analytics'); process.exit(0); }));
 function save(kind){
   const file = path.join(DATA_DIR, kind + '.json');
   const text = JSON.stringify(db[kind], null, 1);
@@ -614,6 +629,7 @@ db.analytics = analytics;
 let analyticsTimer = 0;
 const saveAnalytics = () => { if(!analyticsTimer) analyticsTimer = setTimeout(() => { analyticsTimer = 0; save('analytics'); }, 10_000); };
 const trackHits = new Map();
+LIMITERS.push(trackHits);
 const BOT = /bot|crawl|spider|slurp|headless|lighthouse|preview|facebookexternalhit|curl|wget|python|node-fetch/i;
 function bump(map, key, max = 300){
   key = clean(String(key || ''), 80);
@@ -656,6 +672,7 @@ async function handleTrack(req, res){
    them under "Unfinished" in admin.html and can email, call or WhatsApp them.
    One lead per browser draft id; sending the booking/enquiry marks it "booked". */
 const leadHits = new Map();
+LIMITERS.push(leadHits);
 function leadLimited(ip){
   const now = Date.now();
   const recent = (leadHits.get(ip) || []).filter(t => now - t < 60_000);
@@ -666,7 +683,7 @@ function closeLead(draft, outcome){
   const lead = draft && db.leads.find(x => x.draft === clean(draft, 40));
   if(!lead || lead.status === 'booked') return;
   lead.status = 'booked'; lead.outcome = outcome; lead.updated = new Date().toISOString();
-  save('leads');
+  saveSoon('leads');
 }
 async function handleLead(req, res){
   const ip = req.socket.remoteAddress || 'unknown';
@@ -689,7 +706,7 @@ async function handleLead(req, res){
     source: b.source === 'custom' ? 'Custom trip' : 'Booking', page: clean(b.page, 120), step: clean(b.step, 80),
     resume: clean(b.resume, 300), name: clean(fields.Name || '', 120), email, phone, fields, updated: now
   });
-  save('leads');
+  saveSoon('leads');
   sendJSON(res, 200, { saved: true });
 }
 
@@ -733,6 +750,7 @@ function adminPassword(){
 const sessions = new Map();                     // token → expiry time
 const SESSION_MS = 12 * 3600_000;
 const loginHits = new Map();
+LIMITERS.push(hits, loginHits);
 const tokenOf = req => (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
 
 function isAdmin(req){
@@ -855,13 +873,63 @@ function serveStatic(req, res){
       fs.createReadStream(file, { start, end }).pipe(res);
     });
   }
-  fs.readFile(file, (err, data) => {
-    if(err){ res.writeHead(404, { 'Content-Type':'text/plain' }); return res.end('Not found'); }
-    const headers = { 'Content-Type': TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream' };
-    if(/\.(html|js|css)$/.test(file)) headers['Cache-Control'] = 'no-cache';   // edits show on the next page load
+  cachedFile(file).then(f => {
+    if(!f){ res.writeHead(404, { 'Content-Type':'text/plain' }); return res.end('Not found'); }
+    const headers = { 'Content-Type': f.type, 'ETag': f.etag, 'Vary': 'Accept-Encoding',
+      // Pages, styles and scripts: always check for a newer version (a quick 304 when unchanged), so edits show at once.
+      // Photos, fonts: keep for a week (uploads get new file names, so they never go stale).
+      'Cache-Control': f.text ? 'no-cache' : 'public, max-age=604800' };
+    if(req.headers['if-none-match'] === f.etag){ res.writeHead(304, headers); return res.end(); }
+    const accept = req.headers['accept-encoding'] || '';
+    let body = f.raw;
+    if(f.br && /\bbr\b/.test(accept)){ body = f.br; headers['Content-Encoding'] = 'br'; }
+    else if(f.gz && /\bgzip\b/.test(accept)){ body = f.gz; headers['Content-Encoding'] = 'gzip'; }
+    headers['Content-Length'] = body.length;
     res.writeHead(200, headers);
-    res.end(data);
-  });
+    res.end(req.method === 'HEAD' ? undefined : body);
+  }).catch(() => { res.writeHead(500); res.end('Server error'); });
+}
+
+/* ---------- File cache ----------
+   Each file is read from disk once and kept in memory with a Brotli and a gzip copy (text only)
+   and an ETag. A quick stat on every request notices edits, so changes still show straight away.
+   Large files (videos, big photos) are read fresh and not kept, so memory stays small. */
+const fileCache = new Map();
+const brotli = promisify(zlib.brotliCompress), gzip = promisify(zlib.gzip);
+// Read and compress pages, styles, scripts and translations once at start-up, so the first visitors are fast too
+async function warmCache(){
+  const dirs = ['.', 'css', 'js', 'lang'];
+  for(const d of dirs){
+    let names = [];
+    try { names = fs.readdirSync(path.join(ROOT, d)).filter(n => /\.(html|css|js)$/.test(n)); } catch {}
+    for(const n of names) await cachedFile(path.join(ROOT, d, n)).catch(() => {});
+  }
+}
+const CACHE_MAX_FILE = 2 * 1024 * 1024, CACHE_MAX_TOTAL = 150 * 1024 * 1024;
+let cacheBytes = 0;
+async function cachedFile(file){
+  let st;
+  try { st = await fs.promises.stat(file); } catch { return null; }
+  if(!st.isFile()) return null;
+  const hit = fileCache.get(file);
+  if(hit && hit.mtime === st.mtimeMs && hit.size === st.size) return hit;
+  const raw = await fs.promises.readFile(file);
+  const type = TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream';
+  const text = /^(text\/|application\/json|image\/svg)/.test(type);
+  const f = { mtime: st.mtimeMs, size: st.size, type, text, raw,
+    etag: '"' + crypto.createHash('sha1').update(raw).digest('base64url').slice(0, 16) + '"' };
+  if(text && raw.length > 512){
+    // Compression runs off the main thread, so other visitors are never held up
+    [f.br, f.gz] = await Promise.all([brotli(raw, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 9 } }), gzip(raw, { level: 9 })]);
+  }
+  const weight = raw.length + (f.br ? f.br.length + f.gz.length : 0);
+  if(raw.length <= CACHE_MAX_FILE){
+    if(hit) cacheBytes -= hit.weight;
+    // Full: forget the oldest entries first
+    for(const [k, v] of fileCache){ if(cacheBytes + weight <= CACHE_MAX_TOTAL) break; fileCache.delete(k); cacheBytes -= v.weight; }
+    f.weight = weight; fileCache.set(file, f); cacheBytes += weight;
+  }
+  return f;
 }
 
 function sendJSON(res, status, obj){
@@ -892,6 +960,7 @@ http.createServer((req, res) => {
     else res.end();
   });
 }).listen(PORT, () => {
+  warmCache();
   console.log(`SafariNomad running at http://localhost:${PORT}`);
   console.log(`Admin dashboard:  http://localhost:${PORT}/admin.html`);
   if(!process.env.ADMIN_PASSWORD) console.log(`Admin password:   ${adminPassword()}   (edit server/data/admin-password.txt, or set ADMIN_PASSWORD, to change it)`);

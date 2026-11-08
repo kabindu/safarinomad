@@ -292,9 +292,6 @@ const SN = (function(){
     .sort((a, b) => b.reviews - a.reviews);
 
   // Homepage: one tile per landscape, linking to those trips
-  $$('[data-lands]').forEach(el => {
-    el.innerHTML = LANDS.map(l => `<a class="land-tile" href="trips.html?land=${l.key}"><i class="fa-solid ${l.icon}"></i><b>${l.label}</b><span>${pick({ packLand:l.key }).length} trips</span></a>`).join('');
-  });
 
   // Destinations page: a row per landscape the country has
   $$('[data-country-lands]').forEach(el => {

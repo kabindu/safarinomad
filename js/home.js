@@ -265,38 +265,4 @@
     if(search.months.length) q.set('months', search.months.join(','));
     location.href = 'trips.html' + (q.toString() ? '?' + q : '');
   });
-
-  /* ---------- When to go ---------- */
-  const WHEN = [
-    {m:'Jan', t:'January: calving season begins', d:'Hot, dry and green. Wildebeest gather on the short-grass plains of southern Serengeti (Ndutu) to give birth, and predators follow. A great month for Kenya and gorilla trekking too.', tags:['Ndutu calving','Gorilla trekking','Beach weather'], img:'lion-and-cub'},
-    {m:'Feb', t:'February: peak calving', d:'Up to 8,000 calves are born a day in the southern Serengeti, so big-cat action is intense. Dry weather makes this one of the best months for a combined safari and beach trip.', tags:['Predator action','Southern Serengeti','Zanzibar'], img:'lioness'},
-    {m:'Mar', t:'March: the quiet shoulder', d:'The last dry weeks before the long rains. Parks are quieter, lodge rates start dropping, and the herds are still in the south.', tags:['Fewer crowds','Value rates'], img:'serengeti-acacia'},
-    {m:'Apr', t:'April: Green Season savings', d:'The long rains bring emerald plains, dramatic skies and the lowest prices of the year, with up to 25% off. Showers are usually short afternoon bursts.', tags:['Up to 25% off','Photography','Birding'], img:'zebra'},
-    {m:'May', t:'May: lush and uncrowded', d:'Green Season continues and the migration starts moving north-west through the central Serengeti. Ideal for travellers who want a quiet, private feel.', tags:['Private feel','Central Serengeti'], img:'elephants-grassland'},
-    {m:'Jun', t:'June: dry season begins', d:'Grass shortens and animals gather around water. The herds reach the Grumeti River in the western Serengeti, and gorilla high season starts in Uganda and Rwanda.', tags:['Grumeti crossings','Gorilla season','Kilimanjaro'], img:'giraffe-sunset', peak:true},
-    {m:'Jul', t:'July: the Mara crossings begin', d:'The migration pours into Kenya\'s Maasai Mara and the famous Mara River crossings start. Peak season, so book 9–12 months ahead for the best camps.', tags:['River crossings','Maasai Mara','Book early'], img:'lion-walking', peak:true},
-    {m:'Aug', t:'August: the migration at its peak', d:'The most dramatic month for river crossings, with dry weather and superb game viewing across East Africa. Also perfect for gorilla trekking.', tags:['Peak crossings','Family holidays','Gorilla trekking'], img:'lion-and-cub', peak:true},
-    {m:'Sep', t:'September: big herds, fewer families', d:'The herds are still in the Mara, the school holidays are over and the weather is dry. Many guides say this is the best month of the year.', tags:['Maasai Mara','Kilimanjaro','Honeymoons'], img:'elephant-savannah', peak:true},
-    {m:'Oct', t:'October: great value, great game', d:'The herds begin drifting back south into Tanzania. It\'s shoulder season, with excellent sightings, thinner crowds and better lodge availability.', tags:['Shoulder pricing','Serengeti','Beach'], img:'elephant-amboseli'},
-    {m:'Nov', t:'November: the short rains', d:'Brief showers refresh the land and the herds return to the northern Serengeti. Look out for last-minute deals and migratory birds arriving.', tags:['Last-minute deals','Birding'], img:'flamingo'},
-    {m:'Dec', t:'December: festive safaris', d:'Green landscapes, newborn animals and warm evenings under the stars. A popular festive escape, often ending on the Kenyan or Zanzibar coast.', tags:['Festive trips','Safari & beach','Families'], img:'coast-resort', peak:true}
-  ];
-  const monthsEl = $('#months');
-  if(!monthsEl) return;                // the planner isn't on the page
-  WHEN.forEach((w, i) => {
-    const b = document.createElement('button');
-    b.className = 'month' + (w.peak ? ' peak' : '');
-    b.textContent = w.m; b.type = 'button';
-    b.addEventListener('click', () => showMonth(i));
-    monthsEl.appendChild(b);
-  });
-  function showMonth(i){
-    const w = WHEN[i];
-    $$('.month').forEach((b, j) => b.classList.toggle('active', i === j));
-    $('#whenTitle').textContent = w.t;
-    $('#whenText').textContent = w.d;
-    $('#whenTags').innerHTML = w.tags.map(t => `<span class="chip">${t}</span>`).join('');
-    $('#whenImg').src = `images/${w.img}.jpg`;
-  }
-  showMonth(new Date().getMonth());
 })();

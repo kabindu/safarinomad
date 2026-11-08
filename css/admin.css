@@ -79,15 +79,6 @@ code{background:var(--yt-surface);padding:1px 6px;border-radius:5px;font-size:.9
 .stat b{font-size:26px;font-family:var(--font-body);font-weight:700;color:var(--yt-text);}
 .stat span{font-size:13px;color:var(--yt-muted);font-weight:600;}
 .stat.hot i{background:var(--orange);color:#fff;}
-.adm-cols{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;align-items:start;}
-.feed{list-style:none;padding:0;margin:0;}
-.feed li{display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:var(--box-radius);cursor:pointer;transition:background .15s;}
-.feed li + li{border-top:none;}
-.feed li:hover{background:var(--box-bg);}
-.feed li > i{width:36px;height:36px;border-radius:50%;background:var(--box-bg);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--yt-text);flex-shrink:0;}
-.feed li div{flex:1;min-width:0;}
-.feed p{font-size:14px;line-height:1.45;}
-.feed small{color:var(--yt-muted);font-size:12px;}
 
 /* Departures */
 .dep{display:flex;gap:14px;align-items:center;padding:10px;cursor:pointer;border-radius:var(--box-radius);transition:background .15s;}
@@ -180,7 +171,6 @@ code{background:var(--yt-surface);padding:1px 6px;border-radius:5px;font-size:.9
 /* ---------- Responsive ---------- */
 @media (max-width:1200px){
   .stats{grid-template-columns:repeat(3,minmax(0,1fr));}
-  .adm-cols{grid-template-columns:1fr;}
 }
 @media (max-width:860px){
   .adm{grid-template-columns:1fr;}

@@ -20,9 +20,6 @@
 .hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(95deg,rgba(8,22,44,.72) 0%,rgba(8,22,44,.38) 42%,rgba(8,22,44,.05) 75%),linear-gradient(0deg,rgba(8,22,44,.45),transparent 35%);}
 .hero-controls{position:absolute;right:28px;bottom:118px;z-index:3;display:flex;align-items:center;gap:14px;}
 .hero-place{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;background:rgba(8,22,44,.4);backdrop-filter:blur(6px);color:#fff;font-size:13px;font-weight:600;}
-.hero-dots{display:flex;gap:6px;}
-.hero-dots button{width:8px;height:8px;padding:0;border-radius:8px;border:none;background:rgba(255,255,255,.55);cursor:pointer;transition:width .3s,background .3s;}
-.hero-dots button.on{width:26px;background:#fff;}
 .hero-pause{position:relative;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(8,22,44,.35);backdrop-filter:blur(6px);color:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
 .hero-pause:hover{background:rgba(8,22,44,.6);}
 
