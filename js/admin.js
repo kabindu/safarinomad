@@ -73,7 +73,8 @@
 
   async function load(quiet){
     try{
-      data = await api('data');
+      const [bulk, who_] = await Promise.all([api('data'), api('me')]);
+      data = Object.assign(bulk, who_);
       $('#updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
       applyRole();
       $('#demoBar').hidden = !data.demo;
@@ -92,7 +93,7 @@
     let weak = ''; try{ weak = sessionStorage.getItem('sn-weak'); }catch(e){}
     $('#pwBar').hidden = !weak;
     if(me.mustChange) openAccount(true);
-    const need = { packages:'website', flights:'website', deals:'website', flash:'website', lastminute:'website', team:'team' }[view];
+    const need = { pricing:'website', packages:'website', flights:'website', deals:'website', flash:'website', lastminute:'website', team:'team' }[view];
     if(need && !can(need)) go('overview');
   }
   // Every person and their name, for "assigned to" and "done by"
@@ -133,13 +134,14 @@
   const VIEWS = {
     overview:   { title:'Today', sub:'What needs doing now, oldest first. Everything else is one click away.', filters:null },
     insights:   { title:'Insights', sub:'Visits, most booked packages and the destinations travellers ask for. Click any package or place to open its records.', filters:null, manual:true },
-    bookings:   { title:'Bookings', sub:'Every booking made on the website. Click one to confirm, cancel or add a note.', filters:['all','pending','confirmed','completed','cancelled'] },
+    bookings:   { title:'Bookings', sub:'Every booking made on the website. Click one to confirm, cancel or add a note.', filters:['all','pending','confirmed','completed','cancelled','discounts'] },
     departures: { title:'Bookings', sub:'Seats booked on each departure.', filters:['upcoming','past'] },
     deals:      { title:'Deals', sub:'Flash sales and last-minute departures shown on the website.', filters:null, manual:true },
     enquiries:  { title:'Enquiries', sub:'Quote requests, flight requests, guide requests and sign-ups.', filters:['all','new','replied','closed'] },
     leads:      { title:'Unfinished', sub:'Travellers who started a booking or custom trip and left before sending it. Email, call or WhatsApp them to help finish.', filters:['open','contacted','booked','lost','all'] },
     flightplans:{ title:'Flight plans', sub:'Flights travellers are comparing or asked us to book. Open one to see their options, check live prices and email them.', filters:['waiting','all'] },
     questions:  { title:'Chat questions', sub:'What travellers asked Nomad, the AI assistant, and how it answered.', filters:['all','new','reviewed'] },
+    pricing:    { title:'Prices', sub:'Estimated cost and suggested price for every package. Nothing changes on the website until you publish.', filters:null, manual:true },
     team:       { title:'Team & activity', sub:'Who is on the team, what each person has done, and every sign-in and change.', filters:null, manual:true }
   };
   // Website content pages live in js/admin-content.js
@@ -183,8 +185,9 @@
     $('#viewTitle').textContent = v.title;
     $('#mbarTitle').textContent = v.title;
     $('#viewSub').textContent = v.sub;
-    $('#export').hidden = ['overview', 'insights', 'deals', 'team', 'flightplans'].includes(view) || !!v.custom;
-    $('.adm-search').hidden = ['insights', 'overview', 'team'].includes(view);
+    $('#export').hidden = ['overview', 'insights', 'deals', 'team', 'flightplans', 'pricing'].includes(view) || !!v.custom;
+    $('.adm-search').hidden = ['insights', 'overview', 'team', 'pricing'].includes(view);
+    if(view === 'pricing'){ $('#filters').innerHTML = ''; return AdminPricing.render($('#view'), { api, toast, esc, usd, content: AdminContent }); }
     if(view === 'team'){ $('#filters').innerHTML = ''; return AdminTeam.render($('#view'), { api, toast, esc, data, me: data.me || {}, fmtWhen, usd, openDetail, reload: true }); }
     // Deals: one page, two tabs (the editors come from js/admin-content.js)
     if(view === 'deals'){
@@ -204,6 +207,7 @@
   function countFor(f){
     const list = view === 'bookings' ? data.bookings : view === 'enquiries' ? data.enquiries : view === 'questions' ? data.questions : view === 'leads' ? (data.leads || []) : null;
     if(!list) return null;
+    if(f === 'discounts') return list.filter(x => x.discount && x.discount.status === 'requested').length;
     return f === 'all' ? list.length : list.filter(x => x.status === f).length;
   }
   const empty = (icon, text) => `<div class="adm-empty"><i class="fa-solid ${icon}"></i><p>${text}</p></div>`;
@@ -219,8 +223,12 @@
     data.bookings.filter(b => b.status === 'pending').forEach(b => todo.push({
       t:b.created, icon:'fa-calendar-check', kind:'Booking', open:`bookings:${b.id}`,
       title:`Confirm <b>${esc(b.name)}</b>'s booking`,
-      sub:`${esc(b.tripTitle)} · ${fmtDate(b.date)} · ${party(b)} traveller${party(b) === 1 ? '' : 's'} · ${usd(b.total)}`,
+      sub:`${esc(b.tripTitle)} · ${fmtDate(b.date)} · ${party(b)} traveller${party(b) === 1 ? '' : 's'} · ${usd(b.total)}${b.discount && b.discount.status === 'requested' ? ' · <b>Discount requested</b>' : ''}`,
       actions: btn(`mailto:${b.email}`, 'fa-solid fa-envelope', 'Email') + (b.phone ? btn(`https://wa.me/${b.phone.replace(/\D/g, '')}`, 'fa-brands fa-whatsapp', 'WhatsApp', 'wa') : '')
+    }));
+    data.bookings.filter(b => b.status !== 'pending' && b.discount && b.discount.status === 'requested').forEach(b => todo.push({
+      t:b.discount.requestedAt, icon:'fa-tag', kind:'Discount', open:`bookings:${b.id}`, title:`Decide <b>${esc(b.name)}</b>'s discount`,
+      sub:`${esc(b.tripTitle)} · ${party(b)} travellers · ${esc(b.discount.reason)}`, actions:''
     }));
     data.enquiries.filter(e => e.status === 'new').forEach(e => todo.push({
       t:e.created, icon:'fa-envelope', kind:e.type, open:`enquiries:${e.id}`,
@@ -270,7 +278,7 @@
 
   /* ---------- Bookings ---------- */
   function filteredBookings(){
-    return data.bookings.filter(b => (filter === 'all' || b.status === filter) && matches(b))
+    return data.bookings.filter(b => (filter === 'all' || b.status === filter || (filter === 'discounts' && b.discount && b.discount.status === 'requested')) && matches(b))
       .sort((a, b) => b.created.localeCompare(a.created));
   }
   const bookingSwitch = () => `<div class="seg adm-switch" role="tablist" aria-label="Show bookings">
@@ -292,7 +300,7 @@
           <td data-l="Start date">${fmtDate(b.date)}<small>${b.days} days</small></td>
           <td data-l="Party">${b.adults} ad${b.children ? ` + ${b.children} ch` : ''}</td>
           <td data-l="Total"><b>${usd(b.total)}</b></td>
-          <td data-l="Status">${pill(b.status)}${b.assignedTo && who(b.assignedTo) ? `<small><i class="fa-solid fa-user"></i> ${esc(who(b.assignedTo))}</small>` : ''}</td>
+          <td data-l="Status">${pill(b.status)}${b.assignedTo && who(b.assignedTo) ? `<small><i class="fa-solid fa-user"></i> ${esc(who(b.assignedTo))}</small>` : ''}${b.discount ? `<small class="disc ${esc(b.discount.status)}"><i class="fa-solid fa-tag"></i> ${b.discount.status === 'approved' ? `${esc(b.discount.pct)}% off` : `Discount ${esc(b.discount.status)}`}</small>` : ''}</td>
           <td data-l="Received">${fmtWhen(b.created)}</td>
         </tr>`).join('')}</tbody></table></div>`;
   }
@@ -405,6 +413,37 @@
       <a class="adm-btn" href="${esc(flightLive(o))}" target="_blank" rel="noopener"><i class="fa-solid fa-magnifying-glass-dollar"></i> Live prices</a></li>`).join('')}</ul>`;
   }
 
+  /* ---------- Discounts: the team decides, within the safe limit ---------- */
+  async function discountPanel(b){
+    const box = $('#discountPanel'), d = b.discount;
+    if(!box) return;
+    let info;
+    try{ info = await api('discount-info?id=' + encodeURIComponent(b.id)); }catch(e){ return; }
+    if(!$('#discountPanel') || !openItem || openItem.id !== b.id) return;
+    const pctDefault = (d && d.pct) || Math.min(info.suggestedPct || 0, info.maxPct) || '';
+    const status = !d ? '' : d.status === 'approved' ? `<p class="disc-state ok"><i class="fa-solid fa-circle-check"></i> ${esc(d.pct)}% approved by ${esc(who(d.decidedBy) || 'the team')}: ${usd(d.original)} → ${usd(b.total)}</p>`
+      : d.status === 'declined' ? `<p class="disc-state no"><i class="fa-solid fa-circle-xmark"></i> Declined by ${esc(who(d.decidedBy) || 'the team')}</p>`
+      : `<p class="disc-state ask"><i class="fa-solid fa-tag"></i> <b>Requested:</b> ${esc(d.reason)}${d.message ? ` · "${esc(d.message)}"` : ''}</p>`;
+    box.innerHTML = `<h4>Discount</h4>${status}
+      <dl class="dl">${row('Price before discount', usd(info.original))}${row('Lowest safe total', info.floor ? usd(info.floor) : 'Not known for this trip')}${row('Group discount for this size', info.suggestedPct ? info.suggestedPct + '%' : 'None')}${row('Most you can safely give', info.maxPct + '%')}</dl>
+      ${info.belowCost ? '<p class="tip disc-warn"><i class="fa-solid fa-triangle-exclamation"></i> This booking is already below estimated cost, so a discount would add to the loss. Check Prices.</p>' : ''}
+      <div class="disc-row"><label>Discount %<input class="adm-input" id="discPct" type="number" min="1" max="50" value="${esc(pctDefault)}"></label><span id="discNew"></span></div>
+      <label class="team-check" id="discOverride" hidden><input type="checkbox"> I accept selling below the lowest safe price</label>
+      <div class="disc-go"><button type="button" class="adm-btn primary" id="discYes">Approve discount</button>${d && d.status !== 'declined' ? '<button type="button" class="adm-btn" id="discNo">Decline</button>' : ''}</div>`;
+    const pct = $('#discPct'), preview = () => { const v = Number(pct.value), t = Math.round(info.original * (1 - v / 100)), low = info.floor && t < info.floor; $('#discNew').innerHTML = v > 0 ? `New total <b>${usd(t)}</b>${low ? ' <span class="disc-low">below safe price</span>' : ''}` : ''; $('#discOverride').hidden = !(low && info.role === 'owner'); };
+    pct.addEventListener('input', preview); preview();
+    const send = async body => {
+      try{
+        const r = await api('discount', { method:'POST', body:JSON.stringify(Object.assign({ id:b.id }, body)) });
+        data.bookings[data.bookings.findIndex(x => x.id === b.id)] = r.item;
+        counts(); render(); openDetail('bookings', b.id, false);
+        toast(body.action === 'approve' ? 'Discount approved. Email the traveller to let them know' : 'Discount declined');
+      }catch(err){ if(err.message !== 'Signed out') toast(err.message, true); }
+    };
+    $('#discYes').addEventListener('click', () => send({ action:'approve', pct:Number(pct.value), override:$('#discOverride input').checked }));
+    if($('#discNo')) $('#discNo').addEventListener('click', () => send({ action:'decline' }));
+  }
+
   /* ---------- Email: filled in for you, sent from your own mailbox ---------- */
   const firstName = n => { const f = String(n || '').trim().split(/\s+/)[0]; return f && !f.includes('@') ? f : 'there'; };
   const VISA_TEXT = `Here are the official sites and how long each usually takes:\n\nKenya eTA: https://www.etakenya.go.ke (usually 3 working days)\nTanzania eVisa: https://visa.immigration.go.tz (allow up to 15 working days)\nUganda eVisa: https://visas.immigration.go.ug (allow up to 10 working days)\nRwanda: https://irembo.gov.rw (about 4 days online, or on arrival)\n\nPlease apply at least 3 weeks before you fly, and check each site for the current rules and fees.`;
@@ -415,6 +454,10 @@
     if((item.flights || []).length){
       const lines = item.flights.map((o, i) => `${i + 1}. ${o.fromName} to ${o.toName}, ${flightWhen(o)}, ${flightWho(o)}, ${o.cabinName}${o.airline ? ', ' + o.airline : ''}${flightPrice(o) ? ', ' + flightPrice(o) : ''}`).join('\n');
       out.push({ label:'Their flights', subject:'Your flight options with SafariNomad', body:`${hi}Thank you for comparing flights with us. These are the options you saved:\n\n${lines}\n\nMy suggestion: \n\nWould you like us to book this for you, or would you like more options?${bye}` });
+    }
+    if(kind === 'bookings' && item.discount && item.discount.status !== 'requested'){
+      const dd = item.discount, yes = dd.status === 'approved';
+      out.push({ label:'Discount decision', subject:`Your discount request: ${item.ref}`, body: yes ? `${hi}Good news: we have approved a ${dd.pct}% discount on ${item.tripTitle}.\n\nPrice before discount: ${usd(dd.original)}\nYour new total: ${usd(item.total)}\nDeposit: ${usd(item.deposit)}${bye}` : `${hi}Thank you for asking about a discount on ${item.tripTitle}. Unfortunately we can't reduce this price, because most of it is park fees and permits set by the authorities.\n\nYour total remains ${usd(item.total)}. Please let me know if you'd like to look at other dates or a different trip.${bye}` });
     }
     if(kind === 'bookings'){
       const party = item.adults + item.children;
@@ -482,6 +525,7 @@
     if(!item){ closeDetail(); return; }
     if(keep && document.activeElement && document.activeElement.id === 'note') return;   // don't wipe a note being typed
     if(keep && $('#compose') && $('#compose').open) return;                               // or an email being written
+    if(keep && document.activeElement && document.activeElement.id === 'discPct') return;  // or a discount being entered
     openItem = { kind, id };
     let body = '';
     if(kind === 'bookings'){
@@ -503,6 +547,7 @@
           ${row('Received', new Date(b.created).toLocaleString('en-GB'))}
         </dl>
         ${b.notes ? `<h4>Traveller's notes</h4><p class="quote">${esc(b.notes)}</p>` : ''}
+        <div id="discountPanel"></div>
         ${composeHtml(kind, b)}`;
     }
     if(kind === 'enquiries'){
@@ -545,6 +590,7 @@
 
     $$('#drawerBody [data-status]').forEach(btn => btn.addEventListener('click', () => update(kind, id, { status:btn.dataset.status })));
     wireCompose(kind, id, item);
+    if(kind === 'bookings') discountPanel(item);
     const sn = $('#saveNote');
     if(sn) sn.addEventListener('click', () => update(kind, id, { note:$('#note').value }));
     const as = $('#assign');
@@ -573,8 +619,8 @@
   /* ---------- CSV export ---------- */
   $('#export').addEventListener('click', () => {
     let rows = [];
-    if(view === 'bookings') rows = [['Ref','Status','Trip','Start','End','Private','Adults','Children','Total USD','Deposit USD','Balance due','Name','Email','Phone','Country','Nationality','Visa','Flights','Flying from','Arrival flight','Notes','Team note','Received'],
-      ...filteredBookings().map(b => [b.ref, b.status, b.tripTitle, b.date, b.endDate, b.private ? 'yes' : 'no', b.adults, b.children, b.total, b.deposit, b.balanceDue, b.name, b.email, b.phone, b.country, b.nationality, b.visa, b.flights, b.flyFrom, [b.flightNo, b.arrival].filter(Boolean).join(' '), b.notes, b.note, b.created])];
+    if(view === 'bookings') rows = [['Ref','Status','Trip','Start','End','Private','Adults','Children','Total USD','Deposit USD','Balance due','Name','Email','Phone','Country','Nationality','Visa','Flights','Flying from','Arrival flight','Notes','Team note','Received','Discount'],
+      ...filteredBookings().map(b => [b.ref, b.status, b.tripTitle, b.date, b.endDate, b.private ? 'yes' : 'no', b.adults, b.children, b.total, b.deposit, b.balanceDue, b.name, b.email, b.phone, b.country, b.nationality, b.visa, b.flights, b.flyFrom, [b.flightNo, b.arrival].filter(Boolean).join(' '), b.notes, b.note, b.created, b.discount ? `${b.discount.status}${b.discount.pct ? ' ' + b.discount.pct + '%' : ''}` : ''])];
     if(view === 'leads'){
       const list = (data.leads || []).filter(l => filter === 'all' || l.status === filter);
       const keys = [...new Set(list.flatMap(l => Object.keys(l.fields || {})))];

@@ -80,6 +80,15 @@
         </div>
       </div>
 
+      <!-- Discount request: a planner decides; the price doesn't change on its own -->
+      <div class="bk-block bk-discount">
+        <label class="bk-check"><input type="checkbox" id="wantDiscount"><span><b>Request a discount</b><small id="discountHint"></small></span></label>
+        <div class="bk-fields" id="discountFields" hidden>
+          <label class="bk-field"><span>Why are you asking?</span><select id="discountReason" class="bk-input"><option>Group size</option><option>Returning traveller</option><option>Longer stay</option><option>School or charity</option><option>Other</option></select></label>
+          <label class="bk-field"><span>Anything to add? <small>(optional)</small></span><input id="discountMessage" class="bk-input" type="text" maxlength="400"></label>
+        </div>
+      </div>
+
       <!-- Details -->
       <div class="bk-block" id="stepDetails">
         <span class="bk-h"><span class="bk-n">4</span> Your details</span>
@@ -138,6 +147,7 @@
       </dl>
       <div class="rc-total"><span>Total</span><strong id="sumTotal"></strong></div>
       <div class="rc-small"><span>Deposit after confirmation</span><b id="sumDeposit"></b></div>
+      <p class="rc-discount" id="sumDiscount" hidden><i class="fa-solid fa-tag"></i> Discount requested. A planner will confirm your final price.</p>
       <label class="bk-agree"><input type="checkbox" id="bkAgree" required> <span>I accept the <a href="terms.html" target="_blank">booking terms</a></span></label>
       <button class="btn bk-submit" type="submit" form="bookForm" id="bookBtn">Request booking</button>
       <p class="rc-note"><i class="fa-solid fa-lock"></i> No payment today</p>

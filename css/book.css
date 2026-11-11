@@ -152,3 +152,13 @@ button.cal-day:hover{background:#CCE0FF;}
 .bk-choice label:has(input:checked){border-color:var(--orange);background:#F5F9FF;box-shadow:0 0 0 1px var(--orange);}
 #stepTravel .bk-fields{margin-top:12px;}
 textarea.bk-input{resize:vertical;font:inherit;font-size:16px;}
+
+/* Discount request */
+.bk-check{display:flex;align-items:flex-start;gap:12px;cursor:pointer;}
+.bk-check input{width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--orange);}
+.bk-check b{display:block;font-size:15px;font-weight:600;color:var(--yt-text);}
+.bk-check small{display:block;font-size:13px;color:var(--yt-muted);margin-top:2px;}
+.bk-discount .bk-fields{margin-top:14px;}
+.bk-discount .bk-fields[hidden]{display:none;}
+.rc-discount{margin-top:10px;padding:9px 11px;border-radius:9px;background:#FFF6E0;color:#6b4e00;font-size:13px;line-height:1.4;}
+.rc-discount[hidden]{display:none;}

@@ -76,6 +76,9 @@ export function makeDemo({ TRIPS, PLACES, BookingRules, BOOKING }){
     };
   });
 
+  // Two of the waiting bookings have asked for a discount
+  bookings.filter(b => b.status === 'pending').slice(0, 2).forEach((b, i) => { b.discount = { status:'requested', reason: i ? 'Returning traveller' : 'Group size', message:'', suggestedPct: BookingRules.tier(b.adults + b.children), requestedAt: b.created }; });
+
   /* Enquiries: a mix of what the site's forms send */
   const route = n => PLACES.slice(n, n + 3).map(p => p.name).join(' → ');
   const enquiries = [

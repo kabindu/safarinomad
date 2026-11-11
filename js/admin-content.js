@@ -411,5 +411,5 @@ window.AdminContent = (function(){
     });
   }
 
-  return { VIEWS, render, isDirty: () => dirty };
+  return { VIEWS, render, isDirty: () => dirty, reset(){ base = null; loading = null; dirty = false; } };
 })();

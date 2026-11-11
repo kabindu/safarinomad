@@ -198,12 +198,23 @@
     $('#sumTotal').textContent = money(total) + (isPrivate() && info.kind === 'group' ? '*' : '');
     $('#sumDeposit').textContent = money(R.deposit(t.id, state.adults, state.children));
     $('#bookBtn').disabled = !state.date;
+    discountUi();
 
     $('#barTotal').textContent = $('#sumTotal').textContent;
     $('#barDates').textContent = state.date ? shortRange(state.date, end) : T('Choose a date');
     if(typeof saveProgress === 'function') saveProgress();
   }
   form.addEventListener('input', () => render());
+
+  /* ---------- Discount request ---------- */
+  function discountUi(){
+    const party = state.adults + state.children, tiers = BOOKING.discountTiers || [], pct = R.tier(party), next = tiers.find(x => x.min > party), want = $('#wantDiscount').checked;
+    const fill = (text, v) => SNI18N.t(text, v);
+    $('#discountHint').textContent = pct ? fill('Groups of {n} or more can ask for up to {pct}% off. A planner confirms the final price.', { n: tiers.filter(x => x.pct === pct)[0].min, pct })
+      : next ? fill('Groups of {n} or more can ask for up to {pct}% off. You can still ask for your trip.', { n: next.min, pct: next.pct }) : T('A planner will look at your request and confirm the final price.');
+    $('#discountFields').hidden = !want;
+    $('#sumDiscount').hidden = !want;
+  }
 
   /* ---------- Visa & flights (step 5) ---------- */
   const VISA = { help:'Wants help with visa / eTA', own:'Arranging own visa', none:'No visa needed (East African citizen)' };
@@ -259,7 +270,8 @@
       name:d.name.trim(), email:d.email.trim(), phone:(d.phone || '').trim(), country:(d.country || '').trim(), notes:(d.notes || '').trim(),
       nationality:(d.nationality || '').trim(), visa:d.visa || '', flights:d.flights || '',
       flyFrom:d.flights === 'help' ? (d.flyFrom || '').trim() : '', flightNo:d.flights === 'booked' ? (d.flightNo || '').trim() : '', arrival:d.flights === 'booked' ? (d.arrival || '') : '',
-      lang:SNI18N.lang, currency:(SN.store.get('currency') || 'USD'), draft:lead.draft };
+      lang:SNI18N.lang, currency:(SN.store.get('currency') || 'USD'), draft:lead.draft,
+      discount:$('#wantDiscount').checked ? { reason:$('#discountReason').value, message:$('#discountMessage').value.trim() } : null };
 
     if(!ONLINE) return emailFallback(payload);
     const buttons = [$('#bookBtn'), $('#barBtn')];
@@ -289,6 +301,7 @@
       'Name: ' + p.name, 'Email: ' + p.email, 'Phone: ' + (p.phone || '-'), 'Country: ' + (p.country || '-'),
       'Nationality: ' + (p.nationality || '-'), 'Visa: ' + (VISA[p.visa] || '-'), 'Flights: ' + (FLIGHTS[p.flights] || '-'),
       p.flyFrom ? 'Flying from: ' + p.flyFrom : '', p.flightNo || p.arrival ? 'Arrival: ' + [p.flightNo, p.arrival].filter(Boolean).join(' · ') : '',
+      p.discount ? 'Discount requested: ' + p.discount.reason + (p.discount.message ? ' (' + p.discount.message + ')' : '') : '',
       p.notes ? '\nNotes:\n' + p.notes : ''
     ].filter(Boolean).join('\n');
   }
@@ -310,7 +323,8 @@
         ${line('Travellers', peopleText())}
       </dl>
       <div class="rc-total"><span>${T('Total')}</span><strong>${$('#sumTotal').textContent}</strong></div>
-      <div class="rc-small"><span>${T('Deposit after confirmation')}</span><b>${$('#sumDeposit').textContent}</b></div>`;
+      <div class="rc-small"><span>${T('Deposit after confirmation')}</span><b>${$('#sumDeposit').textContent}</b></div>
+      ${p.discount ? `<p class="rc-discount"><i class="fa-solid fa-tag"></i> ${T('Discount requested. A planner will confirm your final price.')}</p>` : ''}`;
     form.hidden = true; $('#summary').hidden = true; $('#bkBar').hidden = true; $('#done').hidden = false;
     window.scrollTo({ top:0, behavior:'smooth' });
 

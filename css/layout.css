@@ -379,7 +379,8 @@ a.df-title:hover{color:var(--orange-dark);}
 .social-float .fb{background:#1877F2;}
 .social-float .wa{background:#25D366;font-size:24px;}
 .chat.open ~ .social-float{opacity:0;visibility:hidden;}
-body[data-page="contact"] .social-float{display:none;}   /* this page already lists every way to reach us */
+/* Contact already lists every way to reach us; on Booking and Customise they would cover prices and forms */
+body[data-page="contact"] .social-float,body[data-page="book"] .social-float,body[data-page="plan"] .social-float{display:none;}
 @media print{.social-float{display:none;}}
 /* Tablets: up over the hero photo, clear of the search form */
 @media (min-width:701px) and (max-width:1180px){.social-float{top:210px !important;bottom:auto !important;}}
@@ -412,8 +413,8 @@ body[data-page="contact"] .social-float{display:none;}   /* this page already li
   body{padding-bottom:calc(64px + env(safe-area-inset-bottom));}
   .chat{bottom:calc(76px + env(safe-area-inset-bottom));}
   .social-float{right:14px;top:auto;bottom:calc(76px + env(safe-area-inset-bottom));transform:none;gap:8px;}
-  /* Booking, customising and comparing flights need the whole small screen (controls reach the edge) */
-  body[data-page="book"] .social-float,body[data-page="plan"] .social-float,body[data-page="flights"] .social-float{display:none;}
+  /* Comparing flights needs the whole small screen (controls reach the edge) */
+  body[data-page="flights"] .social-float{display:none;}
   .social-float a{width:44px;height:44px;font-size:20px;}
   .chat-launcher{display:none;}
   .chat.ai-open .chat-panel{bottom:calc(76px + env(safe-area-inset-bottom));}

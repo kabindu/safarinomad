@@ -52,6 +52,7 @@ import { flightStatusConfigured, flightByNumber, airportBoard, routeSearch, Flig
 import { makeDemo } from './demo.mjs';
 import { createTeam, TeamError } from './team.mjs';
 import { createSeo } from './seo.mjs';
+import { estimate } from './pricing.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PORT) || 3000;
@@ -467,22 +468,35 @@ KINDS.forEach(k => {
 // and is written with the next save.
 // Bookings and enquiries are written at once; frequent, low-stakes data is batched (a few seconds at most)
 const saveTimers = {};
+const saveCost = {};                              // how long each file took to write last time
 function saveSoon(kind, ms = 3000){
-  if(!saveTimers[kind]) saveTimers[kind] = setTimeout(() => { saveTimers[kind] = 0; save(kind); }, ms);
+  // A big file is written less often, so saving never takes more than about 5% of the server's time
+  if(!saveTimers[kind]) saveTimers[kind] = setTimeout(() => { saveTimers[kind] = 0; save(kind); }, Math.max(ms, (saveCost[kind] || 0) * 20));
+}
+/* Bookings and enquiries are real money, so each change is first added to a small journal: one
+   instant line on disk, however many records there are. The big files are then rewritten at most
+   every few seconds. If the server is killed in between, the journal is replayed at the next start. */
+const JOURNAL = path.join(DATA_DIR, 'journal.ndjson');
+const journalPending = new Set();
+function persist(kind, item){
+  if(kind === 'bookings') seatIndex = null;
+  try { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.appendFileSync(JOURNAL, JSON.stringify({ kind, item }) + '\n'); journalPending.add(kind); saveSoon(kind, 2000); }
+  catch(err){ console.error('[journal]', err.message); save(kind); }   // no journal: write the file straight away
 }
 // Write anything still pending when the server stops
 ['SIGINT', 'SIGTERM'].forEach(sig => process.on(sig, () => { Object.keys(saveTimers).forEach(k => { if(saveTimers[k]){ clearTimeout(saveTimers[k]); save(k); } }); if(analyticsTimer) save('analytics'); process.exit(0); }));
 function save(kind){
+  const started = Date.now();
   const file = path.join(DATA_DIR, kind + '.json');
-  const text = JSON.stringify(db[kind], null, 1);
+  const text = JSON.stringify(db[kind]);
   try {
     fs.mkdirSync(DATA_DIR, { recursive: true });
     fs.writeFileSync(file + '.tmp', text);
     for(let attempt = 1; ; attempt++){
-      try { fs.renameSync(file + '.tmp', file); return; }
+      try { fs.renameSync(file + '.tmp', file); saveCost[kind] = Date.now() - started; journalSaved(kind); return; }
       catch(err){
         if(!['EPERM', 'EBUSY', 'EACCES'].includes(err.code)) throw err;
-        if(attempt >= 5){ fs.writeFileSync(file, text); fs.rmSync(file + '.tmp', { force: true }); return; }
+        if(attempt >= 5){ fs.writeFileSync(file, text); fs.rmSync(file + '.tmp', { force: true }); journalSaved(kind); return; }
         Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 40 * attempt);   // short pause, then retry
       }
     }
@@ -490,6 +504,25 @@ function save(kind){
     console.error(`[save] could not write ${kind}.json:`, err.message);
   }
 }
+// Once every journalled list is safely on disk, the journal can start again
+function journalSaved(kind){
+  if(journalPending.delete(kind) && !journalPending.size){ try { fs.truncateSync(JOURNAL, 0); } catch {} }
+}
+// Replay anything left by a crash
+try {
+  const lines = fs.readFileSync(JOURNAL, 'utf8').split('\n').filter(Boolean), replayed = new Set();
+  for(const line of lines){
+    try {
+      const { kind, item } = JSON.parse(line);
+      if(!KINDS.includes(kind) || !item || !item.id) continue;
+      const i = db[kind].findIndex(x => x.id === item.id);
+      if(i >= 0) db[kind][i] = item; else db[kind].push(item);
+      replayed.add(kind);
+    } catch {}                                     // a half-written last line
+  }
+  if(replayed.size){ replayed.forEach(save); console.log(`[journal] recovered ${lines.length} change(s) after an unclean stop`); }
+  fs.truncateSync(JOURNAL, 0);
+} catch {}
 const newId = () => crypto.randomBytes(6).toString('hex');
 const clean = (v, max = 200) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -565,6 +598,7 @@ function cleanContent(c){
       departs: txt(t.departs, 20), spaces: num(t.spaces, 0, 60), price: num(t.price, 1, 200000), was: num(t.was, 1, 200000),
       img: img(t.img) || 'images/lion-walking.jpg', alt: txt(t.alt, 160) });
   }).filter(t => t.title && t.price && t.days && !isNaN(new Date(t.departs + ' 12:00 UTC')));
+  if(Array.isArray(c.discountTiers)) out.discountTiers = c.discountTiers.slice(0, 6).map(x => ({ min: num(x && x.min, 2, 200), pct: num(x && x.pct, 1, 30) })).filter(x => x.min && x.pct);
   if(Array.isArray(c.flights)) out.flights = c.flights.slice(0, 200).map(f => {
     const code = v => /^[A-Z]{3}$/.test(v) ? v : '';
     return drop({ from: code(f.from), to: code(f.to), time: /^\d{1,2}h( \d{1,2}m)?$/.test(f.time) ? f.time : '', stops: num(f.stops, 0, 3) || 0,
@@ -582,11 +616,19 @@ function saveContent(c){
 }
 
 // Travellers already booked on each departure of a trip (private trips don't share seats)
+// Seats taken per trip and date, worked out once and reused until a booking changes
+var seatIndex = null;
 function bookedSeats(tripId){
-  const out = {};
-  db.bookings.filter(b => b.trip === tripId && b.status !== 'cancelled' && !b.private && !b.demo)
-    .forEach(b => { out[b.date] = (out[b.date] || 0) + b.adults + b.children; });
-  return out;
+  if(!seatIndex){
+    seatIndex = new Map();
+    for(const b of db.bookings){
+      if(b.status === 'cancelled' || b.private || b.demo) continue;
+      if(!seatIndex.has(b.trip)) seatIndex.set(b.trip, {});
+      const out = seatIndex.get(b.trip);
+      out[b.date] = (out[b.date] || 0) + b.adults + b.children;
+    }
+  }
+  return seatIndex.get(tripId) || {};
 }
 
 /* ---------- GET /api/availability?trip=ID ---------- */
@@ -598,6 +640,7 @@ function handleAvailability(req, res){
 }
 
 /* ---------- POST /api/bookings ---------- */
+const DISCOUNT_REASONS = ['Group size', 'Returning traveller', 'Longer stay', 'School or charity', 'Other'];
 async function handleBooking(req, res){
   const ip = clientIp(req);
   if(rateLimited(ip)) return sendJSON(res, 429, { error: 'Too many requests. Please wait a minute.' });
@@ -636,8 +679,13 @@ async function handleBooking(req, res){
     nationality: clean(b.nationality, 80), visa: clean(b.visa, 40), flights: clean(b.flights, 40),
     flightNo: clean(b.flightNo, 40), arrival: clean(b.arrival, 40), flyFrom: clean(b.flyFrom, 80)
   };
+  // A discount request never changes the price by itself: the team decides in admin
+  if(b.discount && typeof b.discount === 'object'){
+    booking.discount = { status: 'requested', reason: DISCOUNT_REASONS.includes(b.discount.reason) ? b.discount.reason : 'Other', message: clean(b.discount.message, 400),
+      suggestedPct: BookingRules.tier(party), requestedAt: booking.created };
+  }
   db.bookings.push(booking);
-  save('bookings');
+  persist('bookings', booking);
   closeLead(b.draft, `Booked ${ref}`);
   console.log(`[booking] ${ref} ${booking.tripTitle} on ${date} for ${party} (${email})`);
   const { note, ...forVisitor } = booking;
@@ -721,8 +769,14 @@ function leadLimited(ip){
   recent.push(now); leadHits.set(ip, recent);
   return recent.length > 40;                       // autosave is debounced; this only stops abuse
 }
+// Autosave looks a lead up on every few keystrokes, so keep them indexed by draft id
+var leadIndex = null;
+function leadByDraft(draft){
+  if(!leadIndex) leadIndex = new Map(db.leads.map(l => [l.draft, l]));
+  return leadIndex.get(draft);
+}
 function closeLead(draft, outcome){
-  const lead = draft && db.leads.find(x => x.draft === clean(draft, 40));
+  const lead = draft && leadByDraft(clean(draft, 40));
   if(!lead || lead.status === 'booked') return;
   lead.status = 'booked'; lead.outcome = outcome; lead.updated = new Date().toISOString();
   saveSoon('leads');
@@ -741,9 +795,9 @@ async function handleLead(req, res){
   const phone = (fields.Phone || '').replace(/[^\d+]/g, '').length >= 7 ? fields.Phone : '';
   if(!email && !phone) return sendJSON(res, 202, { saved: false });   // nobody to follow up with yet
   const now = new Date().toISOString();
-  let lead = db.leads.find(x => x.draft === draft);
+  let lead = leadByDraft(draft);
   if(lead && lead.status === 'booked') return sendJSON(res, 200, { saved: false });
-  if(!lead){ lead = { id: newId(), draft, created: now, status: 'open', note: '' }; db.leads.push(lead); }
+  if(!lead){ lead = { id: newId(), draft, created: now, status: 'open', note: '' }; db.leads.push(lead); leadByDraft(draft); leadIndex.set(draft, lead); }
   Object.assign(lead, {
     source: { custom:'Custom trip', group:'Group trip', flights:'Flights' }[b.source] || 'Booking', flights: cleanFlights(b.flights), page: clean(b.page, 120), step: clean(b.step, 80),
     resume: clean(b.resume, 300), name: clean(fields.Name || '', 120), email, phone, fields, updated: now
@@ -812,7 +866,7 @@ async function handleEnquiry(req, res){
   if(!emailOk(email)) return sendJSON(res, 400, { error: 'Please enter a valid email address.' });
   const enquiry = { id: newId(), created: new Date().toISOString(), status: 'new', type: clean(b.type, 40) || 'Enquiry', page: clean(b.page, 120), fields, flights: cleanFlights(b.flights), note: '' };
   db.enquiries.push(enquiry);
-  save('enquiries');
+  persist('enquiries', enquiry);
   closeLead(b.draft, `Sent: ${enquiry.type}`);
   console.log(`[enquiry] ${enquiry.type} from ${email}`);
   sendJSON(res, 201, { ok: true });
@@ -855,6 +909,33 @@ const CONTENT_PARTS = { trips: 'packages', added: 'new packages', flash: 'flash 
 const asText = v => { const t = JSON.stringify(v ?? null); return t === '{}' || t === '[]' ? 'null' : t; };   // empty = not set
 const contentChanges = (a, b) => Object.keys({ ...a, ...b }).filter(k => asText(a[k]) !== asText(b[k])).map(k => CONTENT_PARTS[k] || k);
 const readJSON = async (req, limit) => { try { return JSON.parse(await readBody(req, limit)); } catch { return null; } };
+const PRICING_UNDO = path.join(DATA_DIR, 'pricing-undo.json');
+// What a booking can safely be discounted to
+function discountInfo(b){
+  const { TRIPS, BOOKING, BookingRules } = loadData();
+  const trip = TRIPS.find(t => t.id === b.trip), party = b.adults + b.children;
+  const est = trip ? estimate(trip) : null, kids = trip && (trip.styles || []).includes('family') ? BOOKING.childRate : 1;
+  const floor = est ? Math.round(est.floor * b.adults + est.floor * kids * b.children) : 0;
+  const original = (b.discount && b.discount.original) || b.total;
+  return { floor, original, suggestedPct: BookingRules.tier(party), maxPct: floor && original > floor ? Math.floor((1 - floor / original) * 100) : 0, belowCost: !!floor && original < floor };
+}
+// Admin's big list: only the newest records and anything still waiting, so it stays small however
+// many years of records pile up. Built and compressed once, then shared by everyone polling.
+var bulkCache = { key: '' }, bulkBuilding = null;
+function adminBulk(){
+  const key = `${contentVersion}|${Math.floor(Date.now() / 5000)}`;
+  if(bulkCache.key === key) return bulkCache;
+  if(bulkBuilding && bulkBuilding.key === key) return bulkBuilding.done;
+  const { TRIPS, LAST_MINUTE, PLACES } = loadData();
+  // Newest 5,000, plus up to 2,000 older ones still waiting for someone
+  const recent = (list, waiting) => { const start = Math.max(0, list.length - 5000); return [...list.slice(0, start).filter(waiting).slice(-2000), ...list.slice(start)]; };
+  const raw = Buffer.from(JSON.stringify({ bookings: recent(db.bookings, b => b.status === 'pending'), enquiries: recent(db.enquiries, e => e.status === 'new'), questions: db.questions.slice(-1500), leads: recent(db.leads, l => l.status === 'open'),
+    trips: [...TRIPS, ...LAST_MINUTE].map(t => ({ id: t.id, title: t.title, days: t.days, capacity: t.group || t.spaces, private: t.group <= 2, country: t.country || '', countries: t.countries || '', img: t.img || '' })),
+    places: PLACES.map(p => ({ name: p.name, country: p.country })), analytics: demoAnalytics ? mergeAnalytics(analytics, demoAnalytics) : analytics, demo: KINDS.some(k => db[k].some(x => x.demo)) }));
+  const done = gzip(raw, { level: 3 }).then(gz => { bulkCache = { key, raw, gz }; bulkBuilding = null; return bulkCache; });
+  bulkBuilding = { key, done };
+  return done;
+}
 
 async function handleAdmin(req, res){
   const route = new URL(req.url, 'http://x').pathname.replace('/api/admin/', '');
@@ -876,11 +957,97 @@ async function handleAdmin(req, res){
   if(!me) return sendJSON(res, 401, { error: 'Please sign in.' });
   const allow = what => team.can(me, what) ? true : (sendJSON(res, 403, { error: 'Your role doesn\'t allow this. Ask the owner.' }), false);
 
+  // Prices: estimates to review, published only when someone presses Publish
+  if(route.startsWith('pricing')){
+    if(!allow('website')) return;
+    if(route === 'pricing' && req.method === 'GET'){
+      const { TRIPS, BOOKING } = loadData();
+      const rows = TRIPS.map(t => { const current = t.flash ? t.was : t.price; return { ...estimate({ ...t, price: current }), title: t.title, days: t.days, country: t.country }; });
+      return sendJSON(res, 200, { rows, tiers: BOOKING.discountTiers, canUndo: fs.existsSync(PRICING_UNDO), canOverride: me.role === 'owner' });
+    }
+    const b = await readJSON(req, 60_000);
+    if(!b) return sendJSON(res, 400, { error: 'Bad request' });
+    if(route === 'pricing/publish' && req.method === 'POST'){
+      const { TRIPS } = loadData();
+      const entries = Object.entries(b.prices && typeof b.prices === 'object' ? b.prices : {});
+      if(!entries.length) return sendJSON(res, 400, { error: 'Choose at least one package.' });
+      const next = structuredClone(content); next.trips = next.trips || {}; next.added = next.added || [];
+      const below = [];
+      for(const [id, value] of entries){
+        const price = num(value, 1, 200000), t = TRIPS.find(x => x.id === id);
+        if(!price || !t) return sendJSON(res, 400, { error: `Check the price for ${txt(id, 60)}.` });
+        if(price < estimate(t).floor) below.push(t.title);
+        // An old "was" price or "Save" badge would no longer be true
+        const change = { price, was: 0, ...(/^Save /i.test(t.badge || '') ? { badge: '' } : {}) };
+        const added = next.added.find(x => x.id === id);
+        if(added) Object.assign(added, change); else next.trips[id] = { ...(next.trips[id] || {}), ...change };
+      }
+      if(below.length && !(me.role === 'owner' && b.confirmBelow === true)) return sendJSON(res, 409, { error: `Below the lowest safe price: ${below.slice(0, 5).join(', ')}. Only the owner can publish these.`, below });
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+      fs.writeFileSync(PRICING_UNDO, JSON.stringify(content));
+      saveContent(cleanContent(next));
+      team.log(me, 'Published new prices', `${entries.length} package${entries.length === 1 ? '' : 's'}${below.length ? `, ${below.length} below the lowest safe price` : ''}`);
+      return sendJSON(res, 200, { ok: true, count: entries.length });
+    }
+    if(route === 'pricing/undo' && req.method === 'POST'){
+      let prev; try { prev = JSON.parse(fs.readFileSync(PRICING_UNDO, 'utf8')); } catch { return sendJSON(res, 404, { error: 'Nothing to undo.' }); }
+      saveContent(cleanContent(prev));
+      fs.rmSync(PRICING_UNDO, { force: true });
+      team.log(me, 'Undid the last price publish');
+      return sendJSON(res, 200, { ok: true });
+    }
+    if(route === 'pricing/tiers' && req.method === 'POST'){
+      const tiers = (Array.isArray(b.tiers) ? b.tiers : []).slice(0, 6).map(x => ({ min: num(x && x.min, 2, 200), pct: num(x && x.pct, 1, 30) }));
+      if(!tiers.length || tiers.some(x => !x.min || !x.pct)) return sendJSON(res, 400, { error: 'Each row needs a group size (2 or more) and a discount (1 to 30%).' });
+      tiers.sort((x, y) => x.min - y.min);
+      saveContent(cleanContent({ ...content, discountTiers: tiers }));
+      team.log(me, 'Changed group discounts', tiers.map(x => `${x.min}+: ${x.pct}%`).join(', '));
+      return sendJSON(res, 200, { tiers });
+    }
+    return sendJSON(res, 404, { error: 'Not found' });
+  }
+  // Discount requests: the team sees the safe limit and decides
+  if(route === 'discount-info' && req.method === 'GET'){
+    if(!allow('work')) return;
+    const item = db.bookings.find(x => x.id === new URL(req.url, 'http://x').searchParams.get('id'));
+    if(!item) return sendJSON(res, 404, { error: 'Not found' });
+    return sendJSON(res, 200, { ...discountInfo(item), role: me.role });
+  }
+  if(route === 'discount' && req.method === 'POST'){
+    if(!allow('work')) return;
+    const b = await readJSON(req, 2000);
+    const item = b && db.bookings.find(x => x.id === b.id);
+    if(!item) return sendJSON(res, 404, { error: 'Not found' });
+    const info = discountInfo(item), when = new Date().toISOString();
+    const d = item.discount = item.discount || { status: 'requested', reason: 'Offered by the team', message: '', suggestedPct: info.suggestedPct, requestedAt: when };
+    if(b.action === 'decline'){
+      item.total = info.original;
+      Object.assign(d, { status: 'declined', pct: 0, amount: 0, decidedBy: me.id, decidedAt: when });
+      team.log(me, 'Declined a discount', label('bookings', item), { fields: { kind: 'bookings', ref: item.id } });
+    } else if(b.action === 'approve'){
+      const pct = num(b.pct, 1, 50);
+      if(!pct) return sendJSON(res, 400, { error: 'Enter a discount between 1 and 50%.' });
+      const total = Math.round(info.original * (1 - pct / 100));
+      if(me.role === 'agent' && pct > info.suggestedPct) return sendJSON(res, 403, { error: `Sales agents can approve up to ${info.suggestedPct}% for this group. Ask a manager.` });
+      if(total < info.floor || !info.floor){
+        if(me.role !== 'owner') return sendJSON(res, 403, { error: 'That is below the lowest safe price for this trip. Only the owner can approve it.' });
+        if(b.override !== true) return sendJSON(res, 409, { error: 'That is below the lowest safe price. Tick the box to confirm you accept the loss.', needOverride: true });
+      }
+      item.total = total; item.deposit = Math.min(item.deposit, total);
+      Object.assign(d, { status: 'approved', pct, amount: info.original - total, original: info.original, decidedBy: me.id, decidedAt: when, belowFloor: total < info.floor });
+      team.log(me, `Approved a ${pct}% discount`, `${label('bookings', item)}: ${info.original} to ${total} USD`, { fields: { kind: 'bookings', ref: item.id } });
+    } else return sendJSON(res, 400, { error: 'Unknown action' });
+    item.updated = when; item.updatedBy = me.id;
+    persist('bookings', item);
+    bulkCache = { key: '' };
+    return sendJSON(res, 200, { item });
+  }
+
   if(route === 'logout' && req.method === 'POST'){
     team.logout(tokenOf(req));
     return sendJSON(res, 200, { ok: true });
   }
-  if(route === 'me' && req.method === 'GET') return sendJSON(res, 200, { user: team.publicUser(me), can: team.ROLES[me.role].can });
+  if(route === 'me' && req.method === 'GET') return sendJSON(res, 200, { me: team.publicUser(me), can: team.ROLES[me.role].can, team: team.directory(), now: new Date().toISOString() });
   if(route === 'password' && req.method === 'POST'){
     const b = await readJSON(req, 2000) || {};
     try { team.changePassword(me, String(b.current || ''), String(b.next || '')); return sendJSON(res, 200, { ok: true, user: team.publicUser(me) }); }
@@ -906,13 +1073,9 @@ async function handleAdmin(req, res){
     return sendJSON(res, 404, { error: 'Not found' });
   }
   if(route === 'data' && req.method === 'GET'){
-    const { TRIPS, LAST_MINUTE, PLACES } = loadData();
-    const trips = [...TRIPS, ...LAST_MINUTE].map(t => ({ id: t.id, title: t.title, days: t.days, capacity: t.group || t.spaces, private: t.group <= 2, country: t.country || '', countries: t.countries || '', img: t.img || '' }));
-    const places = PLACES.map(p => ({ name: p.name, country: p.country }));
-    const demo = KINDS.some(k => db[k].some(x => x.demo));
-    return sendJSON(res, 200, { bookings: db.bookings, enquiries: db.enquiries, questions: db.questions.slice(-1500), leads: db.leads, trips, places,
-      analytics: demoAnalytics ? mergeAnalytics(analytics, demoAnalytics) : analytics, demo, now: new Date().toISOString(),
-      me: team.publicUser(me), can: team.ROLES[me.role].can, team: team.directory() });
+    const f = await adminBulk(), zip = /\bgzip\b/.test(req.headers['accept-encoding'] || ''), body = zip ? f.gz : f.raw;
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Vary': 'Accept-Encoding', 'Content-Length': body.length, ...(zip ? { 'Content-Encoding': 'gzip' } : {}) });
+    return res.end(body);
   }
   // Demo data for presenting the dashboard: added alongside real records (each flagged demo:true)
   // and removed again by "clear". Visit numbers live in their own file and are only added on screen.
@@ -921,6 +1084,7 @@ async function handleAdmin(req, res){
     let b = {};
     try { b = JSON.parse(await readBody(req, 1000)); } catch {}
     KINDS.forEach(k => { db[k] = db[k].filter(x => !x.demo); });
+    seatIndex = null; leadIndex = null; bulkCache = { key: '' };
     demoAnalytics = null;
     fs.rmSync(DEMO_ANALYTICS, { force: true });
     if(b.action === 'load'){
@@ -967,7 +1131,8 @@ async function handleAdmin(req, res){
     if(typeof b.emailed === 'string' && b.kind !== 'questions'){ item.lastEmail = { at: when, by: me.id, subject: clean(b.emailed, 160) }; what.push('opened an email to the customer'); }
     if(!what.length) return sendJSON(res, 200, { item });
     item.updated = when; item.updatedBy = me.id;
-    save(b.kind);
+    persist(b.kind, item);
+    bulkCache = { key: '' };
     if(!b.auto) team.log(me, `${what.join(', ')[0].toUpperCase()}${what.join(', ').slice(1)}`, label(b.kind, item), { fields: { kind: b.kind, ref: item.id } });
     return sendJSON(res, 200, { item });
   }

@@ -741,6 +741,7 @@ const BOOKING = {
   noticeDays: 7,         // earliest start date: a week from today
   monthsAhead: 12,       // how far ahead the calendar opens
   childRate: 0.5,        // children (5 to 15) pay this share on family trips
+  discountTiers: [{ min:4, pct:3 }, { min:6, pct:5 }, { min:10, pct:8 }],   // the discount a group can ask for (admin → Prices)
   departDays: { 'great-migration':[2,6], 'classic-kenya':[1,4], 'northern-circuit':[0,4], 'serengeti-zanzibar':[3,6], 'amboseli-tsavo':[1,3,5], 'kilimanjaro-machame':[0,3], 'kilimanjaro-lemosho':[2] }
 };
 
@@ -779,7 +780,9 @@ const BookingRules = (function(){
   function deposit(id, adults, children){
     return Math.min(BOOKING.deposit * (adults + children), price(id, adults, children));
   }
-  return { find, isDeparture, price, deposit, iso, parse, today, addDays };
+  // The discount a party of this size can ask for, in percent (0 if none)
+  const tier = party => (BOOKING.discountTiers || []).filter(x => party >= x.min).reduce((n, x) => Math.max(n, x.pct), 0);
+  return { find, isDeparture, price, deposit, tier, iso, parse, today, addDays };
 })();
 
 
@@ -811,6 +814,7 @@ function applyContent(C, now){
     t.flash = { pct, ends: f.ends || '', label: f.label || 'Flash sale' };
     t.badge = `${t.flash.label} −${pct}%`; t.badgeType = 'sale';
   });
+  if(Array.isArray(C.discountTiers) && C.discountTiers.length) BOOKING.discountTiers = C.discountTiers;
   if(typeof LAST_MINUTE !== 'undefined') swap(LAST_MINUTE, C.lastMinute);
   if(typeof FLIGHTS !== 'undefined') swap(FLIGHTS, C.flights);
   dropPastDepartures(now);
