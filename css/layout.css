@@ -267,7 +267,8 @@ a.df-title:hover{color:var(--orange-dark);}
 }
 
 /* ---------- "Chat with an expert" widget ---------- */
-.chat{position:fixed;right:22px;bottom:22px;z-index:140;display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
+.chat{position:fixed;right:22px;bottom:22px;z-index:140;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:none;}
+.chat-launcher,.chat.open .chat-panel{pointer-events:auto;}
 .chat-launcher{display:flex;align-items:center;gap:10px;background:#181818;color:#fff;border:none;border-radius:50px;padding:7px 18px 7px 7px;font:inherit;font-size:14.5px;font-weight:600;cursor:pointer;box-shadow:0 12px 30px -8px rgba(0,0,0,.45);position:relative;transition:transform .2s,background .2s;}
 .chat-launcher:hover{transform:translateY(-2px);background:#000;}
 .chat-avatars{display:flex;}
@@ -358,6 +359,22 @@ a.df-title:hover{color:var(--orange-dark);}
 .ai-form button:disabled{opacity:.4;cursor:wait;}
 .ai-note{font-size:12px;color:var(--yt-muted);text-align:center;padding:8px 16px 12px;}
 
+/* ---------- Floating Instagram, Facebook and WhatsApp buttons ----------
+   Middle of the right edge on laptops; bottom right, above the tab bar, on phones.
+   Sits below the header (z-index 100), so open menus cover it rather than the other way round. */
+.social-float{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:90;display:flex;flex-direction:column;gap:10px;transition:opacity .2s,visibility .2s;}
+.social-float a{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:21px;box-shadow:0 10px 24px -8px rgba(0,0,0,.45);transition:transform .15s;}
+.social-float a:hover{transform:scale(1.08);}
+.social-float a:focus-visible{outline:3px solid var(--navy);outline-offset:2px;}
+.social-float .ig{background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%);}
+.social-float .fb{background:#1877F2;}
+.social-float .wa{background:#25D366;font-size:24px;}
+.chat.open ~ .social-float{opacity:0;visibility:hidden;}
+body[data-page="contact"] .social-float{display:none;}   /* this page already lists every way to reach us */
+@media print{.social-float{display:none;}}
+/* Tablets: up over the hero photo, clear of the search form */
+@media (min-width:701px) and (max-width:1180px){.social-float{top:210px !important;bottom:auto !important;}}
+
 /* ---------- Bottom tab bar (phones & tablets) ---------- */
 .tabbar{display:none;}
 
@@ -385,6 +402,10 @@ a.df-title:hover{color:var(--orange-dark);}
   .tab-count:empty{display:none;}
   body{padding-bottom:calc(64px + env(safe-area-inset-bottom));}
   .chat{bottom:calc(76px + env(safe-area-inset-bottom));}
+  .social-float{right:14px;top:auto;bottom:calc(76px + env(safe-area-inset-bottom));transform:none;gap:8px;}
+  /* Booking and customising need the whole small screen (the calendar reaches the edge) */
+  body[data-page="book"] .social-float,body[data-page="plan"] .social-float{display:none;}
+  .social-float a{width:44px;height:44px;font-size:20px;}
   .chat-launcher{display:none;}
   .chat.ai-open .chat-panel{bottom:calc(76px + env(safe-area-inset-bottom));}
   .toast{bottom:calc(84px + env(safe-area-inset-bottom));}

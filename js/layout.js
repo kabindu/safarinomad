@@ -395,6 +395,12 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
   </button>
 </div>
 
+<div class="social-float" aria-label="Find us on social media">
+  <a class="ig" href="${s.social.instagram}" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+  <a class="fb" href="${s.social.facebook}" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+  <a class="wa" href="https://wa.me/${s.whatsapp}?text=${encodeURIComponent('Hi SafariNomad! I am planning a safari and have a question.')}" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+</div>
+
 <nav class="tabbar" aria-label="Quick navigation">
   <a href="index.html" data-tab="home"><i class="fa-solid fa-house"></i><span>Home</span></a>
   <a href="trips.html" data-tab="trips"><i class="fa-solid fa-compass"></i><span>Packages</span></a>
