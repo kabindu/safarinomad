@@ -410,3 +410,8 @@
 .seo-route li::before{content:counter(stop);width:26px;height:26px;border-radius:50%;background:var(--orange);color:#fff;font-size:13px;display:grid;place-items:center;}
 .seo-more{margin-top:14px;font-size:15px;}
 .seo-more a{font-weight:700;color:var(--orange-dark);}
+
+/* Photo credits */
+.credit-list{margin:20px 0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--yt-muted, #555);}
+.credit-list li{margin-bottom:6px;overflow-wrap:anywhere;}
+.credit-list b{color:var(--yt-ink, #0B1F3A);font-weight:600;}
