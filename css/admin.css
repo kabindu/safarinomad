@@ -473,3 +473,21 @@ button.ins-r:hover,a.ins-r:hover{background:var(--box-bg);}
 .team-notice-actions .adm-btn.wa{color:#128C4B;}
 .team-check{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-top:12px;cursor:pointer;}
 .team-check input{width:17px;height:17px;accent-color:var(--orange);}
+
+/* Flight plans and the email composer */
+.fp-mini{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px;font-size:13.5px;}
+.fp-mini span{color:var(--yt-muted);}
+.fp-list{list-style:none;padding:0;margin:0;display:grid;gap:8px;}
+.fp-list li{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--box-bg);border-radius:10px;padding:10px 12px;}
+.fp-list li > div{flex:1 1 180px;min-width:0;}
+.fp-list small{display:block;color:var(--yt-muted);font-size:12.5px;margin-top:2px;}
+.fp-price{font-weight:800;white-space:nowrap;}
+.compose{margin-top:16px;}
+.compose > summary{list-style:none;cursor:pointer;justify-content:center;}
+.compose > summary::-webkit-details-marker{display:none;}
+.compose-body{display:grid;gap:10px;margin-top:14px;}
+.compose-body label{display:grid;gap:5px;font-size:13px;font-weight:700;}
+.compose-body textarea{margin-bottom:0;font-size:14.5px;line-height:1.5;}
+.compose-body #cpTo{background:var(--yt-surface);}
+.compose-go{display:flex;gap:8px;flex-wrap:wrap;}
+.compose-body input,.compose-body select,.compose-body textarea{font-weight:400;}

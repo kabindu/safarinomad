@@ -124,6 +124,7 @@
     set('#cntEnquiries', data.enquiries.filter(e => e.status === 'new').length);
     set('#cntQuestions', data.questions.filter(q => q.status === 'new').length);
     set('#cntLeads', (data.leads || []).filter(l => l.status === 'open').length);
+    set('#cntFlights', flightPlans().filter(x => ['new', 'open'].includes(x.item.status)).length);
     // Total waiting, on the phone Menu button
     set('#menuCount', ['#cntBookings', '#cntEnquiries', '#cntLeads'].reduce((n, id) => n + (Number($(id).textContent) || 0), 0));
   }
@@ -137,6 +138,7 @@
     deals:      { title:'Deals', sub:'Flash sales and last-minute departures shown on the website.', filters:null, manual:true },
     enquiries:  { title:'Enquiries', sub:'Quote requests, flight requests, guide requests and sign-ups.', filters:['all','new','replied','closed'] },
     leads:      { title:'Unfinished', sub:'Travellers who started a booking or custom trip and left before sending it. Email, call or WhatsApp them to help finish.', filters:['open','contacted','booked','lost','all'] },
+    flightplans:{ title:'Flight plans', sub:'Flights travellers are comparing or asked us to book. Open one to see their options, check live prices and email them.', filters:['waiting','all'] },
     questions:  { title:'Chat questions', sub:'What travellers asked Nomad, the AI assistant, and how it answered.', filters:['all','new','reviewed'] },
     team:       { title:'Team & activity', sub:'Who is on the team, what each person has done, and every sign-in and change.', filters:null, manual:true }
   };
@@ -181,7 +183,7 @@
     $('#viewTitle').textContent = v.title;
     $('#mbarTitle').textContent = v.title;
     $('#viewSub').textContent = v.sub;
-    $('#export').hidden = ['overview', 'insights', 'deals', 'team'].includes(view) || !!v.custom;
+    $('#export').hidden = ['overview', 'insights', 'deals', 'team', 'flightplans'].includes(view) || !!v.custom;
     $('.adm-search').hidden = ['insights', 'overview', 'team'].includes(view);
     if(view === 'team'){ $('#filters').innerHTML = ''; return AdminTeam.render($('#view'), { api, toast, esc, data, me: data.me || {}, fmtWhen, usd, openDetail, reload: true }); }
     // Deals: one page, two tabs (the editors come from js/admin-content.js)
@@ -197,7 +199,7 @@
       const n = countFor(f);
       return `<button data-filter="${f}" class="${f === filter ? 'on' : ''}">${f[0].toUpperCase() + f.slice(1)}${n !== null ? ` <b>${n}</b>` : ''}</button>`;
     }).join('') : '';
-    $('#view').innerHTML = ({ overview, bookings, departures, enquiries, questions, leads })[view]();
+    $('#view').innerHTML = ({ overview, bookings, departures, enquiries, questions, leads, flightplans })[view]();
   }
   function countFor(f){
     const list = view === 'bookings' ? data.bookings : view === 'enquiries' ? data.enquiries : view === 'questions' ? data.questions : view === 'leads' ? (data.leads || []) : null;
@@ -354,9 +356,9 @@
     return `mailto:${l.email}?subject=${encodeURIComponent(`Your SafariNomad ${l.source === 'Custom trip' ? 'custom trip' : 'booking'}${what ? ': ' + what : ''}`)}&body=${encodeURIComponent(body)}`;
   }
   const waNumber = p => String(p || '').replace(/\D/g, '');
-  function leadActions(l){
+  function leadActions(l, noEmail){
     return `<div class="lead-actions">
-      ${l.email ? `<a class="adm-btn" href="${esc(leadMail(l))}"><i class="fa-solid fa-envelope"></i> Email</a>` : ''}
+      ${l.email && !noEmail ? `<a class="adm-btn" href="${esc(leadMail(l))}"><i class="fa-solid fa-envelope"></i> Email</a>` : ''}
       ${l.phone ? `<a class="adm-btn" href="tel:${esc(l.phone.replace(/[^\d+]/g, ''))}"><i class="fa-solid fa-phone"></i> Call</a>
       <a class="adm-btn wa" target="_blank" rel="noopener" href="https://wa.me/${esc(waNumber(l.phone))}?text=${encodeURIComponent(`Hi ${(l.name || '').split(' ')[0]}, this is SafariNomad. I saw you started ${leadWhat(l) ? 'booking ' + leadWhat(l) : 'a booking'} on our website. Can I help you finish it?`)}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ''}
     </div>`;
@@ -372,6 +374,92 @@
         <p class="clip"><b>${esc(leadWhat(l) || 'Not chosen yet')}</b>${l.fields && l.fields.Date ? ' · ' + fmtDate(l.fields.Date) : ''}<br>Stopped at: ${esc(l.step || '')}</p>
         ${leadActions(l)}
       </article>`).join('')}</div>`;
+  }
+
+  /* ---------- Flight plans: what travellers are comparing ---------- */
+  function flightPlans(){
+    return [...data.enquiries.filter(e => (e.flights || []).length || e.type === 'Flight request').map(item => ({ kind:'enquiries', item, name:nameOf(item), email:emailOf(item), when:item.created, tag:item.type })),
+      ...(data.leads || []).filter(l => l.source === 'Flights').map(item => ({ kind:'leads', item, name:item.name || 'No name yet', email:item.email || item.phone, when:item.updated || item.created, tag:'Still comparing' }))]
+      .sort((a, b) => b.when.localeCompare(a.when));
+  }
+  const flightWhen = o => `${fmtDate(o.depart)}${o.ret ? ' → ' + fmtDate(o.ret) : ''}`;
+  const flightWho = o => `${o.adults + o.children} traveller${o.adults + o.children === 1 ? '' : 's'}`;
+  const flightPrice = o => o.price ? `${o.cur} ${Number(o.price).toLocaleString('en-US')}` : '';
+  const flightLive = o => `https://www.google.com/travel/flights?q=${encodeURIComponent(`${o.ret ? '' : 'one way '}flights from ${o.from} to ${o.to} on ${o.depart}${o.ret ? ` through ${o.ret}` : ''} ${o.adults} adult${o.adults > 1 ? 's' : ''}${o.children ? ` ${o.children} children` : ''} ${o.cabinName}`)}&hl=en`;
+  function flightplans(){
+    const list = flightPlans().filter(x => (filter === 'all' || ['new', 'open'].includes(x.item.status)) && matches(x.item));
+    if(!list.length) return empty('fa-plane-up', query ? 'No flight plans match your search.' : 'Nothing waiting. When a traveller saves flights and types their email, or sends a flight request, it appears here.');
+    return `<div class="cards">${list.map(({ kind, item, name, email, when, tag }) => `
+      <article class="card ${['new', 'open'].includes(item.status) ? 'unread' : ''}" data-open="${kind}:${item.id}">
+        <header><span class="type">${esc(tag)}</span>${pill(item.status)}${item.assignedTo && who(item.assignedTo) ? `<span class="assignee"><i class="fa-solid fa-user"></i> ${esc(who(item.assignedTo))}</span>` : ''}<small>${fmtWhen(when)}</small></header>
+        <h3>${esc(name)}</h3><p class="muted">${esc(email)}</p>
+        ${(item.flights || []).length ? `<ul class="fp-mini">${item.flights.map(o => `<li><b>${esc(o.fromName)} → ${esc(o.toName)}</b> <span>${flightWhen(o)}${flightPrice(o) ? ' · ' + esc(flightPrice(o)) : ''}</span></li>`).join('')}</ul>`
+          : `<p class="clip"><b>${esc((item.fields || {}).Route || '')}</b>${(item.fields || {}).Date ? ' · ' + fmtDate(item.fields.Date) : ''}</p>`}
+      </article>`).join('')}</div>`;
+  }
+  function flightDetail(item){
+    if(!(item.flights || []).length) return '';
+    return `<h4>Flights they're comparing</h4><ul class="fp-list">${item.flights.map(o => `
+      <li><div><b>${esc(o.fromName)} → ${esc(o.toName)}</b><small>${flightWhen(o)} · ${flightWho(o)} · ${esc(o.cabinName)}${o.airline ? ' · ' + esc(o.airline) : ''}</small></div>
+      ${flightPrice(o) ? `<span class="fp-price">${esc(flightPrice(o))}</span>` : '<span class="muted">No price yet</span>'}
+      <a class="adm-btn" href="${esc(flightLive(o))}" target="_blank" rel="noopener"><i class="fa-solid fa-magnifying-glass-dollar"></i> Live prices</a></li>`).join('')}</ul>`;
+  }
+
+  /* ---------- Email: filled in for you, sent from your own mailbox ---------- */
+  const firstName = n => { const f = String(n || '').trim().split(/\s+/)[0]; return f && !f.includes('@') ? f : 'there'; };
+  const VISA_TEXT = `Here are the official sites and how long each usually takes:\n\nKenya eTA: https://www.etakenya.go.ke (usually 3 working days)\nTanzania eVisa: https://visa.immigration.go.tz (allow up to 15 working days)\nUganda eVisa: https://visas.immigration.go.ug (allow up to 10 working days)\nRwanda: https://irembo.gov.rw (about 4 days online, or on arrival)\n\nPlease apply at least 3 weeks before you fly, and check each site for the current rules and fees.`;
+  function emailTemplates(kind, item){
+    const name = kind === 'bookings' || kind === 'leads' ? item.name : nameOf(item);
+    const hi = `Hi ${firstName(name)},\n\n`, bye = `\n\nBest wishes,\n${(data.me || {}).name || 'The team'}\nSafariNomad`;
+    const out = [];
+    if((item.flights || []).length){
+      const lines = item.flights.map((o, i) => `${i + 1}. ${o.fromName} to ${o.toName}, ${flightWhen(o)}, ${flightWho(o)}, ${o.cabinName}${o.airline ? ', ' + o.airline : ''}${flightPrice(o) ? ', ' + flightPrice(o) : ''}`).join('\n');
+      out.push({ label:'Their flights', subject:'Your flight options with SafariNomad', body:`${hi}Thank you for comparing flights with us. These are the options you saved:\n\n${lines}\n\nMy suggestion: \n\nWould you like us to book this for you, or would you like more options?${bye}` });
+    }
+    if(kind === 'bookings'){
+      const party = item.adults + item.children;
+      out.push({ label:'Booking details', subject:`Your SafariNomad booking ${item.ref}: ${item.tripTitle}`, body:`${hi}Thank you for booking ${item.tripTitle}, starting ${fmtDate(item.date)}, for ${party} traveller${party === 1 ? '' : 's'}.\n\nTotal: ${usd(item.total)}\nDeposit: ${usd(item.deposit)}\nBalance due: ${fmtDate(item.balanceDue)}\n\n${bye.trimStart()}` });
+    }
+    if(kind === 'leads' && !(item.flights || []).length){
+      const what = leadWhat(item);
+      out.push({ label:'Help them finish', subject:`Your SafariNomad ${item.source === 'Custom trip' ? 'custom trip' : item.source === 'Group trip' ? 'group trip' : 'booking'}${what ? ': ' + what : ''}`, body:`${hi}Thank you for looking at ${what || 'a trip'} with SafariNomad. I saw you didn't get to finish, so I wanted to check if I can help with anything: dates, prices, visas or flights.${resumeUrl(item) ? `\n\nYou can pick up where you left off here:\n${resumeUrl(item)}` : ''}${bye}` });
+    }
+    out.push({ label:'General reply', subject:`Re: your SafariNomad ${kind === 'enquiries' ? String(item.type).toLowerCase() : 'trip'}`, body:`${hi}Thank you for getting in touch with SafariNomad.\n\n${bye.trimStart()}` });
+    out.push({ label:'Visa help', subject:'Your visas for East Africa', body:`${hi}${VISA_TEXT}\n\nJust reply if you'd like help with the application.${bye}` });
+    return out;
+  }
+  function composeHtml(kind, item){
+    const to = kind === 'enquiries' ? emailOf(item) : item.email;
+    if(!to) return '';
+    const name = kind === 'enquiries' ? nameOf(item) : item.name;
+    const tpl = emailTemplates(kind, item);
+    const last = item.lastEmail && `<p class="muted dr-by"><i class="fa-solid fa-paper-plane"></i> ${esc(who(item.lastEmail.by) || 'Someone')} opened an email "${esc(item.lastEmail.subject)}" ${fmtWhen(item.lastEmail.at)}</p>`;
+    return `<details class="compose" id="compose">
+      <summary class="adm-btn wide"><i class="fa-solid fa-envelope"></i> Email ${esc(firstName(name))}</summary>
+      <div class="compose-body">
+        <label>To<input class="adm-input" id="cpTo" readonly value="${esc(to)}"></label>
+        <label>Template<select class="adm-input" id="cpTpl">${tpl.map((t, i) => `<option value="${i}">${esc(t.label)}</option>`).join('')}</select></label>
+        <label>Subject<input class="adm-input" id="cpSub" value="${esc(tpl[0].subject)}"></label>
+        <label>Message<textarea id="cpBody" rows="11">${esc(tpl[0].body)}</textarea></label>
+        <div class="compose-go">
+          <a class="adm-btn primary" id="cpGmail" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> Open in Gmail</a>
+          <a class="adm-btn" id="cpMail" href="#"><i class="fa-solid fa-envelope-open-text"></i> Email app</a>
+          <button type="button" class="adm-btn" id="cpCopy"><i class="fa-regular fa-copy"></i> Copy</button>
+        </div>
+        <small class="muted">Opens ready to send from your own mailbox. After sending, set the status below.</small>
+      </div></details>${last || ''}`;
+  }
+  function wireCompose(kind, id, item){
+    if(!$('#compose')) return;
+    const tpl = emailTemplates(kind, item), sub = $('#cpSub'), body = $('#cpBody'), to = $('#cpTo').value;
+    $('#cpTpl').addEventListener('change', e => { const t = tpl[+e.target.value]; sub.value = t.subject; body.value = t.body; });
+    const noted = async () => {
+      try{ const r = await api('update', { method:'POST', body:JSON.stringify({ kind, id, emailed:sub.value }) }); data[kind][data[kind].findIndex(x => x.id === id)] = r.item; }catch(e){}
+      toast('Email opened. Set the status once it is sent');
+    };
+    $('#cpGmail').addEventListener('click', e => { e.currentTarget.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(sub.value)}&body=${encodeURIComponent(body.value)}`; noted(); });
+    $('#cpMail').addEventListener('click', e => { e.currentTarget.href = `mailto:${encodeURIComponent(to).replace('%40', '@')}?subject=${encodeURIComponent(sub.value)}&body=${encodeURIComponent(body.value)}`; noted(); });
+    $('#cpCopy').addEventListener('click', () => { navigator.clipboard.writeText(`To: ${to}\nSubject: ${sub.value}\n\n${body.value}`).then(() => toast('Email copied')).catch(() => toast('Could not copy', true)); });
   }
 
   /* ---------- Chat questions ---------- */
@@ -393,11 +481,11 @@
     const item = data[kind].find(x => x.id === id);
     if(!item){ closeDetail(); return; }
     if(keep && document.activeElement && document.activeElement.id === 'note') return;   // don't wipe a note being typed
+    if(keep && $('#compose') && $('#compose').open) return;                               // or an email being written
     openItem = { kind, id };
     let body = '';
     if(kind === 'bookings'){
       const b = item;
-      const mail = `mailto:${b.email}?subject=${encodeURIComponent(`Your SafariNomad booking ${b.ref}: ${b.tripTitle}`)}&body=${encodeURIComponent(`Hi ${b.name.split(' ')[0]},\n\nThank you for booking ${b.tripTitle} starting ${fmtDate(b.date)}.\n\n`)}`;
       body = `<div class="dr-head"><span class="ref">${esc(b.ref)}</span>${pill(b.status)}</div>
         <h2>${esc(b.tripTitle)}</h2>
         <p class="muted">${fmtDate(b.date)} → ${fmtDate(b.endDate)} · ${b.days} days${b.private ? ' · Private' : ''}</p>
@@ -415,15 +503,14 @@
           ${row('Received', new Date(b.created).toLocaleString('en-GB'))}
         </dl>
         ${b.notes ? `<h4>Traveller's notes</h4><p class="quote">${esc(b.notes)}</p>` : ''}
-        <a class="adm-btn wide" href="${esc(mail)}"><i class="fa-solid fa-reply"></i> Email ${esc(b.name.split(' ')[0])}</a>`;
+        ${composeHtml(kind, b)}`;
     }
     if(kind === 'enquiries'){
       const e = item;
-      const mail = `mailto:${emailOf(e)}?subject=${encodeURIComponent('Re: your SafariNomad ' + e.type.toLowerCase())}`;
       body = `<div class="dr-head"><span class="type">${esc(e.type)}</span>${pill(e.status)}</div>
         <h2>${esc(nameOf(e))}</h2><p class="muted">${new Date(e.created).toLocaleString('en-GB')}${e.page ? ' · from ' + esc(e.page) : ''}</p>
-        <dl class="dl">${Object.entries(e.fields).map(([k, v]) => row(esc(k), esc(v).replace(/\n/g, '<br>'))).join('')}</dl>
-        <a class="adm-btn wide" href="${esc(mail)}"><i class="fa-solid fa-reply"></i> Reply by email</a>`;
+        <dl class="dl">${Object.entries(e.fields).filter(([k]) => !((e.flights || []).length && k === 'Route')).map(([k, v]) => row(esc(k), esc(v).replace(/\n/g, '<br>'))).join('')}</dl>
+        ${flightDetail(e)}${composeHtml(kind, e)}`;
     }
     if(kind === 'leads'){
       const l = item;
@@ -431,9 +518,10 @@
         <h2>${esc(l.name || 'No name yet')}</h2>
         <p class="muted">Started ${new Date(l.created).toLocaleString('en-GB')} · last active ${fmtWhen(l.updated || l.created)}${l.page ? ' · on ' + esc(l.page) : ''}</p>
         <p class="tip"><i class="fa-solid fa-flag"></i> Stopped at: <b>${esc(l.step || '')}</b>${l.outcome ? ` · ${esc(l.outcome)}` : ''}</p>
-        <dl class="dl">${Object.entries(l.fields || {}).map(([k, v]) => row(esc(k), esc(v).replace(/\n/g, '<br>'))).join('')}</dl>
+        <dl class="dl">${Object.entries(l.fields || {}).filter(([k]) => !((l.flights || []).length && k === 'Route')).map(([k, v]) => row(esc(k), esc(v).replace(/\n/g, '<br>'))).join('')}</dl>
+        ${flightDetail(l)}
         ${resumeUrl(l) ? `<p class="muted">Link to continue: <a href="${esc(resumeUrl(l))}" target="_blank" rel="noopener">${esc(l.resume)}</a></p>` : ''}
-        ${leadActions(l)}`;
+        ${leadActions(l, true)}${composeHtml(kind, l)}`;
     }
     if(kind === 'questions'){
       const q = item;
@@ -456,6 +544,7 @@
     $('#drawer').classList.add('open'); $('#drawerBg').classList.add('open'); $('#drawer').setAttribute('aria-hidden', 'false');
 
     $$('#drawerBody [data-status]').forEach(btn => btn.addEventListener('click', () => update(kind, id, { status:btn.dataset.status })));
+    wireCompose(kind, id, item);
     const sn = $('#saveNote');
     if(sn) sn.addEventListener('click', () => update(kind, id, { note:$('#note').value }));
     const as = $('#assign');

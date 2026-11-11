@@ -124,6 +124,7 @@
     <!-- Results -->
     <div class="fs-results" id="fsResults" hidden>
       <div class="fs-summary" id="fsSummary"></div>
+      <div class="fs-save"><button type="button" class="btn" id="fsSave"><i class="fa-regular fa-bookmark"></i> Save to My flights</button><span>Keep several options and compare them side by side.</span></div>
 
       <!-- 1. Live prices on trusted comparison sites (links filled in with the search) -->
       <div class="fs-block">
@@ -150,6 +151,27 @@
       <p class="fs-note"><i class="fa-solid fa-circle-info"></i> Prices and tickets come from the airline or comparison site you choose. Routes change, so the comparison sites show exactly who flies on your dates.</p>
     </div>
 
+    <!-- My flights: saved options to compare (js/flight-plan.js) -->
+    <div class="fs-block fm" id="myFlights" hidden>
+      <h3><i class="fa-solid fa-plane-up"></i> My flights <span class="fm-count" id="fmCount"></span></h3>
+      <p class="fs-sub">Add the airline and the price you find for each option and we'll show you the cheapest.</p>
+      <div class="fm-list" id="fmList"></div>
+      <form class="fm-form" id="fmForm" novalidate>
+        <h4>Want a planner to check these for you?</h4>
+        <div class="contact-form">
+          <div class="form-field"><label for="fmName">Your name</label><input id="fmName" name="name" type="text" autocomplete="name" required></div>
+          <div class="form-field"><label for="fmEmail">Email</label><input id="fmEmail" name="email" type="email" autocomplete="email" required></div>
+          <div class="form-field"><label for="fmPhone">Phone or WhatsApp <span class="opt">(optional)</span></label><input id="fmPhone" name="phone" type="tel" autocomplete="tel"></div>
+          <div class="form-field"><label for="fmMessage">Anything we should know? <span class="opt">(optional)</span></label><input id="fmMessage" name="message" type="text"></div>
+        </div>
+        <div class="form-foot">
+          <small><i class="fa-solid fa-lock"></i> We save your details as you go so a planner can help. <a href="privacy.html">Privacy</a></small>
+          <button class="btn" type="submit">Send to a planner <i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        <div id="fmStatus" class="contact-status" aria-live="polite"></div>
+      </form>
+    </div>
+
     <h3 class="fs-popular">Popular routes</h3>
     <div class="tabs" id="routeTabs">
       <button class="tab active" data-route="">All routes</button>
@@ -171,27 +193,28 @@
       </div>
     </div>
     <div class="visa-grid">
-      <a class="visa-card" href="https://evisa.go.ke/" target="_blank" rel="noopener">
-        <span class="visa-flag" translate="no">KE</span><b>Kenya</b><span>eTA online before you travel</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
+      <a class="visa-card" href="https://www.etakenya.go.ke/en" target="_blank" rel="noopener">
+        <span class="visa-flag" translate="no">KE</span><b>Kenya</b><span>eTA online before you travel</span><span class="visa-time"><i class="fa-regular fa-clock"></i> Usually 3 working days</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
       </a>
       <a class="visa-card" href="https://visa.immigration.go.tz/" target="_blank" rel="noopener">
-        <span class="visa-flag" translate="no">TZ</span><b>Tanzania &amp; Zanzibar</b><span>eVisa online</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span class="visa-flag" translate="no">TZ</span><b>Tanzania &amp; Zanzibar</b><span>eVisa online</span><span class="visa-time"><i class="fa-regular fa-clock"></i> Allow up to 15 working days</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
       </a>
       <a class="visa-card" href="https://visas.immigration.go.ug/" target="_blank" rel="noopener">
-        <span class="visa-flag" translate="no">UG</span><b>Uganda</b><span>eVisa online</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span class="visa-flag" translate="no">UG</span><b>Uganda</b><span>eVisa online</span><span class="visa-time"><i class="fa-regular fa-clock"></i> Allow up to 10 working days</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
       </a>
       <a class="visa-card" href="https://irembo.gov.rw/" target="_blank" rel="noopener">
-        <span class="visa-flag" translate="no">RW</span><b>Rwanda</b><span>Apply on Irembo</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span class="visa-flag" translate="no">RW</span><b>Rwanda</b><span>Apply on Irembo, or on arrival</span><span class="visa-time"><i class="fa-regular fa-clock"></i> About 4 days online</span><i class="fa-solid fa-arrow-up-right-from-square"></i>
       </a>
     </div>
     <div class="visa-tips">
-      <div class="visa-eatv"><i class="fa-solid fa-stamp"></i><div><b>East Africa Tourist Visa</b><span>Kenya + Uganda + Rwanda on one visa · <b data-usd="100"></b> · 90 days</span></div></div>
+      <div class="visa-eatv"><i class="fa-solid fa-stamp"></i><div><b>East Africa Tourist Visa</b><span>Kenya + Uganda + Rwanda on one visa · valid 90 days</span></div></div>
       <ul>
         <li><i class="fa-solid fa-passport"></i> Passport valid 6+ months, 2 blank pages</li>
         <li><i class="fa-solid fa-syringe"></i> Yellow fever card may be asked for</li>
         <li><i class="fa-solid fa-circle-check"></i> We check your entry rules when we book</li>
       </ul>
     </div>
+    <p class="visa-note"><i class="fa-solid fa-circle-info"></i> Working days don't count weekends or public holidays. These times are a guide and can be longer in busy periods, so apply at least 3 weeks before you fly and check the official site for the current rules and fees.</p>
     <p class="photo-credit" translate="no">Header photos via Wikimedia Commons: Alan Wilson (CC BY-SA 2.0), Mike Peel (CC BY-SA 4.0); Unsplash contributors Alex Robert, Brian Gaid, Matthew Smith, Tim Gouw (CC0).</p>
   </div>
 </section>
@@ -210,8 +233,8 @@
     <div class="contact-form-card">
       <form data-mailto="Flight request" novalidate>
         <div class="contact-form">
-          <div class="form-field"><label for="fName">Full name</label><input id="fName" name="Name" type="text" required></div>
-          <div class="form-field"><label for="fEmail">Email address</label><input id="fEmail" name="Email" type="email" required></div>
+          <div class="form-field"><label for="fName">Full name</label><input id="fName" name="Name" type="text" autocomplete="name" required></div>
+          <div class="form-field"><label for="fEmail">Email address</label><input id="fEmail" name="Email" type="email" autocomplete="email" required></div>
           <div class="form-field full">
             <label for="fType">What do you need?</label>
             <select id="fType" name="Flight type">
@@ -247,6 +270,7 @@
 <script src="js/assistant.js"></script>
 <script src="js/pages.js"></script>
 <script src="js/flights.js"></script>
+<script src="js/flight-plan.js"></script>
 <script src="js/flight-status.js"></script>
 </body>
 </html>

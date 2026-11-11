@@ -109,6 +109,17 @@ export function makeDemo({ TRIPS, PLACES, BookingRules, BOOKING }){
       step, resume: t ? `book.html?trip=${t.id}` : source === 'Group trip' ? 'groups.html#group-form' : 'plan.html', name, email: fields.Email, phone: fields.Phone, fields };
   });
 
+  /* A traveller comparing flights, and one who sent them to a planner */
+  const flightOpts = [
+    { from:'FRA', to:'NBO', fromName:'Frankfurt', toName:'Nairobi', depart: BookingRules.addDays(today, 40), ret: BookingRules.addDays(today, 52), adults:2, children:0, cabinName:'Economy', airline:'Ethiopian Airlines', price:1180, cur:'EUR' },
+    { from:'FRA', to:'NBO', fromName:'Frankfurt', toName:'Nairobi', depart: BookingRules.addDays(today, 42), ret: BookingRules.addDays(today, 54), adults:2, children:0, cabinName:'Economy', airline:'Emirates', price:1320, cur:'EUR' }
+  ];
+  const [flyName] = PEOPLE[16], [leadName] = PEOPLE[17];
+  enquiries.push({ id:'demo-e-fly', demo:true, created: ago(5 * H), status:'new', type:'Flight plan', page:'flights.html', flights: flightOpts, note:'',
+    fields: { Name: flyName, Email: email(flyName), Phone: phone(70), Route:'Frankfurt → Nairobi; Frankfurt → Nairobi', Message:'Comparing 2 flight options' } });
+  leads.push({ id:'demo-l-fly', demo:true, draft:'demo-draft-fly', created: ago(30 * H), updated: ago(28 * H), status:'open', note:'', source:'Flights', page:'flights.html', step:'Comparing flights', resume:'flights.html#myFlights',
+    name: leadName, email: email(leadName), phone:'', flights: flightOpts.slice(0, 1), fields: { Name: leadName, Email: email(leadName), Route:'Frankfurt → Nairobi' } });
+
   /* Chat questions */
   const questions = QUESTIONS.map(([q, a], i) => ({ id: 'demo-q' + i, demo: true, created: ago(int(1, 10 * 24) * H), status: i < 5 ? 'new' : 'reviewed',
     session: 'demo', page: pick(['index.html', 'trips.html', 'book.html', 'flights.html']), lang: /[äöüß]|Wie /.test(q) ? 'de' : 'en', question: q, answer: a }));

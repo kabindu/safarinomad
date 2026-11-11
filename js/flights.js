@@ -101,8 +101,8 @@
     business: { text:'business class',  sky:'business',       kayak:'business' },
     first:    { text:'first class',     sky:'first',          kayak:'first' }
   };
-  function compareLinks(a, b, d, r){
-    const c = CABIN[cabin.value], n = pax.adults, k = pax.children, kids = Array(k).fill(8);   // children's ages: the sites ask for one; 8 is a neutral default
+  function compareLinks(a, b, d, r, o = { cabin: cabin.value, adults: pax.adults, children: pax.children }){
+    const c = CABIN[o.cabin], n = o.adults, k = o.children, kids = Array(k).fill(8);   // children's ages: the sites ask for one; 8 is a neutral default
     const who = `${n} adult${n > 1 ? 's' : ''}${k ? ` ${k} child${k > 1 ? 'ren' : ''}` : ''}`;
     const cur = (SN.store.get('currency') || 'USD') === 'EUR' ? 'EUR' : 'USD';
     const yymmdd = s => s.slice(2).replace(/-/g, '');
@@ -173,6 +173,13 @@
     run();
     form.scrollIntoView({ behavior:'smooth' });
   }));
+
+  // Used by "My flights" (js/flight-plan.js)
+  window.SNFlights = {
+    current: () => ({ from: fromSel.value, to: toSel.value, fromName: AIRPORTS[fromSel.value], toName: AIRPORTS[toSel.value], depart: depIn.value,
+      ret: trip === 'return' ? retIn.value : '', adults: pax.adults, children: pax.children, cabin: cabin.value, cabinName: cabin.selectedOptions[0].text }),
+    links: o => compareLinks(o.from, o.to, o.depart, o.ret || null, o)
+  };
 
   document.addEventListener('currencychange', () => { if(!$('#fsResults').hidden) run(); });
   run();

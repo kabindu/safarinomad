@@ -403,8 +403,8 @@ body[data-page="contact"] .social-float{display:none;}   /* this page already li
   body{padding-bottom:calc(64px + env(safe-area-inset-bottom));}
   .chat{bottom:calc(76px + env(safe-area-inset-bottom));}
   .social-float{right:14px;top:auto;bottom:calc(76px + env(safe-area-inset-bottom));transform:none;gap:8px;}
-  /* Booking and customising need the whole small screen (the calendar reaches the edge) */
-  body[data-page="book"] .social-float,body[data-page="plan"] .social-float{display:none;}
+  /* Booking, customising and comparing flights need the whole small screen (controls reach the edge) */
+  body[data-page="book"] .social-float,body[data-page="plan"] .social-float,body[data-page="flights"] .social-float{display:none;}
   .social-float a{width:44px;height:44px;font-size:20px;}
   .chat-launcher{display:none;}
   .chat.ai-open .chat-panel{bottom:calc(76px + env(safe-area-inset-bottom));}

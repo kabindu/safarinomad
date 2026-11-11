@@ -125,7 +125,7 @@ const AdminInsights = (function(){
     });
     const regions = tally(Object.entries(P.a.tz), ([tz]) => countryOf(tz), ([, n]) => n);
     const langs = tally(Object.entries(P.a.lang), ([l]) => langOf(l), ([, n]) => n);
-    const startedBooking = P.leads.filter(l => l.source !== 'Custom trip').length + P.bookings.length;
+    const startedBooking = P.leads.filter(l => !l.source || l.source === 'Booking').length + P.bookings.length;
     const opened = Object.values(P.a.trips).reduce((s, n) => s + n, 0);
 
     const stat = (label, val, d, go, icon) => `<button class="ins-stat" ${go ? `data-go="${go}"` : ''}><span class="ins-stat-l"><i class="fa-solid ${icon}" aria-hidden="true"></i> ${label}</span><b>${val}</b>${d}</button>`;

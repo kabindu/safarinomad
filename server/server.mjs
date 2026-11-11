@@ -489,6 +489,14 @@ function save(kind){
 const newId = () => crypto.randomBytes(6).toString('hex');
 const clean = (v, max = 200) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+// Flight options a visitor saved in "My flights"
+const isoDay = v => /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : '';
+const cleanFlights = v => (Array.isArray(v) ? v : []).slice(0, 6).map(o => {
+  if(!o || !/^[A-Z]{3}$/.test(o.from) || !/^[A-Z]{3}$/.test(o.to) || !isoDay(o.depart)) return null;
+  const count = (n, min) => Math.min(9, Math.max(min, Math.floor(Number(n)) || 0)), price = Number(o.price);
+  return { from: o.from, to: o.to, fromName: clean(o.fromName, 60), toName: clean(o.toName, 60), depart: o.depart, ret: isoDay(o.ret), adults: count(o.adults, 1), children: count(o.children, 0),
+    cabinName: clean(o.cabinName, 30), airline: clean(o.airline, 60), price: price > 0 && price < 1e6 ? price : 0, cur: o.cur === 'EUR' ? 'EUR' : 'USD' };
+}).filter(Boolean);
 
 /* =========================================================
    Website content edited in the dashboard
@@ -733,7 +741,7 @@ async function handleLead(req, res){
   if(lead && lead.status === 'booked') return sendJSON(res, 200, { saved: false });
   if(!lead){ lead = { id: newId(), draft, created: now, status: 'open', note: '' }; db.leads.push(lead); }
   Object.assign(lead, {
-    source: { custom:'Custom trip', group:'Group trip' }[b.source] || 'Booking', page: clean(b.page, 120), step: clean(b.step, 80),
+    source: { custom:'Custom trip', group:'Group trip', flights:'Flights' }[b.source] || 'Booking', flights: cleanFlights(b.flights), page: clean(b.page, 120), step: clean(b.step, 80),
     resume: clean(b.resume, 300), name: clean(fields.Name || '', 120), email, phone, fields, updated: now
   });
   saveSoon('leads');
@@ -798,7 +806,7 @@ async function handleEnquiry(req, res){
     .forEach(([k, v]) => { const key = clean(k, 60), val = clean(String(v ?? ''), 3000); if(key && val) fields[key] = val; });
   const email = Object.entries(fields).find(([k]) => /e-?mail/i.test(k))?.[1] || '';
   if(!emailOk(email)) return sendJSON(res, 400, { error: 'Please enter a valid email address.' });
-  const enquiry = { id: newId(), created: new Date().toISOString(), status: 'new', type: clean(b.type, 40) || 'Enquiry', page: clean(b.page, 120), fields, note: '' };
+  const enquiry = { id: newId(), created: new Date().toISOString(), status: 'new', type: clean(b.type, 40) || 'Enquiry', page: clean(b.page, 120), fields, flights: cleanFlights(b.flights), note: '' };
   db.enquiries.push(enquiry);
   save('enquiries');
   closeLead(b.draft, `Sent: ${enquiry.type}`);
@@ -952,6 +960,7 @@ async function handleAdmin(req, res){
       item.assignedTo = to ? to.id : '';
       what.push(to ? `assigned to ${to.name}` : 'unassigned');
     }
+    if(typeof b.emailed === 'string' && b.kind !== 'questions'){ item.lastEmail = { at: when, by: me.id, subject: clean(b.emailed, 160) }; what.push('opened an email to the customer'); }
     if(!what.length) return sendJSON(res, 200, { item });
     item.updated = when; item.updatedBy = me.id;
     save(b.kind);

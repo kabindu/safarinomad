@@ -177,6 +177,11 @@ const SN = (function(){
     };
   }
 
+  // Remember the email typed on this device, so forms can offer it with one tap
+  document.addEventListener('change', e => {
+    if(e.target.matches && e.target.matches('input[type=email]') && emailOk(e.target.value.trim())) store.set('myEmail', e.target.value.trim());
+  });
+
   /* ---------- Carousels (buttons with data-car="carouselId") ---------- */
   function updateCarNav(){
     $$('.car-btn').forEach(b => {
