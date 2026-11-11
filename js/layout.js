@@ -341,6 +341,9 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
         </div>
       </form>
     </div>
+    <nav class="ft-popular" aria-label="Popular safaris">
+      <a href="kenya-safari-packages">Kenya safaris</a><a href="tanzania-safari-packages">Tanzania safaris</a><a href="uganda-safari-tours">Uganda safaris</a><a href="rwanda-safari-tours">Rwanda tours</a><a href="maasai-mara-safari-packages">Maasai Mara</a><a href="serengeti-safari-packages">Serengeti</a><a href="great-migration-safari-tours">Great Migration</a><a href="gorilla-trekking-tours">Gorilla trekking</a><a href="kilimanjaro-climbing-tours">Kilimanjaro</a><a href="zanzibar-holiday-packages">Zanzibar</a><a href="affordable-safari-packages">Affordable safaris</a><a href="luxury-safari-packages">Luxury safaris</a><a href="family-safari-packages">Family safaris</a><a href="honeymoon-safari-packages">Honeymoons</a><a href="short-safaris-from-nairobi">Short safaris</a>
+    </nav>
     <div class="ft-bottom">
       <div><span>© 2026 SafariNomad Ltd. All rights reserved.</span><a href="privacy.html">Privacy Policy</a><a href="terms.html">Booking Terms</a></div>
       <ul class="pay-row" aria-label="Payment methods">

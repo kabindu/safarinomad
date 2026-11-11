@@ -51,10 +51,14 @@ import { GoogleGenAI, ApiError as GeminiApiError } from '@google/genai';
 import { flightStatusConfigured, flightByNumber, airportBoard, routeSearch, FlightApiError } from './flights.mjs';
 import { makeDemo } from './demo.mjs';
 import { createTeam, TeamError } from './team.mjs';
+import { createSeo } from './seo.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PORT) || 3000;
 const MODEL = 'claude-opus-5-5';
+
+// The site's public address, used in canonical links and the sitemap. Set it when hosting.
+const SITE_URL = (process.env.SITE_URL || `http://localhost:${PORT}`).trim();
 
 const client = new Anthropic(); // reads ANTHROPIC_API_KEY from the environment
 
@@ -1036,6 +1040,7 @@ function serveStatic(req, res){
     });
   }
   cachedFile(file).then(async f => {
+    if(f) return sendFile(req, res, f);
     if(!f){
       // A missing page gets the friendly "page not found" page; a missing image or script stays a plain 404
       const page = /(\.html?|\/[^./]*)$/i.test(urlPath) && await cachedFile(path.join(ROOT, '404.html'));
@@ -1043,19 +1048,51 @@ function serveStatic(req, res){
       res.writeHead(404, { 'Content-Type': page.type, 'Cache-Control': 'no-cache' });
       return res.end(req.method === 'HEAD' ? undefined : page.raw);
     }
-    const headers = { 'Content-Type': f.type, 'ETag': f.etag, 'Vary': 'Accept-Encoding',
-      // Pages, styles and scripts: always check for a newer version (a quick 304 when unchanged), so edits show at once.
-      // Photos, fonts: keep for a week (uploads get new file names, so they never go stale).
-      'Cache-Control': f.text ? 'no-cache' : 'public, max-age=604800' };
-    if(req.headers['if-none-match'] === f.etag){ res.writeHead(304, headers); return res.end(); }
-    const accept = req.headers['accept-encoding'] || '';
-    let body = f.raw;
-    if(f.br && /\bbr\b/.test(accept)){ body = f.br; headers['Content-Encoding'] = 'br'; }
-    else if(f.gz && /\bgzip\b/.test(accept)){ body = f.gz; headers['Content-Encoding'] = 'gzip'; }
-    headers['Content-Length'] = body.length;
-    res.writeHead(200, headers);
-    res.end(req.method === 'HEAD' ? undefined : body);
   }).catch(() => { res.writeHead(500); res.end('Server error'); });
+}
+function sendFile(req, res, f){
+  const headers = { 'Content-Type': f.type, 'ETag': f.etag, 'Vary': 'Accept-Encoding',
+    // Pages, styles and scripts: always check for a newer version (a quick 304 when unchanged), so edits show at once.
+    // Photos, fonts: keep for a week (uploads get new file names, so they never go stale).
+    'Cache-Control': f.text ? 'no-cache' : 'public, max-age=604800' };
+  if(req.headers['if-none-match'] === f.etag){ res.writeHead(304, headers); return res.end(); }
+  const accept = req.headers['accept-encoding'] || '';
+  let body = f.raw;
+  if(f.br && /\bbr\b/.test(accept)){ body = f.br; headers['Content-Encoding'] = 'br'; }
+  else if(f.gz && /\bgzip\b/.test(accept)){ body = f.gz; headers['Content-Encoding'] = 'gzip'; }
+  headers['Content-Length'] = body.length;
+  res.writeHead(200, headers);
+  res.end(req.method === 'HEAD' ? undefined : body);
+}
+
+/* ---------- Search engine pages (server/seo.mjs) ---------- */
+const seo = createSeo({ siteUrl: SITE_URL, root: ROOT, load: () => loadData(),
+  stamp: () => Math.max(fs.statSync(DATA_FILE).mtimeMs, fs.existsSync(CONTENT_FILE) ? fs.statSync(CONTENT_FILE).mtimeMs : 0) });
+const compress = async raw => raw.length > 512 ? Promise.all([brotli(raw, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 9 } }), gzip(raw, { level: 9 })]) : [undefined, undefined];
+// Built pages are kept until the package data changes (at most a minute behind)
+let seoCache = { key: '', pages: new Map() };
+async function builtPage(url, type, make){
+  const key = dataKey();
+  if(seoCache.key !== key) seoCache = { key, pages: new Map() };
+  if(seoCache.pages.has(url)) return seoCache.pages.get(url);
+  const text = make();
+  if(text === null) return null;
+  const raw = Buffer.from(text), [br, gz] = await compress(raw);
+  const f = { type, text: true, raw, br, gz, etag: '"' + crypto.createHash('sha1').update(raw).digest('base64url').slice(0, 16) + '"' };
+  seoCache.pages.set(url, f);
+  return f;
+}
+// Old addresses move permanently to where the content lives now
+const MOVED = { '/guides.html': 'services.html#guides', '/deals.html': 'services.html#flash-deals' };
+async function seoRoute(req, res, url){
+  if(MOVED[url]){ res.writeHead(301, { Location: '/' + MOVED[url] }); res.end(); return true; }
+  if(url === '/sitemap.xml'){ sendFile(req, res, await builtPage(url, 'application/xml; charset=utf-8', () => seo.sitemap())); return true; }
+  if(url === '/robots.txt'){ sendFile(req, res, await builtPage(url, 'text/plain; charset=utf-8', () => seo.robots())); return true; }
+  if(seo.isPage(url)){
+    const f = await builtPage(url, 'text/html; charset=utf-8', () => seo.page(url));
+    if(f){ sendFile(req, res, f); return true; }
+  }
+  return false;
 }
 
 /* ---------- File cache ----------
@@ -1081,7 +1118,8 @@ async function cachedFile(file){
   if(!st.isFile()) return null;
   const hit = fileCache.get(file);
   if(hit && hit.mtime === st.mtimeMs && hit.size === st.size) return hit;
-  const raw = await fs.promises.readFile(file);
+  let raw = await fs.promises.readFile(file);
+  if(file.endsWith('.html')) raw = Buffer.from(seo.injectHead(file, raw.toString()));
   const type = TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream';
   const text = /^(text\/|application\/json|image\/svg)/.test(type);
   const f = { mtime: st.mtimeMs, size: st.size, type, text, raw,
@@ -1119,6 +1157,7 @@ async function route(req, res){
   if(path.startsWith('/api/chat')) return post(handleChat);
   if(path.startsWith('/api/translate')) return post(handleTranslate);
   if(req.method !== 'GET' && req.method !== 'HEAD') return sendJSON(res, 405, { error: 'Method not allowed' });
+  if(await seoRoute(req, res, path)) return;
   serveStatic(req, res);
 }
 
@@ -1138,6 +1177,7 @@ http.createServer((req, res) => {
   warmCache();
   console.log(`SafariNomad running at http://localhost:${PORT}`);
   console.log(`Admin dashboard:  http://localhost:${PORT}/admin.html`);
+  console.log(`Search engines:   ${seo.urls().length} pages in the sitemap for ${SITE_URL}${process.env.SITE_URL ? '' : '   (set SITE_URL to your real address when hosting)'}`);
   if(team.created) console.log(`Admin sign-in:    username "${team.created.username}", password "${team.created.password}"   (first run: change it in the dashboard under your name)`);
   else console.log(`Admin team:       ${team.users().filter(u => !u.demo).length} account(s). Forgot a password? npm run reset-password -- <username> <new password>`);
   console.log(flightStatusConfigured() ? 'Flight status:    live (AeroDataBox)' : 'Flight status:    no AERODATABOX_KEY, so searches link to official airline/airport sites');
