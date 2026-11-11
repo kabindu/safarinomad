@@ -1218,8 +1218,9 @@ function serveStatic(req, res){
 function sendFile(req, res, f){
   const headers = { 'Content-Type': f.type, 'ETag': f.etag, 'Vary': 'Accept-Encoding',
     // Pages, styles and scripts: always check for a newer version (a quick 304 when unchanged), so edits show at once.
-    // Photos, fonts: keep for a week (uploads get new file names, so they never go stale).
-    'Cache-Control': f.text ? 'no-cache' : 'public, max-age=604800' };
+    // Site photos in /images are replaced by saving a new file under the same name, so they are checked too.
+    // Admin uploads and fonts: keep for a week (uploads get new file names, so they never go stale).
+    'Cache-Control': f.text || f.replaceable ? 'no-cache' : 'public, max-age=604800' };
   if(req.headers['if-none-match'] === f.etag){ res.writeHead(304, headers); return res.end(); }
   const accept = req.headers['accept-encoding'] || '';
   let body = f.raw;
@@ -1287,7 +1288,8 @@ async function cachedFile(file){
   if(file.endsWith('.html')) raw = Buffer.from(seo.injectHead(file, raw.toString()));
   const type = TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream';
   const text = /^(text\/|application\/json|image\/svg)/.test(type);
-  const f = { mtime: st.mtimeMs, size: st.size, type, text, raw,
+  const replaceable = file.startsWith(path.join(ROOT, 'images') + path.sep) && !file.startsWith(UPLOAD_DIR + path.sep);
+  const f = { mtime: st.mtimeMs, size: st.size, type, text, raw, replaceable,
     etag: '"' + crypto.createHash('sha1').update(raw).digest('base64url').slice(0, 16) + '"' };
   if(text && raw.length > 512){
     // Compression runs off the main thread, so other visitors are never held up
