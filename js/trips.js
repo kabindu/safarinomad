@@ -83,7 +83,12 @@
 
     grid.innerHTML = list.map(SN.tripCard).join('');
     $('#noResults').classList.toggle('show', list.length === 0);
-    $('#noResultsText').textContent = s.saved && !SN.wish.size
+    const noText = $('#noResultsText'), emptySaved = s.saved && !SN.wish.size;
+    $('#noResultsAsk').style.display = s.q && !emptySaved ? '' : 'none';
+    if(s.q && !emptySaved){
+      noText.innerHTML = '<strong>Nothing found for <span translate="no"></span></strong><br>Ask Nomad, our AI travel expert, or let us build a trip for you.';
+      noText.querySelector('span').textContent = `“${s.q}”`;
+    } else noText.textContent = emptySaved
       ? 'You haven\'t saved any trips yet. Tap the heart on any trip to save it here.'
       : 'No set itineraries match those filters, but we can build one for you.';
 
@@ -116,6 +121,7 @@
   }
 
   $$('#filters input, #sortBy').forEach(el => el.addEventListener('input', render));
+  $('#noResultsAsk').addEventListener('click', e => { e.stopPropagation(); if(window.NomadAssistant) NomadAssistant.askAbout($('#tripQuery').value.trim()); });
   $('#clearFilters').addEventListener('click', () => {
     $$('#filters input[type=checkbox]').forEach(c => c.checked = false);
     $('#tripQuery').value = '';

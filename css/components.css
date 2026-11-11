@@ -39,6 +39,7 @@
 .car-btn:disabled{opacity:.35;cursor:not-allowed;}
 .empty-state{display:none;padding:40px;text-align:center;background:var(--yt-surface);border-radius:var(--yt-radius);color:var(--yt-muted);}
 .empty-state.show{display:block;}
+.empty-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
 
 /* ---------- Trip card (classic brochure card) ---------- */
 .trip-card{position:relative;display:flex;flex-direction:column;min-width:0;}

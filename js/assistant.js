@@ -289,7 +289,14 @@
 
   document.addEventListener('langchange', () => { if(!$('#aiView').hidden) render(); });
 
-  window.NomadAssistant = { open: openAI, ask, localAnswer };
+  // Open the chat and ask straight away (e.g. from a search that found nothing)
+  function askAbout(text){
+    chat.classList.add('open');
+    $('#chatLauncher').setAttribute('aria-expanded', 'true');
+    openAI();
+    ask(text);
+  }
+  window.NomadAssistant = { open: openAI, ask, askAbout, localAnswer };
 
   // Re-open the AI view if the visitor was chatting on the previous page
   try{ if(sessionStorage.getItem('nomadOpen') === '1'){ chat.classList.add('open'); openAI(); } }catch(e){}

@@ -329,6 +329,11 @@ const SNSearch = (function(){
 
   function rowHTML(r, i){
     const id = `yt-opt-${i}`;
+    if(r.kind === 'ask') return `<div class="yt-row yt-ask" id="${id}" role="option" data-i="${i}" data-ask>
+      <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+      <span class="yt-rich-text"><span>Ask Nomad, our AI travel expert</span><small translate="no">${escHTML(r.text)}</small></span>
+      <i class="fa-solid fa-arrow-right yt-ask-go" aria-hidden="true"></i>
+    </div>`;
     if(r.kind === 'rich'){
       const it = r.item;
       const thumb = it.img ? `<img src="${it.img}" alt="" loading="lazy">` : `<i class="fa-solid ${it.icon}"></i>`;
@@ -349,6 +354,7 @@ const SNSearch = (function(){
     const q = input.value.trim();
     typed = input.value;
     rows = [];
+    let none = false;
     if(!q){
       recent.get().slice(0, 6).forEach(t => rows.push({ kind:'recent', text:t }));
       POPULAR.filter(p => !rows.some(r => r.text.toLowerCase() === p.toLowerCase())).slice(0, 8 - rows.length).forEach(t => rows.push({ kind:'trend', text:t }));
@@ -356,14 +362,26 @@ const SNSearch = (function(){
       const r = recent.get().filter(t => norm(t).startsWith(norm(q))).slice(0, 2);
       r.forEach(t => rows.push({ kind:'recent', text:t }));
       textSuggestions(q).filter(t => !r.includes(t)).forEach(t => rows.push({ kind:'suggest', text:t }));
-      search(q, 4).forEach(item => rows.push({ kind:'rich', item }));
+      const hits = search(q, 4);
+      hits.forEach(item => rows.push({ kind:'rich', item }));
+      // Nothing on the site: say so and offer Nomad. Only a loose match (some of the words): offer Nomad after it.
+      none = q.length >= 2 && !hits.length;
+      if(none) rows.unshift({ kind:'ask', text:q });
+      else if(q.length >= 2 && lastRelaxed) rows.push({ kind:'ask', text:q });
     }
     active = -1;
     const firstRich = rows.findIndex(r => r.kind === 'rich');
-    box.innerHTML = rows.map((r, i) => (i === firstRich && i > 0 ? '<div class="yt-sep"></div>' : '') + rowHTML(r, i)).join('');
+    const askAt = rows.findIndex(r => r.kind === 'ask');
+    box.innerHTML = (none ? `<div class="yt-none"><b>Nothing found for <span translate="no">“${escHTML(q)}”</span></b><span>No trip, place or guide on our site matches that.</span></div>` : '') +
+      rows.map((r, i) => (((i === firstRich && i > 0) || (i === askAt && i > 0) || (none && i === 1)) ? '<div class="yt-sep"></div>' : '') + rowHTML(r, i)).join('');
     box.hidden = !rows.length;
     input.setAttribute('aria-expanded', String(!box.hidden));
     form.classList.toggle('has-text', !!input.value);
+  }
+
+  function askNomad(q){
+    close();
+    if(window.NomadAssistant) NomadAssistant.askAbout(q);
   }
 
   function go(q){
@@ -383,7 +401,7 @@ const SNSearch = (function(){
     els.forEach((el, i) => el.classList.toggle('active', i === active));
     input.setAttribute('aria-activedescendant', els[active].id);
     const r = rows[active];
-    if(r.kind !== 'rich') input.value = r.text;          // like YouTube: arrows put the suggestion in the box
+    if(r.kind !== 'rich' && r.kind !== 'ask') input.value = r.text;          // like YouTube: arrows put the suggestion in the box
     els[active].scrollIntoView({ block:'nearest' });
   }
 
@@ -399,6 +417,7 @@ const SNSearch = (function(){
       if(e.key === 'ArrowDown'){ e.preventDefault(); highlightRow(active + 1); }
       else if(e.key === 'ArrowUp'){ e.preventDefault(); highlightRow(active - 1); }
       else if(e.key === 'Escape'){ if(!box.hidden){ box.hidden = true; input.value = typed; } else close(); }
+      else if(e.key === 'Enter' && active >= 0 && rows[active].kind === 'ask'){ e.preventDefault(); askNomad(rows[active].text); }
       else if(e.key === 'Enter' && active >= 0 && rows[active].kind === 'rich'){ e.preventDefault(); recent.add(typed.trim() || L(rows[active].item.title)); location.href = rows[active].item.url; }
     });
     form.addEventListener('submit', e => { e.preventDefault(); go(input.value); });
@@ -410,6 +429,7 @@ const SNSearch = (function(){
       if(rm){ recent.remove(rm.dataset.remove); render(); return; }
       const row = e.target.closest('.yt-row');
       if(!row) return;
+      if(row.dataset.ask !== undefined){ e.stopPropagation(); askNomad(rows[+row.dataset.i].text); return; }   // stop: a click outside the chat closes it
       if(row.dataset.q !== undefined){ input.value = row.dataset.q; go(row.dataset.q); }
       else if(typed.trim()) recent.add(typed.trim());
     });

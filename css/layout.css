@@ -119,6 +119,12 @@ a.df-title:hover{color:var(--orange-dark);}
 .yt-row:hover .yt-remove,.yt-row.active .yt-remove{display:block;}
 .yt-remove:hover{text-decoration:underline;}
 .yt-sep{height:1px;background:var(--yt-line);margin:8px 0;}
+.yt-none{display:grid;gap:3px;padding:6px 20px 12px 18px;font-size:14px;color:var(--yt-muted);overflow-wrap:anywhere;}
+.yt-none b{font-size:16px;color:var(--yt-text);}
+.yt-ask > i:first-child{color:var(--orange);}
+.yt-ask .yt-rich-text > span{font-weight:700;}
+.yt-ask .yt-rich-text small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.yt-ask-go{color:var(--orange);font-size:13px;}
 .yt-row.rich{gap:12px;}
 .yt-thumb{width:64px;height:40px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--box-bg);display:flex;align-items:center;justify-content:center;color:var(--orange);}
 .yt-thumb img{width:100%;height:100%;object-fit:cover;}
