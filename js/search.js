@@ -170,7 +170,7 @@ const SNSearch = (function(){
 
     TRIPS.forEach(t => out.push(item({
       type:'Trips', icon:'fa-binoculars', title:t.title, url:`book.html?trip=${t.id}`, img:t.img,
-      sub:`${t.countries} · ${t.days} days · ${t.stay}`, price:t.price, rating:t.rating,
+      sub:`${t.countries} · ${t.days} days · ${t.stay}`, price:t.price,
       keywords:[t.country, COUNTRY_NAMES[t.country], ...t.styles, ...t.styles.map(s => STYLE_NAMES[s]), t.stay, t.badge, t.alt, t.days + ' days'].join(' '),
       boost:1, trip:t
     })));
@@ -201,7 +201,6 @@ const SNSearch = (function(){
       ['About us','about.html','fa-circle-info','story company team who we are'],
       ['Safari vehicles, accommodation & guides','services.html','fa-user-tie','guides guide team staff experts private guide hire photography birding tracker'],
       ['Safari flights & transfers','flights.html','fa-plane','flight flights fly plane bush flight airstrip transfer airport international luggage'],
-      ['Traveller reviews','about.html#reviews','fa-star','reviews testimonials ratings feedback'],
       ['Book your safari dates','book.html','fa-calendar-check','book booking dates calendar availability departure seats reserve'],
       ['Request a free quote','contact.html','fa-envelope','contact quote enquiry email phone whatsapp book booking price'],
       ['Saved trips','trips.html?saved=1','fa-heart','wishlist favourites saved hearts'],

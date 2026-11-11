@@ -15,11 +15,11 @@
   const dealIds = new Set([...flashTrips, ...saleTrips].map(t => t.id));
 
   /* ---------- Packages: the first section, a grid with travel-style tabs ----------
-     "Top picks" = trips marked featured; a style tab shows that style's best-rated trips.
+     "Top picks" = trips marked featured; a style tab shows that style's trips, featured first.
      Each tab shows how many packages it has; tabs with none are hidden. */
   const pkgGrid = $('#tripGrid');
   const SHOW = 9;
-  const loved = t => (t.rating || 0) * Math.log10((t.reviews || 0) + 10);
+  const loved = t => t.featured ? 1 : 0;
   const ofStyle = style => style ? TRIPS.filter(t => t.styles.includes(style)) : TRIPS;
   const fromPrice = list => list.length ? Math.min(...list.map(t => t.price)) : 0;
   $$('[data-pkg-total]').forEach(el => { el.textContent = TRIPS.length; });
@@ -32,7 +32,7 @@
     const all = ofStyle(style);
     let list = all.filter(t => !dealIds.has(t.id) && (style || t.featured))
       .sort((a, b) => style ? loved(b) - loved(a) : 0).slice(0, SHOW);
-    // Top picks: fill any gap with the next best-rated packages, so the grid has full rows
+    // Top picks: fill any gap with the next packages, so the grid has full rows
     if(!style && list.length < SHOW) list = list.concat(all.filter(t => !dealIds.has(t.id) && !list.includes(t)).sort((a, b) => loved(b) - loved(a)).slice(0, SHOW - list.length));
     pkgGrid.innerHTML = list.map(t => SN.tripCard(t)).join('');
     $('#emptyState').classList.toggle('show', list.length === 0);
@@ -103,11 +103,7 @@
     load(photos[0][1]); place.textContent = photos[0][0].dataset.place || ''; setBtn(); start();
   }
 
-  /* ---------- Trust strip: worked out from the trips' own ratings ---------- */
-  const reviews = TRIPS.reduce((n, t) => n + (t.reviews || 0), 0);
-  const rating = reviews ? TRIPS.reduce((n, t) => n + (t.rating || 0) * (t.reviews || 0), 0) / reviews : 0;
-  $$('[data-trust="rating"]').forEach(el => { el.textContent = rating.toFixed(1) + '/5'; });
-  $$('[data-trust="reviews"]').forEach(el => { el.textContent = (Math.floor(reviews / 100) * 100).toLocaleString('en-US') + '+'; });
+
 
   /* ---------- Pick up where you left off (trips opened on the booking page) ---------- */
   const recentIds = SN.store.get('recentTrips') || [];

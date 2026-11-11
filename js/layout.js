@@ -25,10 +25,8 @@ const MENU_FACTS = (function(){
   const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
   const from = list => list.length ? Math.min(...list.map(t => t.price)) : 0;
   const price = usd => `<b data-usd="${usd}"></b>`;
-  const score = t => (t.rating || 0) * Math.log10((t.reviews || 0) + 10);
+  const score = t => t.featured ? 1 : 0;
   const month = new Date().getMonth() + 1;
-  const reviews = TRIPS.reduce((n, t) => n + (t.reviews || 0), 0);
-  const rating = reviews ? TRIPS.reduce((n, t) => n + (t.rating || 0) * (t.reviews || 0), 0) / reviews : 0;
   const onSale = TRIPS.filter(t => t.was > t.price);
   const mins = s => { const m = /(\d+)h\s*(\d+)?/.exec(s || ''); return m ? +m[1] * 60 + (+m[2] || 0) : 1e9; };
   const direct = FLIGHTS.filter(f => f.region === 'europe' && !f.stops).sort((a, b) => mins(a.time) - mins(b.time));
@@ -49,7 +47,6 @@ const MENU_FACTS = (function(){
     lengths: Object.entries(DURATIONS).map(([k, d]) => [d.label, `trips.html?len=${k}`, TRIPS.filter(t => d.fits(t.days)).length]),
     under: max => TRIPS.filter(t => t.price <= max).length,
     lastMinute: LAST_MINUTE.length,
-    rating: rating.toFixed(1), reviews: (Math.floor(reviews / 100) * 100).toLocaleString('en-US') + '+',
     direct: direct.length, fastest: direct[0]
   };
 })();
@@ -109,7 +106,7 @@ const MENU = (function(f){
           ['City & beach hotels', 'services.html#hotels', 'Before and after your safari', 'fa-hotel']
         ] },
         { title:'Guides', links:[
-          ['Tour guides', 'services.html#guides', 'Certified and born in the region', 'fa-id-badge'],
+          ['Tour guides', 'services.html#guides', 'A local guide on every trip', 'fa-id-badge'],
           ['Hire a private guide', 'services.html#private', 'Your own 4x4 and your own schedule', 'fa-compass'],
           ['Our standards', 'services.html#quality', 'The same promise on every trip', 'fa-shield-halved']
         ] }
@@ -139,8 +136,7 @@ const MENU = (function(f){
         imgs:['images/vehicle-landcruiser.jpg', 'images/safari-lodge.jpg', 'images/safari-vehicle.jpg'] },
       cols:[
         { title:'SafariNomad', links:[
-          ['Our story', 'about.html#story', 'From one Land Cruiser to 12,000 travellers', 'fa-seedling'],
-          ['Traveller reviews', 'about.html#reviews', `${f.rating}/5 from ${f.reviews} reviews`, 'fa-star'],
+          ['Who we are', 'about.html#story', 'A safari company based in Nairobi', 'fa-seedling'],
           ['Blog', 'blog.html', 'Guides and stories from the field', 'fa-newspaper']
         ] },
         { title:'Book & ask', links:[
@@ -326,9 +322,8 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
       </div>
       <div class="ft-col">
         <h4>About SafariNomad</h4>
-        <a href="about.html#story">Our story</a>
+        <a href="about.html#story">Who we are</a>
         <a href="services.html">Vehicles, stays &amp; guides</a>
-        <a href="about.html#reviews">Reviews</a>
         <a href="blog.html">Blog</a>
       </div>
       <form class="news-form ft-news" id="newsletter" novalidate>
@@ -361,7 +356,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
   <div class="chat-panel" id="chatPanel" role="dialog" aria-label="Chat with a safari expert">
     <div class="chat-head">
       <button type="button" class="chat-back" id="aiBack" aria-label="Back" hidden><i class="fa-solid fa-arrow-left"></i></button>
-      <div class="chat-team" id="chatTeam"><span>JK</span><span>AN</span><span>GU</span></div>
+      <div class="chat-team" id="chatTeam"><span><i class="fa-solid fa-headset"></i></span></div>
       <div>
         <b id="chatTitle">Talk to a safari expert</b>
         <small class="chat-status" id="chatStatus"><i></i> <span>Checking…</span></small>
@@ -392,7 +387,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
     </div>
   </div>
   <button class="chat-launcher" id="chatLauncher" aria-expanded="false" aria-controls="chatPanel">
-    <span class="chat-avatars"><span>JK</span><span>AN</span></span>
+    <span class="chat-avatars"><span><i class="fa-solid fa-headset"></i></span></span>
     <span class="chat-label">Chat with us</span>
     <span class="chat-dot"></span>
   </button>

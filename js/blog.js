@@ -30,8 +30,8 @@ function cardHTML(a){
       ${avatar(auth, 36)}
       <div>
         <h4>${a.title}</h4>
-        <div class="bc-meta">${auth.name}<i class="fa-solid fa-circle-check"></i></div>
-        <div class="bc-meta">${a.views} views • ${a.date}</div>
+        <div class="bc-meta">${auth.name}</div>
+        <div class="bc-meta">${a.readTime}</div>
       </div>
     </div>
   </div>`;
@@ -48,7 +48,7 @@ function renderFeatured(){
       </div>
       <h2>${a.title}</h2>
       <p>${a.excerpt}</p>
-      <div class="author-row">${avatar(auth, 40)}<div><div class="name">${auth.name}</div><div class="meta">${auth.role} · ${a.date}</div></div></div>
+      <div class="author-row">${avatar(auth, 40)}<div><div class="name">${auth.name}</div><div class="meta">${auth.role}</div></div></div>
     </div>`;
   document.getElementById('featured').onclick = () => showArticle(a.id);
 }
@@ -103,16 +103,11 @@ function showArticle(id){
   document.getElementById('artHeroTitle').textContent = a.title;
   document.getElementById('artMeta').innerHTML = `
     <div class="am-author">${avatar(auth, 36)} <span>${auth.name} · ${auth.role}</span></div>
-    <div class="am-date"><i class="fa-regular fa-calendar"></i> ${a.date}</div>
     <div class="am-date"><i class="fa-regular fa-clock"></i> ${a.readTime}</div>
-    <div class="am-date"><i class="fa-solid fa-eye"></i> ${a.views} views</div>`;
+`;
   document.getElementById('artBreadcrumb').textContent = a.title.length > 40 ? a.title.substring(0, 40) + '…' : a.title;
   document.getElementById('artBody').innerHTML = a.body;
-  document.getElementById('artAuthorBio').innerHTML = `
-    ${avatar(auth, 80)}
-    <div><h5 style="font-family:var(--font-body);font-weight:700;font-size:16px;margin-bottom:4px;">About ${auth.name}</h5>
-    <p style="color:var(--gray);font-size:13.5px;margin-bottom:10px;">${auth.role}</p>
-    <p style="font-size:14px;color:#3a4a3a;">${auth.bio}</p></div>`;
+  document.getElementById('artAuthorBio').hidden = true;
   const related = ARTICLES.filter(x => x.id !== id && (x.cat === a.cat || x.author === a.author)).slice(0, 3);
   document.getElementById('relatedGrid').innerHTML = related.map(r =>
     cardHTML(r)).join('');

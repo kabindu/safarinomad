@@ -241,7 +241,6 @@ const SN = (function(){
       <div class="trip-body">
         <h3><a href="tour-${t.id}">${t.title}</a></h3>
         <p class="trip-desc">${t.route || t.countries}</p>
-        ${t.reviews ? `<p class="tc-rating"><span class="stars" style="--r:${t.rating}" aria-label="Rated ${t.rating} out of 5"></span><b translate="no">${t.rating.toFixed(1)}</b><span>(${t.reviews.toLocaleString('en-US')})</span></p>` : ''}
         ${t.flash && t.flash.ends ? `<p class="flash-ends"><i class="fa-regular fa-clock"></i> Sale ends ${new Date(t.flash.ends).toLocaleDateString('en-GB', { day:'numeric', month:'short' })}</p>` : ''}
       </div>
       <div class="trip-foot">
@@ -294,7 +293,7 @@ const SN = (function(){
   const inLand = (t, key) => { const l = LANDS.find(x => x.key === key); return !!l && new RegExp(l.match).test(t.title + ' ' + t.route); };
   const pick = ({ packCountry:c, packStyle:s, packMaxdays:d, packLand:l }) => TRIPS.filter(t =>
       (!c || t.country === c) && (!s || t.styles.includes(s)) && (!d || t.days <= +d) && (!l || inLand(t, l)))
-    .sort((a, b) => b.reviews - a.reviews);
+    .sort((a, b) => !!b.featured - !!a.featured);
 
   // Homepage: one tile per landscape, linking to those trips
 

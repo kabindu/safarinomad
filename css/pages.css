@@ -408,3 +408,5 @@
 .seo-route{list-style:none;counter-reset:stop;padding:0;margin:0 0 26px;display:flex;flex-wrap:wrap;gap:8px;}
 .seo-route li{counter-increment:stop;display:flex;align-items:center;gap:8px;padding:8px 14px 8px 8px;border-radius:40px;background:var(--box-bg);font-size:15px;font-weight:600;}
 .seo-route li::before{content:counter(stop);width:26px;height:26px;border-radius:50%;background:var(--orange);color:#fff;font-size:13px;display:grid;place-items:center;}
+.seo-more{margin-top:14px;font-size:15px;}
+.seo-more a{font-weight:700;color:var(--orange-dark);}

@@ -61,10 +61,9 @@
   }
 
   const SORT = {
-    popular: (a, b) => b.reviews - a.reviews,
+    popular: (a, b) => !!b.featured - !!a.featured,
     'price-asc': (a, b) => a.price - b.price,
     'price-desc': (a, b) => b.price - a.price,
-    rating: (a, b) => b.rating - a.rating || b.reviews - a.reviews,
     days: (a, b) => a.days - b.days
   };
 

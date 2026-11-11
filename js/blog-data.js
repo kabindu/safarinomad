@@ -6,11 +6,7 @@
    ========================================================= */
 
 const AUTHORS = {
-  john: {name:'John Kariuki', role:'Lead Guide · Maasai Mara Expert', bio:'John has been guiding in the Maasai Mara for 14 years. Born in Narok County on the edge of the reserve, he tracked his first lion family at age 19. He holds a KPSGA guiding certificate and leads SafariNomad\'s premium wildlife drives.'},
-  aisha: {name:'Aisha Nakato', role:'Gorilla Trek Specialist · Uganda', bio:'Aisha grew up in Kisoro, the town at the foot of the Virungas. She began her career as a Uganda Wildlife Authority ranger before joining SafariNomad. She holds a UWA gorilla tracking permit and has completed over 400 gorilla treks.'},
-  david: {name:'David Mwangi', role:'Tanzania Circuit Expert', bio:'David has been working in the Serengeti and Ngorongoro ecosystems for over a decade. A self-taught ornithologist, he has identified 620 bird species across Tanzania and leads SafariNomad\'s birding add-on expeditions.'},
-  grace: {name:'Grace Uwimana', role:'Rwanda & Conservation Lead', bio:'Grace is SafariNomad\'s Rwanda programme director and a founding member of Kigali\'s sustainable tourism board. She has led over 300 gorilla treks in Volcanoes National Park and speaks English, French, Kinyarwanda, and Swahili.'},
-  team: {name:'SafariNomad Editorial', role:'Travel Research & Writing Team', bio:'The SafariNomad editorial team comprises guides, naturalists, and travel writers based across East Africa. All content is reviewed by a local expert before publication.'},
+  team: {name:'SafariNomad', role:'Travel guides', bio:''}
 };
 
 const ARTICLES = [
@@ -18,14 +14,13 @@ const ARTICLES = [
     id:'migration', cat:'Wildlife', tag:'tag-wildlife', catLabel:'Wildlife',
     title:'When to See the Great Migration: A Month-by-Month Guide',
     date:'26 August, 2026', readTime:'8 min read',
-    cover:'images/lion-and-cub.jpg', author:'john', views:'14.2k',
+    cover:'images/lion-and-cub.jpg', author:'team',
     excerpt:'1.5 million wildebeest moving in a continuous loop between Tanzania and Kenya — the greatest wildlife spectacle on earth. Here\'s the exact month-by-month breakdown.',
     body:`
       <p>The Great Migration is one of the most extraordinary natural events on earth — and it doesn't happen in one place or at one time. Understanding the movement cycle is the key to being in the right place at the right moment.</p>
       <img src="images/zebra.jpg" alt="Wildebeest herd" class="article-img">
       <h2>What Is the Great Migration?</h2>
       <p>Every year, roughly 1.5 million wildebeest, 200,000 zebra, and 500,000 Thomson's gazelle make a circular journey across the Serengeti-Mara ecosystem — a 1,800 km loop that follows the rains and the grass they bring. The journey has no fixed start or end. The herds are always moving.</p>
-      <blockquote><p>"There is no single 'best month' for the migration. There is only the best month for what you want to see." — John Kariuki, SafariNomad Lead Guide</p></blockquote>
       <h2>Month-by-Month Breakdown</h2>
       <h3>January – March: Calving Season (Southern Serengeti)</h3>
       <p>The short-grass plains of the southern Serengeti and Ndutu area receive the herds. Over 500,000 calves are born in just six weeks — one of the fastest birthing rates of any large mammal. Predators follow closely: cheetahs, lions, hyenas, and wild dog packs all converge. This is arguably the best time for big cat action.</p>
@@ -61,7 +56,7 @@ const ARTICLES = [
     id:'gorilla', cat:'Trekking', tag:'tag-trekking', catLabel:'Trekking',
     title:'Gorilla Permits Explained: Uganda vs Rwanda',
     date:'20 August, 2026', readTime:'6 min read',
-    cover:'images/forest-canopy-walk.jpg', author:'aisha', views:'9.8k',
+    cover:'images/forest-canopy-walk.jpg', author:'team',
     excerpt:'Two countries, two very different experiences, two price points. Here is every detail you need to make the right gorilla trekking decision.',
     body:`
       <p>Mountain gorillas exist in one place on earth: the Virunga Massif and the Bwindi-Sarambwe ecosystem spanning Uganda, Rwanda, and the Democratic Republic of Congo. If you want to see them, you need a permit — and the permit you choose shapes your entire trip.</p>
@@ -99,17 +94,16 @@ const ARTICLES = [
       <p><strong>Choose Uganda if:</strong> you're on a tighter budget, you want the rawer experience, or you're combining with other Uganda parks (Queen Elizabeth, Murchison Falls).</p>
       <p><strong>Choose Rwanda if:</strong> time is limited (easier international connections via Kigali), luxury accommodation is important, or you want to combine with a Kigali city visit.</p>
       <p><strong>Ideal answer:</strong> do both. A combined Uganda-Rwanda gorilla itinerary over 7–10 days is one of the best possible East Africa trips. Contact us — we build this regularly.</p>
-      <blockquote><p>"The gorilla you encounter in Bwindi has never seen a camera flash. That wildness you feel — it's real. In Rwanda the experience is polished but no less moving." — Aisha Nakato, Gorilla Trek Specialist</p></blockquote>
     `
   },
   {
     id:'packing', cat:'Travel Tips', tag:'tag-tips', catLabel:'Travel Tips',
     title:'The Only Packing List You Need for an East Africa Safari',
     date:'14 August, 2026', readTime:'5 min read',
-    cover:'images/tent-view.jpg', author:'team', views:'22.1k',
-    excerpt:'Over-packing ruins safaris. Under-packing ruins safaris differently. This list, refined over 12 years, gets it exactly right.',
+    cover:'images/tent-view.jpg', author:'team',
+    excerpt:'Over-packing ruins safaris. Under-packing ruins safaris differently. This list covers what actually matters.',
     body:`
-      <p>We've watched thousands of travelers arrive at Nairobi's JKIA with rolling suitcases, laptop bags, and a bewildering number of shoes. We've also watched people shiver through game drives because they didn't bring a jacket. After 12 years and tens of thousands of safari days, here's what actually matters.</p>
+      <p>It's easy to arrive in Nairobi with rolling suitcases and too many shoes, and just as easy to shiver through a dawn game drive without a jacket. Here's what actually matters.</p>
       <h2>The Core Principle: Neutral, Layered, Light</h2>
       <p>Safari packing is governed by three rules. <strong>Neutral colours</strong> (khaki, olive, tan, grey) — not because animals care, but because dust shows less on neutral fabrics and you blend into the landscape for photography. <strong>Layers</strong> — East Africa has cold mornings, hot afternoons, and unpredictable afternoon showers. <strong>Light</strong> — most bush flights have 15kg baggage limits.</p>
       <img src="images/tent-view.jpg" alt="Safari packing" class="article-img">
@@ -155,7 +149,6 @@ const ARTICLES = [
         <li>Travel insurance documents (print and store digitally)</li>
         <li>Gorilla permit copies (keep a digital backup)</li>
       </ul>
-      <blockquote><p>"The best packing list is the one that fits in a 40-litre soft bag. If it doesn't fit, you don't need it." — SafariNomad logistics team</p></blockquote>
       <h2>What to Leave Home</h2>
       <p>Hard-sided suitcases (they don't fit in bush planes or Land Cruiser storage). White clothing. Excessive jewellery. More than two pairs of shoes. A hairdryer. Your laptop (your phone will do everything you need and more).</p>
     `
@@ -164,7 +157,7 @@ const ARTICLES = [
     id:'maasai', cat:'Culture', tag:'tag-culture', catLabel:'Culture',
     title:'A Day with the Maasai: What to Expect on a Cultural Visit',
     date:'8 August, 2026', readTime:'7 min read',
-    cover:'images/misty-acacia.jpg', author:'john', views:'7.4k',
+    cover:'images/misty-acacia.jpg', author:'team',
     excerpt:'Most visitors see the Maasai at craft stalls. A real cultural visit is something else entirely — here\'s what to expect and how to approach it with respect.',
     body:`
       <p>The Maasai are one of East Africa's most recognisable peoples, and one of the most misrepresented. If your image of a Maasai cultural visit is a rushed photo opportunity at a roadside craft stall, this article is for you.</p>
@@ -174,7 +167,6 @@ const ARTICLES = [
       <p>SafariNomad works exclusively with the Koiyaki Guiding School and the Maasai Mara Wildlife Conservancy community trust. Our visits are pre-arranged, fair-pay, and designed to be genuinely informative rather than a performance.</p>
       <h2>Arrival: The Adamu Welcome</h2>
       <p>You'll be welcomed with song and jumping. The adamu — the traditional Maasai jumping dance — is performed by warriors who compete to jump highest. It's joyful and energetic, and your participation (however ungraceful) is encouraged and appreciated.</p>
-      <blockquote><p>"Don't try to jump as high as them. Just jump. They will respect the effort." — John Kariuki</p></blockquote>
       <h2>Inside the Enkiama (Home)</h2>
       <p>Maasai homes (enkiama) are built by women from a mixture of mud, acacia branches, cow dung, and ash. They are more sophisticated than they appear: insulated against both cold nights and hot afternoons, with a central fire, sleeping platforms, and a small pen for young calves.</p>
       <img src="images/safari-lodge.jpg" alt="Inside Maasai home" class="article-img">
@@ -198,7 +190,7 @@ const ARTICLES = [
     id:'chimps', cat:'Trekking', tag:'tag-trekking', catLabel:'Trekking',
     title:'Chimpanzee Trekking in Kibale Forest: Everything You Need to Know',
     date:'2 August, 2026', readTime:'6 min read',
-    cover:'images/forest-elephant.jpg', author:'aisha', views:'6.2k',
+    cover:'images/forest-elephant.jpg', author:'team',
     excerpt:'Uganda\'s Kibale Forest is the world\'s best place to see chimpanzees. Here is the complete guide to planning your trek.',
     body:`
       <p>Uganda's Kibale National Park is home to roughly 1,500 chimpanzees across 795 km² of rainforest, making it the highest-density chimpanzee habitat in East Africa. It's also one of the best places in the world to see them face to face.</p>
@@ -221,14 +213,13 @@ const ARTICLES = [
       <h2>Combining Kibale with Bwindi</h2>
       <p>The most popular Uganda itinerary combines Kibale chimp trekking with Bwindi gorilla trekking. The two parks are roughly 4 hours apart through beautiful countryside — tea plantations, volcanic hills, small market towns, and the Queen Elizabeth plains. Many travellers add a night game drive at Queen Elizabeth en route.</p>
       <img src="images/lake-kivu-sunset.jpg" alt="Uganda countryside between parks" class="article-img">
-      <blockquote><p>"The chimps in Kibale have been habituated for decades. They completely ignore you. That indifference is the most thrilling thing about it." — Aisha Nakato</p></blockquote>
     `
   },
   {
     id:'tenthings', cat:'Travel Tips', tag:'tag-tips', catLabel:'Travel Tips',
     title:'Your First Safari: 10 Things No One Tells You',
     date:'28 July, 2026', readTime:'9 min read',
-    cover:'images/safari-vehicle.jpg', author:'team', views:'31.5k',
+    cover:'images/safari-vehicle.jpg', author:'team',
     excerpt:'You\'ve booked. You\'re excited. Here is the unfiltered truth about what your first safari will actually be like.',
     body:`
       <p>You've seen the photographs. You've watched the documentaries. You've booked the flight. Your first safari is going to be extraordinary — and it's also going to surprise you in ways no brochure mentions. Here are ten things we wish every first-time safari traveller knew before they arrived.</p>
@@ -260,17 +251,16 @@ const ARTICLES = [
       <h2>8. Fellow Guests Make the Experience</h2>
       <p>The shared game drive vehicle, the dinner table that seats twelve, the collective gasp when a leopard drops from a tree — safari is surprisingly social. Most travellers find that some of their best conversations happen at the dinner table with strangers who just watched the same sunset over the same Serengeti plain.</p>
       <h2>9. You'll Come Back</h2>
-      <p>In our 12 years of running safaris, over 60% of our travelers have returned for a second trip. We're not saying this as a sales pitch — we're saying it so you book your first trip without over-planning. Africa has a way of answering questions you didn't know you had.</p>
+      <p>Try not to over-plan your first trip. Africa has a way of answering questions you didn't know you had.</p>
       <h2>10. Trust Your Guide</h2>
       <p>Your guide has spent years in this ecosystem. When they stop the vehicle and go quiet, stop talking. When they say drive closer, hold your camera steady. When they say stay in the vehicle, stay in the vehicle. The guides who work for SafariNomad were born near these parks and have spent their lives learning to read them. Trust that knowledge absolutely.</p>
-      <blockquote><p>"The best thing a first-time safari traveller can do is forget everything they think they know and just look." — SafariNomad Guide Team</p></blockquote>
     `
   },
   {
     id:'zanzibar', cat:'Destinations', tag:'tag-destinations', catLabel:'Destinations',
     title:'Zanzibar Beyond the Beach: A Complete Island Guide',
     date:'22 July, 2026', readTime:'7 min read',
-    cover:'images/zanzibar-palms.jpg', author:'david', views:'8.9k',
+    cover:'images/zanzibar-palms.jpg', author:'team',
     excerpt:'Zanzibar is more than white sand and turquoise water. It\'s a spice island with a complex history, a UNESCO-listed old city, and some of the best seafood in the Indian Ocean.',
     body:`
       <p>Most safari itineraries include Zanzibar as a 3-day add-on after the Serengeti. And while the beaches are genuinely as beautiful as the photographs suggest, limiting yourself to the beach means missing an island with extraordinary depth.</p>
@@ -294,14 +284,13 @@ const ARTICLES = [
       <p>Zanzibar's beaches vary dramatically by location and tide. The east coast (Paje, Jambiani, Matemwe) has the finest sand and the most consistent snorkelling. The north coast (Nungwi, Kendwa) stays swimmable at low tide — the east coast can shallow out significantly. The west coast (near Stone Town) has muddy tidal flats and is not recommended for beach days.</p>
       <h2>Mnemba Atoll</h2>
       <p>One of East Africa's best dive and snorkelling sites sits just off Matemwe on Zanzibar's northeast coast. Mnemba Atoll's protected coral reef hosts dolphins, sea turtles, parrotfish, and on lucky days, whale sharks. Access is by dhow from Matemwe beach — we arrange this as part of our Zanzibar packages.</p>
-      <blockquote><p>"The dhow sunset cruise is obligatory. Do it on your last evening — it's a perfect final image of East Africa to carry home." — David Mwangi</p></blockquote>
     `
   },
   {
     id:'cameras', cat:'Gear', tag:'tag-gear', catLabel:'Gear',
     title:'Best Cameras for Safari in 2026: A Guide for Every Budget',
     date:'15 July, 2026', readTime:'10 min read',
-    cover:'images/lion-portrait.jpg', author:'team', views:'18.7k',
+    cover:'images/lion-portrait.jpg', author:'team',
     excerpt:'From mirrorless flagships to smartphone tips, here is the honest guide to safari photography equipment at every price point.',
     body:`
       <p>Safari photography separates itself from almost all other forms of travel photography in one key way: the subjects move fast, are often far away, and the light is frequently either too bright or too dim. Here's what works, at every budget.</p>
@@ -331,15 +320,14 @@ const ARTICLES = [
         <li>For birds: 600mm or more</li>
         <li>Bring a wide-angle lens too — for landscape and vehicle-interior shots</li>
       </ul>
-      <blockquote><p>"The best camera is the one you've learned. Spend the month before your safari shooting birds in your local park. The muscle memory will be there when the cheetah runs." — SafariNomad photography guide</p></blockquote>
     `
   },
   {
     id:'planning', cat:'Planning', tag:'tag-planning', catLabel:'Planning',
     title:'How to Plan a Two-Week East Africa Safari from Scratch',
     date:'5 July, 2026', readTime:'11 min read',
-    cover:'images/serengeti-acacia.jpg', author:'grace', views:'12.3k',
-    excerpt:'Two weeks is the sweet spot for East Africa. Here is the step-by-step planning framework our guides use to build the perfect itinerary.',
+    cover:'images/serengeti-acacia.jpg', author:'team',
+    excerpt:'Two weeks is the sweet spot for East Africa. Here is a step-by-step way to plan your itinerary.',
     body:`
       <p>Two weeks is the ideal length for an East Africa safari. Long enough to cover multiple ecosystems and countries, short enough that it remains focused and manageable. Here's how to build it from scratch.</p>
       <img src="images/serengeti-acacia.jpg" alt="Safari planning map" class="article-img">
@@ -368,14 +356,13 @@ const ARTICLES = [
       <img src="images/tent-view.jpg" alt="Luxury tented camp interior" class="article-img">
       <h2>Step 5: Budget Realistically</h2>
       <p>East Africa safari costs break down into: flights, park fees, accommodation, and guide/transport. Park fees alone can add $100–$200 per day per person in Kenya and Tanzania. Rwanda's gorilla permit is $1,500. Budget these before selecting accommodation — the park fees are fixed, the accommodation is flexible.</p>
-      <blockquote><p>"The biggest planning mistake is booking accommodation before calculating park fees and permits. Know your fixed costs first, then fit the accommodation around your budget." — Grace Uwimana, Rwanda & Planning Lead</p></blockquote>
     `
   },
   {
     id:'birds', cat:'Wildlife', tag:'tag-wildlife', catLabel:'Wildlife',
     title:'East Africa Birding: A Beginner\'s Guide to 50 Must-See Species',
     date:'28 June, 2026', readTime:'8 min read',
-    cover:'images/flamingo.jpg', author:'david', views:'5.6k',
+    cover:'images/flamingo.jpg', author:'team',
     excerpt:'East Africa is one of the world\'s great birding destinations. Over 1,400 species across the four countries — here\'s where to start.',
     body:`
       <p>Most first-time safari travellers don't consider themselves birders. Most of them change their minds by day two, usually because of a lilac-breasted roller sitting on a dead acacia in golden afternoon light. East Africa's birdlife is impossible to ignore once you start looking.</p>
@@ -407,15 +394,14 @@ const ARTICLES = [
       <img src="images/flamingo.jpg" alt="Flamingos at Lake Nakuru" class="article-img">
       <h2>Recommended Field Guides</h2>
       <p>Stevenson & Fanshawe's <em>Birds of East Africa</em> is the authoritative reference. For digital birding, eBird (with the East Africa checklists) and Merlin Bird ID (audio-based identification) are excellent companions. Many SafariNomad vehicles carry a physical field guide — ask your guide to point out species as you encounter them.</p>
-      <blockquote><p>"Non-birders always say they don't care about birds. Then a martial eagle drops out of the sky onto a hare forty metres from the vehicle and suddenly everyone is asking what it is." — David Mwangi, Birding Guide</p></blockquote>
     `
   },
   {
     id:'budget', cat:'Planning', tag:'tag-planning', catLabel:'Planning',
     title:'East Africa on a Budget: How to Safari Without Spending a Fortune',
     date:'20 June, 2026', readTime:'8 min read',
-    cover:'images/camp-at-night.jpg', author:'team', views:'24.8k',
-    excerpt:'A safari doesn\'t have to cost $1,000 a day. Here are the genuine strategies our team uses to bring costs down without compromising the experience.',
+    cover:'images/camp-at-night.jpg', author:'team',
+    excerpt:'A safari doesn\'t have to cost $1,000 a day. Here are practical ways to bring costs down without compromising the experience.',
     body:`
       <p>The word "safari" carries an association with luxury that makes many travellers assume it's out of reach. It isn't — but budget safari planning requires knowing where the costs are fixed (and can't be reduced) versus where they're flexible (and can be dramatically cut).</p>
       <img src="images/safari-vehicle.jpg" alt="Safari game drive vehicle" class="article-img">
@@ -444,7 +430,6 @@ const ARTICLES = [
         <li><strong>Luxury (private, top camps):</strong> $300–$700+ per person per day</li>
       </ul>
       <p>All of these figures include park fees, guide, vehicle, full board at camp, and scheduled game drives. They do not include international flights (typically $700–$1,400 from Europe or North America) or travel insurance.</p>
-      <blockquote><p>"The best value safari I've ever seen was two friends in a shared group vehicle, staying in public bandas, cooking their own breakfast. They saw exactly the same lions as the people paying three times as much." — SafariNomad team</p></blockquote>
     `
   },
 ];

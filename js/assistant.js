@@ -63,7 +63,7 @@
     $('#aiView').hidden = true;
     back.hidden = true;
     team.classList.remove('ai-mode');
-    team.innerHTML = '<span>JK</span><span>AN</span><span>GU</span>';
+    team.innerHTML = '<span><i class="fa-solid fa-headset"></i></span>';
     titleEl.textContent = original.title;
     status.innerHTML = original.status;
     status.className = 'chat-status' + (chat.classList.contains('is-away') ? ' away' : '');
@@ -253,8 +253,8 @@
       // anything else they asked for ("gorilla trek under 3000") narrows the list
       const rest = q.replace(price[0], '').replace(/\b(safari|safaris|trip|trips|tour|tours|cheap|budget|for|a|the|per person|pp)\b/gi, ' ').trim();
       const fits = TRIPS.filter(t => t.price <= max && (!rest || typeof SNSearch === 'undefined' || SNSearch.tripMatches(t, rest)));
-      fits.sort((a, b) => b.reviews - a.reviews).slice(0, 3).forEach(t => trips.push(t));
-      const intro = rest && fits.length ? 'Here are the best-matching trips from **{max} or less** per person:' : 'Here are our most popular trips from **{max} or less** per person:';
+      fits.sort((a, b) => !!b.featured - !!a.featured).slice(0, 3).forEach(t => trips.push(t));
+      const intro = rest && fits.length ? 'Here are the best-matching trips from **{max} or less** per person:' : 'Here are some trips from **{max} or less** per person:';
       if(trips.length) return `${T(intro, { max:dollars(max) })}\n${trips.map(t => '- ' + link(t)).join('\n')}\n${T('See more on the [trips page]({url}), or ask for a [free quote](contact.html).', { url:'trips.html?max=' + max })}`;
       if(rest) return T("I couldn't find a matching trip under {max} on our current list, but our experts can often build one to fit your budget. [Request a free quote](contact.html) and tell us what you have in mind.", { max:dollars(max) });
     }
