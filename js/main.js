@@ -17,6 +17,19 @@ const SN = (function(){
   };
   const params = new URLSearchParams(location.search);
 
+  /* ---------- Month lists (<select data-months>): the next 18 months, shown in the page language.
+     The value stays in English (e.g. "March 2027") so the team reads it the same way. ---------- */
+  document.querySelectorAll('select[data-months]').forEach(sel => {
+    const now = new Date(), lang = document.documentElement.lang || 'en';
+    for(let i = 0; i < 18; i++){
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      const o = document.createElement('option');
+      o.value = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
+      try { o.textContent = d.toLocaleString(lang, { month: 'long', year: 'numeric' }); } catch { o.textContent = o.value; }
+      sel.appendChild(o);
+    }
+  });
+
   /* ---------- Toast ---------- */
   let toastTimer;
   function toast(msg){

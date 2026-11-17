@@ -411,6 +411,9 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
 
   document.getElementById('site-header').outerHTML = header;
   document.getElementById('site-footer').outerHTML = footer;
+  const floatSoc = document.querySelector('.social-float'), siteFoot = document.querySelector('.site-footer');
+  if(floatSoc && siteFoot && 'IntersectionObserver' in window)
+    new IntersectionObserver(([e]) => floatSoc.classList.toggle('away', e.isIntersecting)).observe(siteFoot);
 
   // Mark the current section in the menu
   const current = document.querySelector(`.nav-item[data-nav="${document.body.dataset.page}"]`);

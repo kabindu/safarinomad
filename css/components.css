@@ -105,10 +105,10 @@
 .dest-tile.tall{grid-row:span 2;}
 .dest-tile.wide{grid-column:span 2;}
 .dest-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s;}
-.dest-tile::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),rgba(0,0,0,0) 60%);z-index:1;}
+.dest-tile::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.82),rgba(0,0,0,.38) 45%,rgba(0,0,0,0) 78%);z-index:1;}
 .dest-tile > *:not(img){position:relative;z-index:2;}
 .dest-tile:hover img{transform:scale(1.05);}
-.dest-tile h3{color:#fff;font-size:28px;}
+.dest-tile h3{color:#fff;font-size:28px;text-shadow:0 2px 14px rgba(0,0,0,.45);}
 .dest-tile .info{display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:13px;color:#e8e8e8;}
 .dest-tile .info i{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--yt-text);display:flex;align-items:center;justify-content:center;font-size:12px;transition:.2s;}
 .dest-tile:hover .info i{background:var(--orange);color:#fff;}
@@ -272,7 +272,8 @@ a.contact-meta-item:hover{background:var(--yt-hover);}
 @media (max-width:900px){ .ct-layout{grid-template-columns:1fr;} .ct-side{position:static;} .ct-form-card{padding:20px;} }
 
 /* ---------- Licences & partners strip (js/layout.js, data in PARTNERS) ---------- */
-.partners{padding:34px 0 38px;border-top:1px solid var(--yt-line);border-bottom:1px solid var(--yt-line);background:#fff;}
+.partners{padding:34px 0 38px;border-top:1px solid var(--yt-line);border-bottom:1px solid var(--yt-line);background:#fff;margin-bottom:72px;}
+@media (max-width:700px){.partners{margin-bottom:48px;}}
 .partners-head{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 10px;margin-bottom:18px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yt-muted);}
 .partners-head .dot{color:var(--line);}
 .marquee{display:flex;overflow:hidden;outline:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);}

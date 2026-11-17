@@ -251,7 +251,9 @@ a.df-title:hover{color:var(--orange-dark);}
 .ft-popular a{color:var(--yt-muted);}
 .ft-popular a:hover{color:var(--yt-text);}
 .ft-bottom{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 0;border-top:1px solid var(--yt-line);font-size:12.5px;color:var(--yt-muted);}
-.ft-bottom a{margin-left:12px;color:var(--yt-muted);}
+.ft-bottom a{margin-left:12px;color:var(--yt-muted);white-space:nowrap;}
+/* Laptops: the footer's last line clears the "Chat with us" button */
+@media (min-width:1181px){.site-footer{padding-bottom:64px;}}
 .ft-bottom a:hover{color:var(--yt-text);}
 .pay-row{list-style:none;margin:0;padding:0;display:flex;gap:6px;}
 .pay{width:42px;height:26px;background:#fff;border:1px solid var(--yt-line);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:19px;}
@@ -273,6 +275,8 @@ a.df-title:hover{color:var(--orange-dark);}
   .ft-col h4{font-size:13px;margin-bottom:8px;}
   .ft-col a{font-size:13px;margin-bottom:6px;}
   .ft-bottom{justify-content:center;text-align:center;}
+  .ft-bottom > div > span{display:block;margin-bottom:6px;}
+  .ft-bottom a{margin:0 6px;}
 }
 
 /* ---------- "Chat with an expert" widget ---------- */
@@ -378,7 +382,7 @@ a.df-title:hover{color:var(--orange-dark);}
 .social-float .ig{background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%);}
 .social-float .fb{background:#1877F2;}
 .social-float .wa{background:#25D366;font-size:24px;}
-.chat.open ~ .social-float{opacity:0;visibility:hidden;}
+.chat.open ~ .social-float,.social-float.away{opacity:0;visibility:hidden;}
 /* Contact already lists every way to reach us; on Booking and Customise they would cover prices and forms */
 body[data-page="contact"] .social-float,body[data-page="book"] .social-float,body[data-page="plan"] .social-float{display:none;}
 @media print{.social-float{display:none;}}

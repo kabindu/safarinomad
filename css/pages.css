@@ -401,6 +401,7 @@
 .seo-links a:hover{background:var(--chip-hover);}
 .seo-trip h2{font-size:clamp(24px,2.6vw,32px);margin:30px 0 12px;}
 .seo-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;}
+@media (max-width:600px){.seo-facts{grid-template-columns:1fr 1fr;}.seo-facts > :last-child:nth-child(odd){grid-column:1/-1;}}
 .seo-fact{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--box-radius);background:var(--box-bg);min-width:0;}
 .seo-fact > i{color:var(--orange);font-size:18px;}
 .seo-fact small{display:block;font-size:12.5px;color:var(--yt-muted);}
