@@ -69,7 +69,7 @@
 
   function render(){
     const s = state();
-    const list = TRIPS.filter(t =>
+    let list = TRIPS.filter(t =>
       (!s.country || t.country === s.country) &&
       (!s.land || inLand(t, s.land)) &&
       (!s.styles.length || s.styles.some(x => t.styles.includes(x))) &&
@@ -79,6 +79,7 @@
       (!s.saved || SN.wish.has(t.id)) &&
       (!s.q || SNSearch.tripMatches(t, s.q))
     ).sort(SORT[s.sort]);
+    if(s.sort === 'popular' && typeof TripMix !== 'undefined') list = TripMix.order(list);
 
     grid.innerHTML = list.map(SN.tripCard).join('');
     $('#noResults').classList.toggle('show', list.length === 0);

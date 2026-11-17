@@ -95,7 +95,7 @@ let dataCache = { key: '', value: null };
 function evalData(withContent){
   const code = fs.readFileSync(DATA_FILE, 'utf8');
   return new vm.Script(code + '\n;' + (withContent ? 'applyContent(__C);' : '') +
-    '({ SITE, TRIPS, LAST_MINUTE, FLIGHTS, AIRPORTS, PLACES, PARTNERS, KNOWLEDGE, BOOKING, BookingRules })').runInNewContext({ __C: JSON.parse(JSON.stringify(content)) });
+    '({ SITE, TRIPS, LAST_MINUTE, FLIGHTS, AIRPORTS, PLACES, PARTNERS, KNOWLEDGE, BOOKING, BookingRules, TripMix })').runInNewContext({ __C: JSON.parse(JSON.stringify(content)) });
 }
 function dataKey(){ return fs.statSync(DATA_FILE).mtimeMs + '|' + contentVersion + '|' + Math.floor(Date.now() / 60_000); }
 function loadData(){

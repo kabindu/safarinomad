@@ -209,7 +209,7 @@ ${body}
       body:`<section><div class="wrap">
         <p class="seo-intro">${esc(fill(h.intro[0], n, from))}</p>
         <div class="sec-head"><div><h2>${esc(h.h1)}, lowest price first</h2></div></div>
-        <div class="card-grid">${list.map(card).join('')}</div>
+        <div class="card-grid">${(d.TripMix ? d.TripMix.order(list) : list).map(card).join('')}</div>
       </div></section>
       <section class="pt-0"><div class="wrap"><div class="sec-head"><div><h2>Questions about ${esc(h.name.replace(/^an? /, ''))}</h2></div></div>${faqHtml(qa)}<p class="seo-more"><a href="about.html#faqs">More answers: visas, deposits, insurance and what's included</a></p></div></section>
       ${linkRow('Explore more trips', others)}` });
@@ -226,7 +226,9 @@ ${body}
     const stay = t.stay ? ` You stay in ${t.stay.toLowerCase()}.` : '';
     const when = months.length && months.length < 12 ? ` The best months for this trip are ${listJoin(months)}.` : '';
     const hubs = hubList(d).filter(x => x.h.filter(t)).map(x => [x.h.slug, x.h.h1]);
-    const related = d.TRIPS.filter(x => x.id !== t.id && x.country === t.country).sort((a, b) => Math.abs(a.price - t.price) - Math.abs(b.price - t.price)).slice(0, 3);
+    const near = d.TRIPS.filter(x => x.id !== t.id && x.country === t.country).sort((a, b) => Math.abs(a.price - t.price) - Math.abs(b.price - t.price)).slice(0, 10);
+    // Similar in country and price, but not three look-alikes: varied against this trip and each other
+    const related = d.TripMix ? d.TripMix.pick([t, ...near], 4).slice(1) : near.slice(0, 3);
     const desc = `${t.days}-day ${word.toLowerCase()} in ${where.replace(/\s*·\s*/g, ' & ')} from ${price} per person: ${(t.route || t.title)}. Check dates and book online.`;
     const crumbs = [['Home', ''], ['Packages', 'trips.html'], [t.title, 'tour-' + t.id]];
     const incl = 'Your guide and 4x4 vehicle, accommodation, park and conservancy fees, most meals, airport transfers and drinking water on game drives.';

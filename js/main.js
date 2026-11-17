@@ -324,7 +324,8 @@ const SN = (function(){
     }).join('');
   });
   $$('[data-pack-country],[data-pack-style],[data-pack-maxdays],[data-pack-land]').forEach(el => {
-    el.innerHTML = pick(el.dataset).slice(0, el.classList.contains('carousel') ? 12 : 3).map(tripCard).join('');
+    const n = el.classList.contains('carousel') ? 12 : 3, found = pick(el.dataset);
+    el.innerHTML = (typeof TripMix !== 'undefined' ? TripMix.pick(found, n) : found.slice(0, n)).map(tripCard).join('');
   });
   if(typeof PLACES !== 'undefined') $$('[data-places]').forEach(el => {
     const c = el.dataset.places;

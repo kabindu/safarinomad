@@ -1,0 +1,730 @@
+{
+ "akagera-camping": {
+  "title": "File:Akagera National Park Giraffes.jpg",
+  "tier": "",
+  "page": "https://commons.wikimedia.org/wiki/File:Akagera_National_Park_Giraffes.jpg",
+  "artist": "Alex shema",
+  "license": "CC BY-SA 4.0"
+ },
+ "amboseli-kili-views": {
+  "title": "File:Kilimanjaro from Amboseli.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Kilimanjaro_from_Amboseli.jpg",
+  "artist": "Sergey Pesterev",
+  "license": "CC BY-SA 4.0"
+ },
+ "amboseli-tsavo": {
+  "title": "File:Elephant running.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Elephant_running.jpg",
+  "artist": "Byrdyak",
+  "license": "CC BY-SA 4.0"
+ },
+ "calving-season": {
+  "title": "File:040 Blue wildebeest with wattled starlings in the Serengeti National Park Photo by Giles Laurent.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:040_Blue_wildebeest_with_wattled_starlings_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0"
+ },
+ "classic-kenya": {
+  "title": "File:Lions Family Portrait Masai Mara.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Lions_Family_Portrait_Masai_Mara.jpg",
+  "artist": "Benh LIEU SONG",
+  "license": "CC BY-SA 3.0"
+ },
+ "east-africa-highlights": {
+  "title": "File:Damaliscus topi.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Damaliscus_topi.jpg",
+  "artist": "\"Daniel Fafard (Dreamdan)\"",
+  "license": "CC BY-SA 3.0"
+ },
+ "great-migration": {
+  "title": "File:Three zebras in Masai Mara National Park, Kenya.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Three_zebras_in_Masai_Mara_National_Park,_Kenya.jpg",
+  "artist": "Volodymyr Burdiak",
+  "license": "CC BY-SA 4.0"
+ },
+ "ishasha-lions": {
+  "title": "File:051 Lion on a tree at Queen Elizabeth National Park Photo by Giles Laurent.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:051_Lion_on_a_tree_at_Queen_Elizabeth_National_Park_Photo_by_Giles_Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0"
+ },
+ "kenya-budget-camping": {
+  "title": "File:Lago Nakuru, Kenia, 2024-05-19, DD 01-03 PAN.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Lago_Nakuru,_Kenia,_2024-05-19,_DD_01-03_PAN.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "kenya-family": {
+  "title": "File:Three giraffes 01.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Three_giraffes_01.jpg",
+  "artist": "Byrdyak",
+  "license": "CC BY-SA 4.0"
+ },
+ "kenya-in-depth": {
+  "title": "File:Lion male.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Lion_male.jpg",
+  "artist": "Byrdyak",
+  "license": "CC BY-SA 4.0"
+ },
+ "kenya-tanzania-zanzibar": {
+  "title": "File:022 Grant's gazelle in the Serengeti National Park Photo by Giles Laurent.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:022_Grant%27s_gazelle_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0"
+ },
+ "kidepo-valley": {
+  "title": "File:029 African buffalo in the Serengeti National Park Photo by Giles Laurent.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:029_African_buffalo_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0"
+ },
+ "laikipia-walking": {
+  "title": "File:African Elephant at Amboseli National Park-070A5584.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:African_Elephant_at_Amboseli_National_Park-070A5584.jpg",
+  "artist": "Bijay Chaurasia",
+  "license": "CC BY-SA 4.0"
+ },
+ "luxury-honeymoon": {
+  "title": "File:037 Cheetah close-up in the Serengeti National Park Photo by Giles Laurent.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:037_Cheetah_close-up_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0"
+ },
+ "manyara-ngorongoro": {
+  "title": "File:Lake Manyara Wildlife.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Lake_Manyara_Wildlife.jpg",
+  "artist": "Gaurav Pandit",
+  "license": "CC BY-SA 3.0"
+ },
+ "mara-balloon": {
+  "title": "File:Mara River Sunrise Aerial View Serengeti Nov26 A7R 07185.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Mara_River_Sunrise_Aerial_View_Serengeti_Nov26_A7R_07185.jpg",
+  "artist": "This Photo was taken by Timothy A. Gonsalves. Feel free to u",
+  "license": "CC BY-SA 4.0"
+ },
+ "migration-crossing": {
+  "title": "File:Masai Mara National Reserve 20 - Mara river crossing.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Masai_Mara_National_Reserve_20_-_Mara_river_crossing.jpg",
+  "artist": "Thomas Fuhrmann",
+  "license": "CC BY-SA 4.0"
+ },
+ "nairobi-national-park": {
+  "title": "File:Buffalo Nairobi Skyline Savannah Kenya May19 R1600769.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Buffalo_Nairobi_Skyline_Savannah_Kenya_May19_R1600769.jpg",
+  "artist": "This Photo was taken by Timothy A. Gonsalves. Feel free to u",
+  "license": "CC BY-SA 4.0"
+ },
+ "ol-pejeta-mount-kenya": {
+  "title": "File:Ceratotherium simum cottoni -Ol Pejeta Conservancy, Kenya.jpg",
+  "tier": "",
+  "page": "https://commons.wikimedia.org/wiki/File:Ceratotherium_simum_cottoni_-Ol_Pejeta_Conservancy,_Kenya.jpg",
+  "artist": "Lengai101",
+  "license": "CC BY 3.0"
+ },
+ "rufiji-river": {
+  "title": "File:048 Hippopotamus fight in the Serengeti National Park Photo by Giles Laurent.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:048_Hippopotamus_fight_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0"
+ },
+ "serengeti-camping": {
+  "title": "File:002 Male Lion prowling in the Serengeti National Park Photo by Giles Laurent.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:002_Male_Lion_prowling_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0"
+ },
+ "serengeti-fly-in": {
+  "title": "File:002 The lion king Snyggve in the Serengeti National Park Photo by Giles Laurent.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:002_The_lion_king_Snyggve_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0"
+ },
+ "southern-tanzania": {
+  "title": "File:Tarangire scenery with baobabs.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Tarangire_scenery_with_baobabs.jpg",
+  "artist": "Leyo",
+  "license": "CC BY-SA 2.5 ch"
+ },
+ "tanzania-family": {
+  "title": "File:042 Masai giraffe in the Serengeti National Park Photo by Giles Laurent.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:042_Masai_giraffe_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0"
+ },
+ "tsavo-watamu": {
+  "title": "File:Leopard on mount in Tsavo East National Park.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Leopard_on_mount_in_Tsavo_East_National_Park.jpg",
+  "artist": "Byrdyak",
+  "license": "CC BY-SA 4.0"
+ },
+ "tsavo-west-chyulu": {
+  "title": "File:Red elephant in dirt.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Red_elephant_in_dirt.jpg",
+  "artist": "Byrdyak",
+  "license": "CC BY-SA 4.0"
+ },
+ "uganda-in-depth": {
+  "title": "File:048 Lioness during golden hour of the morning at Queen Elizabeth National Park Photo by Giles Laurent.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:048_Lioness_during_golden_hour_of_the_morning_at_Queen_Elizabeth_National_Park_Photo_by_Giles_Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0"
+ },
+ "uganda-primates": {
+  "title": "File:013 Alpha male chimpanzee at Kibale forest National Park Photo by Giles Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:013_Alpha_male_chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg",
+  "tier": "Featured"
+ },
+ "rwanda-gorillas": {
+  "title": "File:Mountain gorilla (Gorilla beringei beringei) female 2.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Mountain_gorilla_(Gorilla_beringei_beringei)_female_2.jpg",
+  "tier": "Featured"
+ },
+ "kilimanjaro-machame": {
+  "title": "File:Lascar Kilimanjaro's peak from the top of the Great Barranco Wall (4464000949).jpg",
+  "artist": "Jorge Láscar from Australia",
+  "license": "CC BY 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Lascar_Kilimanjaro%27s_peak_from_the_top_of_the_Great_Barranco_Wall_(4464000949).jpg",
+  "tier": ""
+ },
+ "primate-explorer": {
+  "title": "File:Gorila de montaña (Gorilla beringei beringei), parque nacional de la Selva Impenetrable de Bwindi, Uganda, 2024-02-02, DD 51.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Gorila_de_monta%C3%B1a_(Gorilla_beringei_beringei),_parque_nacional_de_la_Selva_Impenetrable_de_Bwindi,_Uganda,_2024-02-02,_DD_51.jpg",
+  "tier": "Featured"
+ },
+ "kilimanjaro-lemosho": {
+  "title": "File:Shira moorlands on Kilimanjaro.jpg",
+  "artist": "Skeptic cdn at English Wikipedia",
+  "license": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File:Shira_moorlands_on_Kilimanjaro.jpg",
+  "tier": ""
+ },
+ "kilimanjaro-marangu": {
+  "title": "File:Southern Glacier Mt. Kilimanjaro 3.JPG",
+  "artist": "",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Southern_Glacier_Mt._Kilimanjaro_3.JPG",
+  "tier": ""
+ },
+ "kilimanjaro-rongai": {
+  "title": "File:Kilimanjaro, Tanzania, 2024-05-22, DD 109.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Kilimanjaro,_Tanzania,_2024-05-22,_DD_109.jpg",
+  "tier": "Quality"
+ },
+ "bwindi-gorilla-express": {
+  "title": "File:Mountain gorilla, 2-year-old, Mubare Group, Buhoma, Bwindi Impenetrable Forest, Uganda.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Mountain_gorilla,_2-year-old,_Mubare_Group,_Buhoma,_Bwindi_Impenetrable_Forest,_Uganda.jpg",
+  "tier": "Quality"
+ },
+ "nyungwe-chimps": {
+  "title": "File:Beautiful Nyungwe forest, 0785474017.jpg",
+  "artist": "Anatole1234/ 0785474017",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Beautiful_Nyungwe_forest,_0785474017.jpg",
+  "tier": ""
+ },
+ "rift-valley-lakes": {
+  "title": "File:Lake Bogoria.jpg",
+  "artist": "Miken0520",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Lake_Bogoria.jpg",
+  "tier": ""
+ },
+ "mount-kenya-climb": {
+  "title": "File:Mount kenya.JPG",
+  "artist": "Ruud Zwart",
+  "license": "CC BY-SA 2.5 nl",
+  "page": "https://commons.wikimedia.org/wiki/File:Mount_kenya.JPG",
+  "tier": ""
+ },
+ "zanzibar-honeymoon": {
+  "title": "File:Beach Coconut Kizimkazi Zanzibar Nov26 A7CR 17906.jpg",
+  "artist": "This Photo was taken by Timothy A. Gonsalves. Feel free to use my photos, but please mention me as the author. I would much appreciate if you send me an email tagooty@yahoo.com or write on my talk page, for my information. Please contact me before commercial use. Please do not upload an edited image here without consulting me. I would like to make corrections only at my own source to ensure that the changes improve the image and are preserved.Otherwise you may upload an edited image with a new name. Please use one of the templates derivative or extract.",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Beach_Coconut_Kizimkazi_Zanzibar_Nov26_A7CR_17906.jpg",
+  "tier": "Quality"
+ },
+ "zanzibar-spice": {
+  "title": "File:South Waterfront Stone Town Oct26 A7CR 14689.jpg",
+  "artist": "This Photo was taken by Timothy A. Gonsalves. Feel free to use my photos, but please mention me as the author. I would much appreciate if you send me an email tagooty@yahoo.com or write on my talk page, for my information. Please contact me before commercial use. Please do not upload an edited image here without consulting me. I would like to make corrections only at my own source to ensure that the changes improve the image and are preserved.Otherwise you may upload an edited image with a new name. Please use one of the templates derivative or extract.",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:South_Waterfront_Stone_Town_Oct26_A7CR_14689.jpg",
+  "tier": "Quality"
+ },
+ "mburo-bwindi": {
+  "title": "File:Antílope acuático (Kobus ellipsiprymnus defassa), parque nacional del Lago Mburo, Uganda, 2024-02-01, DD 25.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Ant%C3%ADlope_acu%C3%A1tico_(Kobus_ellipsiprymnus_defassa),_parque_nacional_del_Lago_Mburo,_Uganda,_2024-02-01,_DD_25.jpg",
+  "tier": "Featured"
+ },
+ "kibale-chimps": {
+  "title": "File:077 Alpha male chimpanzee checking his arm at Kibale forest National Park Photo by Giles Laurent.jpg",
+  "artist": "Giles Laurent",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:077_Alpha_male_chimpanzee_checking_his_arm_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg",
+  "tier": "Quality"
+ },
+ "rwenzori-trek": {
+  "title": "File:Ruwenzori Vegetation 4.jpg",
+  "artist": "Albert Backer",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Ruwenzori_Vegetation_4.jpg",
+  "tier": ""
+ },
+ "rwanda-gorilla-express": {
+  "title": "File:Mountain gorilla (Gorilla beringei beringei) female eating root.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Mountain_gorilla_(Gorilla_beringei_beringei)_female_eating_root.jpg",
+  "tier": "Featured"
+ },
+ "lake-kivu-retreat": {
+  "title": "File:Childhood by lake Kivu.jpg",
+  "artist": "Hanah136",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Childhood_by_lake_Kivu.jpg",
+  "tier": ""
+ },
+ "golden-monkeys": {
+  "title": "File:Golden monkey (Cercopithecus kandti) eating.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Golden_monkey_(Cercopithecus_kandti)_eating.jpg",
+  "tier": "Featured"
+ },
+ "gorilla-double": {
+  "title": "File:Gorilla family (181091311).jpg",
+  "artist": "Daniel Aufgang",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Gorilla_family_(181091311).jpg",
+  "tier": ""
+ },
+ "kenya-uganda-overland": {
+  "title": "File:River Nile, Jinja, Uganda 5.jpg",
+  "artist": "Owobusingye",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:River_Nile,_Jinja,_Uganda_5.jpg",
+  "tier": ""
+ },
+ "jinja-nile": {
+  "title": "File:River Nile, Jinja, Uganda 12.jpg",
+  "artist": "Owobusingye",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:River_Nile,_Jinja,_Uganda_12.jpg",
+  "tier": ""
+ },
+ "baringo-bogoria": {
+  "title": "File:Hamerkop (Scopus umbretta), Kenya.jpg",
+  "artist": "Hobbyfotowiki",
+  "license": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File:Hamerkop_(Scopus_umbretta),_Kenya.jpg",
+  "tier": "Quality"
+ },
+ "kisumu-kakamega": {
+  "title": "File:Chief (Amauris echeria) underside.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Chief_(Amauris_echeria)_underside.jpg",
+  "tier": "Quality"
+ },
+ "malindi-watamu": {
+  "title": "File:Watamu Beach, Kenya 01.jpg",
+  "artist": "Jenny Kellett",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Watamu_Beach,_Kenya_01.jpg",
+  "tier": ""
+ },
+ "mombasa-kilifi": {
+  "title": "File:Fort jesus mombasa.JPG",
+  "artist": "Alex Wafula",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Fort_jesus_mombasa.JPG",
+  "tier": ""
+ },
+ "longonot-hike": {
+  "title": "File:Longonot volcano crater.jpg",
+  "artist": "Baldfatchris",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Longonot_volcano_crater.jpg",
+  "tier": ""
+ },
+ "aberdare-treetops": {
+  "title": "File:Aberdare National Park 2, Kenya.jpg",
+  "artist": "Nina R",
+  "license": "CC BY 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Aberdare_National_Park_2,_Kenya.jpg",
+  "tier": ""
+ },
+ "sipi-falls-elgon": {
+  "title": "File:Sipi Falls, Kapchorwa District, Eastern Uganda 04.jpg",
+  "artist": "Sandra Aceng",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Sipi_Falls,_Kapchorwa_District,_Eastern_Uganda_04.jpg",
+  "tier": ""
+ },
+ "ssese-islands": {
+  "title": "File:Shores of Lake Victoria at Ssese Islands.jpg",
+  "artist": "Jiame Josh",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Shores_of_Lake_Victoria_at_Ssese_Islands.jpg",
+  "tier": ""
+ },
+ "mgahinga-gorillas": {
+  "title": "File:A group of people trekking in mgahinga national park, Uganda.jpg",
+  "artist": "Happyartst",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:A_group_of_people_trekking_in_mgahinga_national_park,_Uganda.jpg",
+  "tier": ""
+ },
+ "crater-lakes-kazinga": {
+  "title": "File:African spoonbill (Platalea alba).jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:African_spoonbill_(Platalea_alba).jpg",
+  "tier": "Quality"
+ },
+ "lake-natron": {
+  "title": "File:Lake Natron, Tanzania.jpg",
+  "artist": "Christoph Strässler",
+  "license": "CC BY-SA 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Lake_Natron,_Tanzania.jpg",
+  "tier": ""
+ },
+ "mafia-whale-sharks": {
+  "title": "File:Whale Shark AdF.jpg",
+  "artist": "Arturo de Frias Marques",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Whale_Shark_AdF.jpg",
+  "tier": "Featured"
+ },
+ "usambara-hike": {
+  "title": "File:Usambara Mountains (2239796348).jpg",
+  "artist": "Joachim Huber from Switzerland",
+  "license": "CC BY-SA 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Usambara_Mountains_(2239796348).jpg",
+  "tier": ""
+ },
+ "mount-bisoke": {
+  "title": "File:Bisoke Crater View.jpg",
+  "artist": "Joseph Lionceau",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Bisoke_Crater_View.jpg",
+  "tier": ""
+ },
+ "mount-karisimbi": {
+  "title": "File:Mount Mikeno (DR Congo) and Mount Karisimbi (Rwanda), two extinct volcanoes in the Virunga mountain range. (19556231290).jpg",
+  "artist": "MONUSCO Photos",
+  "license": "CC BY-SA 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Mount_Mikeno_(DR_Congo)_and_Mount_Karisimbi_(Rwanda),_two_extinct_volcanoes_in_the_Virunga_mountain_range._(19556231290).jpg",
+  "tier": ""
+ },
+ "congo-nile-trail": {
+  "title": "File:Lake Kivu, Fishing area Western Rwanda.jpg",
+  "artist": "Synkubito",
+  "license": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File:Lake_Kivu,_Fishing_area_Western_Rwanda.jpg",
+  "tier": ""
+ },
+ "gishwati-chimps": {
+  "title": "File:Collines de Gishwati 2.JPG",
+  "artist": "Antoinetorrens",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Collines_de_Gishwati_2.JPG",
+  "tier": ""
+ },
+ "twin-lakes": {
+  "title": "File:View of burera lake.jpg",
+  "artist": "Olivier wood",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:View_of_burera_lake.jpg",
+  "tier": ""
+ },
+ "mombasa-sgr-escape": {
+  "title": "File:Express passenger train on the Mombasa - Nairobi Standard Gauge Railway (SGR).jpg",
+  "artist": "TTC dude",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Express_passenger_train_on_the_Mombasa_-_Nairobi_Standard_Gauge_Railway_(SGR).jpg",
+  "tier": ""
+ },
+ "lamu-dhow-escape": {
+  "title": "File:Lamu town on Lamu Island in Kenya.JPG",
+  "artist": "Magnus Kjaergaard",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Lamu_town_on_Lamu_Island_in_Kenya.JPG",
+  "tier": ""
+ },
+ "iten-altitude-camp": {
+  "title": "File:Iten, Kenya (4201358841).jpg",
+  "artist": "edskoch",
+  "license": "CC BY 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Iten,_Kenya_(4201358841).jpg",
+  "tier": ""
+ },
+ "sagana-rafting-day": {
+  "title": "File:Rafting on the Belá river.JPG",
+  "artist": "Pudelek (Marcin Szala)",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Rafting_on_the_Bel%C3%A1_river.JPG",
+  "tier": "Quality"
+ },
+ "caribbean-cruise": {
+  "title": "File:Tulum - God of the Winds Temple 03.JPG",
+  "artist": "Martin Falbisoner",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Tulum_-_God_of_the_Winds_Temple_03.JPG",
+  "tier": "Featured"
+ },
+ "algarve-festival": {
+  "title": "File:Praia do Submarino 2024-12-19.jpg",
+  "artist": "The Cosmonaut",
+  "license": "CC BY-SA 2.5 ca",
+  "page": "https://commons.wikimedia.org/wiki/File:Praia_do_Submarino_2024-12-19.jpg",
+  "tier": "Featured"
+ },
+ "akagera-big-five": {
+  "title": "File:Leopardo (Panthera pardus), parque nacional de Tarangire, Tanzania, 2024-05-25, DD 58.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Leopardo_(Panthera_pardus),_parque_nacional_de_Tarangire,_Tanzania,_2024-05-25,_DD_58.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "grand-journey": {
+  "title": "File:Elefantes africanos de sabana (Loxodonta africana), reserva natural Masái Mara, Kenia, 2024-05-20, DD 42.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Elefantes_africanos_de_sabana_(Loxodonta_africana),_reserva_natural_Mas%C3%A1i_Mara,_Kenia,_2024-05-20,_DD_42.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "katavi": {
+  "title": "File:Common hippo (Hippopotamus amphibius kiboko) male Serengeti.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Common_hippo_(Hippopotamus_amphibius_kiboko)_male_Serengeti.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0"
+ },
+ "lm-mara": {
+  "title": "File:Datilero del desierto (Balanites aegyptiaca), reserva natural Masái Mara, Kenia, 2024-05-20, DD 14.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Datilero_del_desierto_(Balanites_aegyptiaca),_reserva_natural_Mas%C3%A1i_Mara,_Kenia,_2024-05-20,_DD_14.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "lm-nakuru": {
+  "title": "File:Búfalo cafre (Syncerus caffer), parque nacional del lago Nakuru, Kenia, 2024-05-18, DD 85.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:B%C3%BAfalo_cafre_(Syncerus_caffer),_parque_nacional_del_lago_Nakuru,_Kenia,_2024-05-18,_DD_85.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "lm-serengeti": {
+  "title": "File:León (Panthera leo), parque nacional Serengueti, Tanzania, 2024-05-26, DD 23.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Le%C3%B3n_(Panthera_leo),_parque_nacional_Serengueti,_Tanzania,_2024-05-26,_DD_23.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "mara-diani": {
+  "title": "File:Masai Mara National Reserve 07 - cheetah (Acinonyx jubatus).jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Masai_Mara_National_Reserve_07_-_cheetah_(Acinonyx_jubatus).jpg",
+  "artist": "Thomas Fuhrmann",
+  "license": "CC BY-SA 4.0"
+ },
+ "mara-short-break": {
+  "title": "File:African bush elephant (Loxodonta africana), Masai Mara.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:African_bush_elephant_(Loxodonta_africana),_Masai_Mara.jpg",
+  "artist": "Hobbyfotowiki",
+  "license": "CC0"
+ },
+ "meru-national-park": {
+  "title": "File:León (Panthera leo), parque nacional de Tarangire, Tanzania, 2024-05-24, DD 49.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Le%C3%B3n_(Panthera_leo),_parque_nacional_de_Tarangire,_Tanzania,_2024-05-24,_DD_49.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "mikumi": {
+  "title": "File:Cebras comunes (Equus quagga), parque nacional de Tarangire, Tanzania, 2024-05-25, DD 90.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Cebras_comunes_(Equus_quagga),_parque_nacional_de_Tarangire,_Tanzania,_2024-05-25,_DD_90.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "murchison-boat": {
+  "title": "File:Common hippos (Hippopotamus amphibius kiboko) Serengeti.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Common_hippos_(Hippopotamus_amphibius_kiboko)_Serengeti.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0"
+ },
+ "murchison-ziwa": {
+  "title": "File:Rinoceronte negro (Diceros bicornis), parque nacional del lago Nakuru, Kenia, 2024-05-18, DD 74.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Rinoceronte_negro_(Diceros_bicornis),_parque_nacional_del_lago_Nakuru,_Kenia,_2024-05-18,_DD_74.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "northern-circuit": {
+  "title": "File:Nature of Ngorongoro Conservation Area (129).jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Nature_of_Ngorongoro_Conservation_Area_(129).jpg",
+  "artist": "Zenith4237",
+  "license": "CC BY-SA 4.0"
+ },
+ "northern-kenya": {
+  "title": "File:Elefantes africanos de sabana (Loxodonta africana), reserva natural Masái Mara, Kenia, 2024-05-20, DD 45.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Elefantes_africanos_de_sabana_(Loxodonta_africana),_reserva_natural_Mas%C3%A1i_Mara,_Kenia,_2024-05-20,_DD_45.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "nyerere-zanzibar": {
+  "title": "File:Elefantes africanos de sabana (Loxodonta africana), parque nacional de Amboseli, Kenia, 2024-05-22, DD 86.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Elefantes_africanos_de_sabana_(Loxodonta_africana),_parque_nacional_de_Amboseli,_Kenia,_2024-05-22,_DD_86.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "samburu-special-five": {
+  "title": "File:Avestruz (Struthio camelus), parque nacional de Amboseli, Kenia, 2024-05-22, DD 63.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Avestruz_(Struthio_camelus),_parque_nacional_de_Amboseli,_Kenia,_2024-05-22,_DD_63.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "serengeti-zanzibar": {
+  "title": "File:Leones (Panthera leo), parque nacional Serengueti, Tanzania, 2024-05-27, DD 02.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Leones_(Panthera_leo),_parque_nacional_Serengueti,_Tanzania,_2024-05-27,_DD_02.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "tanzania-camping-7": {
+  "title": "File:Guepardos (Acinonyx jubatus), parque nacional de Tarangire, Tanzania, 2024-05-24, DD 55.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:Guepardos_(Acinonyx_jubatus),_parque_nacional_de_Tarangire,_Tanzania,_2024-05-24,_DD_55.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "tarangire-manyara": {
+  "title": "File:Leones (Panthera leo), parque nacional de Tarangire, Tanzania, 2024-05-25, DD 65.jpg",
+  "tier": "Quality",
+  "page": "https://commons.wikimedia.org/wiki/File:Leones_(Panthera_leo),_parque_nacional_de_Tarangire,_Tanzania,_2024-05-25,_DD_65.jpg",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0"
+ },
+ "uganda-classic": {
+  "title": "File:African elephant (Loxodonta africana) 2.jpg",
+  "tier": "Featured",
+  "page": "https://commons.wikimedia.org/wiki/File:African_elephant_(Loxodonta_africana)_2.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0"
+ },
+ "naivasha-hells-gate": {
+  "title": "File:Hippos eating on shore of Lake Naivasha, Kenya.jpg",
+  "artist": "Daniel Case",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Hippos_eating_on_shore_of_Lake_Naivasha,_Kenya.jpg",
+  "tier": ""
+ },
+ "lamu-island": {
+  "title": "File:Lamu, Lamu Island, Kenya.jpg",
+  "artist": "Erik (HASH) Hersman from Orlando",
+  "license": "CC BY 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Lamu,_Lamu_Island,_Kenya.jpg",
+  "tier": ""
+ },
+ "diani-escape": {
+  "title": "File:Kenya Diani Beach 23 BG.jpg",
+  "artist": "Bingar1234",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Kenya_Diani_Beach_23_BG.jpg",
+  "tier": ""
+ },
+ "mount-meru": {
+  "title": "File:Silvery-cheeked hornbills (Bycanistes brevis) male (left) female (right) Arusha.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Silvery-cheeked_hornbills_(Bycanistes_brevis)_male_(left)_female_(right)_Arusha.jpg",
+  "tier": "Quality"
+ },
+ "rwanda-complete": {
+  "title": "File:Gusarura Icyayi.jpg",
+  "artist": "Germain92",
+  "license": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File:Gusarura_Icyayi.jpg",
+  "tier": "Quality"
+ },
+ "gombe-chimps": {
+  "title": "File:Chimps in Gombe.jpg",
+  "artist": "Cethuyghe",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Chimps_in_Gombe.jpg",
+  "tier": ""
+ },
+ "mahale": {
+  "title": "File:Lake Tanganyika.jpg",
+  "artist": "Orrling",
+  "license": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Lake_Tanganyika.jpg",
+  "tier": ""
+ },
+ "pemba-island": {
+  "title": "File:Vumawimbi Beach, Pemba Island.jpg",
+  "artist": "Marcel Oosterwijk from Amsterdam, The Netherlands",
+  "license": "CC BY-SA 2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Vumawimbi_Beach,_Pemba_Island.jpg",
+  "tier": ""
+ },
+ "rubondo-island": {
+  "title": "File:Lake Victoria sunset in Mwanza Tanzania.jpg",
+  "artist": "Dominicdeus",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Lake_Victoria_sunset_in_Mwanza_Tanzania.jpg",
+  "tier": ""
+ },
+ "lake-bunyonyi": {
+  "title": "File:Grey crowned crane (Balearica regulorum gibbericeps).jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Grey_crowned_crane_(Balearica_regulorum_gibbericeps).jpg",
+  "tier": "Quality"
+ }
+}
