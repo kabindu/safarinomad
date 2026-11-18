@@ -30,12 +30,12 @@
     $('#message').value = `I'd like to travel with ${guide}. Please let me know availability and suggest an itinerary.`;
   }
 
-  // Arriving from "Request a room" on the services page
+  // Arriving from a card on Places to stay (accommodation.html)
   const hotel = params.get('hotel');
   if(hotel && !trip){
     $('#tripNotice').hidden = false;
     $('#tripNotice').innerHTML = `<i class="fa-solid fa-hotel"></i> You're asking about: <b>${hotel.replace(/[<>&]/g, '')}</b>`;
-    $('#message').value = `I'd like to book a room at ${hotel}. Please send me rates for my dates.`;
+    $('#message').value = `I'd like rates for: ${hotel}. My dates and number of travellers are:`;
   }
 
   function setStatus(msg, err){ status.textContent = msg; status.classList.add('show'); status.classList.toggle('error', !!err); }

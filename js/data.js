@@ -436,89 +436,77 @@ const FLIGHTS = [
   { from:'DAR', to:'JRO', time:'1h 10m', stops:0, region:'regional' }
 ];
 
-/* Places to stay (accommodation.html): one tab per setting, like Lindberg's lodges / resorts / town hotels.
-   tier: 1 budget … 4 luxury (a guide only; rates change by season). region: the city, for town hotels.
-   Only list places we can really book; no ratings or prices here (the team quotes rates). */
+/* Places to stay (accommodation.html): shown like the package cards, one card per kind of stay in one place
+   ("Beach hotel in Lamu", "Lake lodge in Naivasha"). Lindberg Safaris lists the same kinds of property
+   (lodges, luxury and bush camps, resort and town hotels) but publishes no nightly rates.
+   price: estimated USD per person per night, sharing, from the nightly costs in server/pricing.mjs plus
+   our usual 30% margin (budget $50 → $65, mid $150 → $195, premium $300 → $390 in Kenya). The team
+   confirms the real rate in the quote. options: properties we can offer there (a guide for the team). */
 const STAY_SETTINGS = [
-  { key:'savannah', short:'Savannah lodges', icon:'fa-sun' },
-  { key:'lake',     short:'Lake view',       icon:'fa-water' },
-  { key:'beach',    short:'Beach resorts',   icon:'fa-umbrella-beach' },
+  { key:'savannah', short:'Savannah lodges',   icon:'fa-sun' },
+  { key:'lake',     short:'Lake view',         icon:'fa-water' },
+  { key:'beach',    short:'Beach hotels',      icon:'fa-umbrella-beach' },
   { key:'mountain', short:'Mountain & forest', icon:'fa-mountain' },
-  { key:'town',     short:'Town hotels',     icon:'fa-hotel' }
+  { key:'town',     short:'Town hotels',       icon:'fa-hotel' }
 ];
 const STAYS = [
-  // Savannah: inside or beside the parks
-  { name:'Sarova Mara Game Camp', area:'Maasai Mara', country:'kenya', setting:'savannah', tier:3 },
-  { name:'Pristine Mara Bay Lodge', area:'Maasai Mara', country:'kenya', setting:'savannah', tier:2 },
-  { name:'Mara Serena Safari Lodge', area:'Maasai Mara', country:'kenya', setting:'savannah', tier:3 },
-  { name:'Amboseli Serena Safari Lodge', area:'Amboseli', country:'kenya', setting:'savannah', tier:3 },
-  { name:'Tawi Lodge', area:'Amboseli', country:'kenya', setting:'savannah', tier:4 },
-  { name:'Ol Tukai Lodge', area:'Amboseli', country:'kenya', setting:'savannah', tier:3 },
-  { name:'Kilaguni Serena Safari Lodge', area:'Tsavo West', country:'kenya', setting:'savannah', tier:3 },
-  { name:'Voi Safari Lodge', area:'Tsavo East', country:'kenya', setting:'savannah', tier:2 },
-  { name:'Elephant Bedroom Camp', area:'Samburu', country:'kenya', setting:'savannah', tier:3 },
-  { name:'Beyond Sayuna Camp', area:'Laikipia', country:'kenya', setting:'savannah', tier:3 },
-  { name:'Sweetwaters Serena Camp', area:'Ol Pejeta', country:'kenya', setting:'savannah', tier:3 },
-  { name:'Serengeti Serena Safari Lodge', area:'Serengeti', country:'tanzania', setting:'savannah', tier:3 },
-  { name:'Ngorongoro Serena Safari Lodge', area:'Ngorongoro Crater rim', country:'tanzania', setting:'savannah', tier:3 },
-  { name:'Tarangire Safari Lodge', area:'Tarangire', country:'tanzania', setting:'savannah', tier:2 },
-  { name:'Mweya Safari Lodge', area:'Queen Elizabeth National Park', country:'uganda', setting:'savannah', tier:3 },
-  { name:'Paraa Safari Lodge', area:'Murchison Falls', country:'uganda', setting:'savannah', tier:3 },
-  { name:'Ruzizi Tented Lodge', area:'Akagera', country:'rwanda', setting:'savannah', tier:3 },
+  // Savannah: inside or beside the parks, full board
+  { id:'mara-lodge', title:'Safari lodge in the Maasai Mara', place:'Maasai Mara', country:'kenya', setting:'savannah', board:'Full board', price:195,
+    img:'images/hero-balloon-zebras.jpg', alt:'Hot-air balloon over zebras in the Maasai Mara', options:['Pristine Mara Bay Lodge', 'Sarova Mara Game Camp', 'Mara Serena Safari Lodge'] },
+  { id:'mara-luxury', title:'Luxury tented camp in the Maasai Mara', place:'Maasai Mara', country:'kenya', setting:'savannah', board:'Full board', price:680,
+    img:'images/safari-lodge.jpg', alt:'Lodge deck and pool at sunset', options:['Angama Mara', 'Olare Mara Kempinski', "Cottar's 1920s Safari Camp"] },
+  { id:'mara-bush-camp', title:'Bush camp in the Maasai Mara', place:'Maasai Mara', country:'kenya', setting:'savannah', board:'Full board', price:85,
+    img:'images/camp-at-night.jpg', alt:'Tents glowing at a camp at night', options:['Matira Bush Camp', 'Olive Bush Camp'] },
+  { id:'amboseli-lodge', title:'Safari lodge in Amboseli', place:'Amboseli', country:'kenya', setting:'savannah', board:'Full board', price:260,
+    img:'images/stays/amboseli-kili-views.jpg', alt:'Kilimanjaro rising above Amboseli', options:['Amboseli Serena Safari Lodge', 'Ol Tukai Lodge', 'Tawi Lodge'] },
+  { id:'tsavo-lodge', title:'Safari lodge in Tsavo', place:'Tsavo East & West', country:'kenya', setting:'savannah', board:'Full board', price:195,
+    img:'images/stays/tsavo-west-chyulu.jpg', alt:'Red-dusted elephant in Tsavo', options:['Voi Safari Lodge', 'Kilaguni Serena Safari Lodge', 'Finch Hattons'] },
+  { id:'samburu-camp', title:'Tented camp in Samburu', place:'Samburu', country:'kenya', setting:'savannah', board:'Full board', price:390,
+    img:'images/elephant-savannah.jpg', alt:'Elephant on the dry savannah', options:['Elephant Bedroom Camp', 'Soroi Larsens Camp'] },
+  { id:'ol-pejeta-camp', title:'Safari camp at Ol Pejeta & Laikipia', place:'Ol Pejeta, Laikipia', country:'kenya', setting:'savannah', board:'Full board', price:390,
+    img:'images/rhinos.jpg', alt:'Rhinos grazing', options:['Sweetwaters Serena Camp', 'Asilia Ol Pejeta Bush Camp', 'Beyond Sayuna Camp'] },
+  { id:'serengeti-lodge', title:'Safari lodge in the Serengeti', place:'Serengeti', country:'tanzania', setting:'savannah', board:'Full board', price:415,
+    img:'images/serengeti-acacia.jpg', alt:'Acacia tree on the plains at sunset', options:['Serengeti Serena Safari Lodge', 'Meliá Serengeti Lodge', 'Four Seasons Safari Lodge'] },
+  { id:'ngorongoro-lodge', title:'Lodge on the Ngorongoro Crater rim', place:'Ngorongoro', country:'tanzania', setting:'savannah', board:'Full board', price:415,
+    img:'images/misty-acacia.jpg', alt:'Acacia trees in the morning mist', options:['Ngorongoro Serena Safari Lodge'] },
+  { id:'tarangire-lodge', title:'Safari lodge in Tarangire', place:'Tarangire', country:'tanzania', setting:'savannah', board:'Full board', price:250,
+    img:'images/stays/tarangire-manyara.jpg', alt:'Lions resting in a tree in Tarangire', options:['Tarangire Safari Lodge'] },
+  { id:'bwindi-lodge', title:'Gorilla lodge in Bwindi', place:'Bwindi Forest', country:'uganda', setting:'savannah', board:'Full board', price:365,
+    img:'images/stays/primate-explorer.jpg', alt:'Mountain gorillas in Bwindi', options:['Buhoma Lodge'] },
+  { id:'queen-elizabeth-lodge', title:'Safari lodge in Queen Elizabeth', place:'Queen Elizabeth National Park', country:'uganda', setting:'savannah', board:'Full board', price:170,
+    img:'images/stays/ishasha-lions.jpg', alt:'Lion resting in a tree', options:['Mweya Safari Lodge', 'Paraa Safari Lodge (Murchison)'] },
+  { id:'volcanoes-lodge', title:'Gorilla lodge in Volcanoes', place:'Volcanoes National Park', country:'rwanda', setting:'savannah', board:'Full board', price:495,
+    img:'images/stays/golden-monkeys.jpg', alt:'Golden monkey in the bamboo', options:['Mountain Gorilla View Lodge'] },
+  { id:'akagera-lodge', title:'Tented lodge in Akagera', place:'Akagera', country:'rwanda', setting:'savannah', board:'Full board', price:260,
+    img:'images/stays/akagera-camping.jpg', alt:'Giraffes on the plains of Akagera', options:['Ruzizi Tented Lodge'] },
   // Lake view
-  { name:'Lake Naivasha Sopa Resort', area:'Lake Naivasha', country:'kenya', setting:'lake', tier:2 },
-  { name:'Enashipai Resort & Spa', area:'Lake Naivasha', country:'kenya', setting:'lake', tier:3 },
-  { name:'Sarova Lion Hill Game Lodge', area:'Lake Nakuru National Park', country:'kenya', setting:'lake', tier:3 },
-  { name:'Lake Nakuru Lodge', area:'Lake Nakuru National Park', country:'kenya', setting:'lake', tier:2 },
-  { name:'Lake Manyara Serena Safari Lodge', area:'Lake Manyara', country:'tanzania', setting:'lake', tier:3 },
-  { name:'Speke Resort Munyonyo', area:'Kampala, Lake Victoria', country:'uganda', setting:'lake', tier:3 },
-  { name:'Lake Victoria Serena', area:'Kigo, Lake Victoria', country:'uganda', setting:'lake', tier:3 },
-  { name:'Protea Hotel Entebbe', area:'Entebbe, Lake Victoria', country:'uganda', setting:'lake', tier:2 },
-  { name:'Lake Kivu Serena Hotel', area:'Rubavu, Lake Kivu', country:'rwanda', setting:'lake', tier:3 },
-  // Beach
-  { name:'Diani Reef Beach Resort & Spa', area:'Diani', country:'kenya', setting:'beach', tier:3 },
-  { name:'Leopard Beach Resort', area:'Diani', country:'kenya', setting:'beach', tier:3 },
-  { name:'Baobab Beach Resort', area:'Diani', country:'kenya', setting:'beach', tier:2 },
-  { name:'Serena Beach Resort & Spa', area:'Shanzu, Mombasa', country:'kenya', setting:'beach', tier:3 },
-  { name:'Sarova Whitesands', area:'Bamburi, Mombasa', country:'kenya', setting:'beach', tier:3 },
-  { name:'Voyager Beach Resort', area:'Nyali, Mombasa', country:'kenya', setting:'beach', tier:2 },
-  { name:'PrideInn Paradise', area:'Shanzu, Mombasa', country:'kenya', setting:'beach', tier:2 },
-  { name:'Hemingways Watamu', area:'Watamu', country:'kenya', setting:'beach', tier:3 },
-  { name:'Turtle Bay Beach Club', area:'Watamu', country:'kenya', setting:'beach', tier:2 },
-  { name:'Peponi Hotel', area:'Shela, Lamu', country:'kenya', setting:'beach', tier:3 },
-  { name:'Zuri Zanzibar', area:'Kendwa, Zanzibar', country:'tanzania', setting:'beach', tier:4 },
-  { name:'Park Hyatt Zanzibar', area:'Stone Town seafront', country:'tanzania', setting:'beach', tier:4 },
+  { id:'naivasha-lodge', title:'Lake lodge in Naivasha', place:'Lake Naivasha', country:'kenya', setting:'lake', board:'Full board', price:195,
+    img:'images/lake-kivu-sunset.jpg', alt:'Sunset over a lake', options:['Lake Naivasha Sopa Resort', 'Enashipai Resort & Spa', 'Hippo Point Manor House'] },
+  { id:'nakuru-lodge', title:'Lodge at Lake Nakuru', place:'Lake Nakuru National Park', country:'kenya', setting:'lake', board:'Full board', price:195,
+    img:'images/flamingo.jpg', alt:'Flamingo wading in a lake', options:['Sarova Lion Hill Game Lodge', 'Lake Nakuru Lodge'] },
+  { id:'kivu-hotel', title:'Lake hotel on Lake Kivu', place:'Rubavu, Lake Kivu', country:'rwanda', setting:'lake', board:'Bed & breakfast', price:180,
+    img:'images/stays/lake-kivu-retreat.jpg', alt:'Children paddling a canoe on Lake Kivu', options:['Lake Kivu Serena Hotel'] },
+  // Beach, half board
+  { id:'lamu-hotel', title:'Beach hotel in Lamu', place:'Lamu & Shela', country:'kenya', setting:'beach', board:'Half board', price:150,
+    img:'images/stays/lamu-island.jpg', alt:'Lamu Old Town waterfront', options:['Peponi Hotel', 'The Majlis Resort'] },
+  { id:'diani-resort', title:'Beach resort in Diani', place:'Diani Beach', country:'kenya', setting:'beach', board:'Half board', price:130,
+    img:'images/coast-resort.jpg', alt:'Beach resort pool by the ocean', options:['Leopard Beach Resort & Spa', 'Baobab Beach Resort & Spa', 'Diani Reef Beach Resort'] },
+  { id:'mombasa-hotel', title:'Beach hotel in Mombasa', place:'Mombasa North Coast', country:'kenya', setting:'beach', board:'Half board', price:90,
+    img:'images/stays/mombasa-kilifi.jpg', alt:'Fort Jesus in Mombasa', options:['Serena Beach Resort & Spa', 'Sarova Whitesands', 'Voyager Beach Resort'] },
+  { id:'watamu-hotel', title:'Beach hotel in Watamu & Malindi', place:'Watamu & Malindi', country:'kenya', setting:'beach', board:'Half board', price:110,
+    img:'images/zanzibar-palms.jpg', alt:'Palm trees over a white-sand beach', options:['Hemingways Watamu', 'Turtle Bay Beach Club'] },
+  { id:'zanzibar-resort', title:'Beach resort in Zanzibar', place:'Zanzibar', country:'tanzania', setting:'beach', board:'Half board', price:150,
+    img:'images/overwater-villas.jpg', alt:'Villas over turquoise water', options:['Zuri Zanzibar', 'Park Hyatt Zanzibar', 'Emerson Spice'] },
   // Mountain & forest
-  { name:'Serena Mountain Lodge', area:'Mount Kenya forest', country:'kenya', setting:'mountain', tier:3 },
-  { name:'Fairmont Mount Kenya Safari Club', area:'Nanyuki', country:'kenya', setting:'mountain', tier:4 },
-  { name:'The Ark', area:'Aberdare National Park', country:'kenya', setting:'mountain', tier:2 },
-  { name:'Kilimanjaro mountain huts', area:'Marangu route: Mandara, Horombo, Kibo', country:'tanzania', setting:'mountain', tier:1 },
-  { name:'Buhoma Lodge', area:'Bwindi Impenetrable Forest', country:'uganda', setting:'mountain', tier:3 },
-  { name:'Mountain Gorilla View Lodge', area:'Volcanoes National Park', country:'rwanda', setting:'mountain', tier:3 },
-  // Town hotels (region = city tab)
-  { name:'Sarova Stanley', area:'City Centre', country:'kenya', setting:'town', region:'Nairobi', tier:3 },
-  { name:'Hemingways Nairobi', area:'Karen', country:'kenya', setting:'town', region:'Nairobi', tier:4 },
-  { name:'Giraffe Manor', area:'Karen', country:'kenya', setting:'town', region:'Nairobi', tier:4 },
-  { name:'Tribe Hotel', area:'Gigiri', country:'kenya', setting:'town', region:'Nairobi', tier:3 },
-  { name:'Radisson Blu Upper Hill', area:'Upper Hill', country:'kenya', setting:'town', region:'Nairobi', tier:3 },
-  { name:'Fairview Hotel', area:'Upper Hill', country:'kenya', setting:'town', region:'Nairobi', tier:2 },
-  { name:'Ole Sereni', area:'Mombasa Road, by Nairobi National Park', country:'kenya', setting:'town', region:'Nairobi', tier:3 },
-  { name:'Eka Hotel', area:'Mombasa Road', country:'kenya', setting:'town', region:'Nairobi', tier:2 },
-  { name:'The Boma Nairobi', area:'South C', country:'kenya', setting:'town', region:'Nairobi', tier:2 },
-  { name:'Ngong Hills Hotel', area:'Ngong Road', country:'kenya', setting:'town', region:'Nairobi', tier:1 },
-  { name:'Arusha Coffee Lodge', area:'Burka coffee estate', country:'tanzania', setting:'town', region:'Arusha', tier:3 },
-  { name:'Gran Meliá Arusha', area:'Arusha', country:'tanzania', setting:'town', region:'Arusha', tier:4 },
-  { name:'Mount Meru Hotel', area:'Arusha town', country:'tanzania', setting:'town', region:'Arusha', tier:2 },
-  { name:'Four Points by Sheraton Arusha', area:'Arusha town', country:'tanzania', setting:'town', region:'Arusha', tier:2 },
-  { name:'Hyatt Regency Dar es Salaam', area:'City Centre', country:'tanzania', setting:'town', region:'Dar & Zanzibar', tier:3 },
-  { name:'Dar es Salaam Serena', area:'City Centre', country:'tanzania', setting:'town', region:'Dar & Zanzibar', tier:3 },
-  { name:'Emerson Spice', area:'Stone Town, Zanzibar', country:'tanzania', setting:'town', region:'Dar & Zanzibar', tier:3 },
-  { name:'Kampala Serena', area:'City Centre', country:'uganda', setting:'town', region:'Kampala', tier:3 },
-  { name:'Sheraton Kampala', area:'City Centre', country:'uganda', setting:'town', region:'Kampala', tier:3 },
-  { name:'Kigali Marriott', area:'Kiyovu', country:'rwanda', setting:'town', region:'Kigali', tier:3 },
-  { name:'Kigali Serena', area:'City Centre', country:'rwanda', setting:'town', region:'Kigali', tier:3 },
-  { name:'Radisson Blu Kigali', area:'Kimihurura', country:'rwanda', setting:'town', region:'Kigali', tier:3 },
-  { name:'Hôtel des Mille Collines', area:'Kiyovu', country:'rwanda', setting:'town', region:'Kigali', tier:3 }
+  { id:'mount-kenya-lodge', title:'Forest lodge on Mount Kenya', place:'Mount Kenya & the Aberdares', country:'kenya', setting:'mountain', board:'Full board', price:195,
+    img:'images/stays/aberdare-treetops.jpg', alt:'Waterfall in the Aberdare forest', options:['Serena Mountain Lodge', 'The Ark', 'Fairmont Mount Kenya Safari Club'] },
+  // Town, bed & breakfast
+  { id:'nairobi-hotel', title:'Town hotel in Nairobi', place:'Nairobi', country:'kenya', setting:'town', board:'Bed & breakfast', price:110,
+    img:'images/nairobi-skyline.jpg', alt:'Nairobi city skyline at dawn', options:['Fairmont The Norfolk', 'Tribe Hotel', 'Sarova Stanley', 'JW Marriott Nairobi'] },
+  { id:'arusha-hotel', title:'Town hotel in Arusha', place:'Arusha', country:'tanzania', setting:'town', board:'Bed & breakfast', price:120,
+    img:'images/giraffe-sunset.jpg', alt:'Giraffe beside an acacia at sunset', options:['Arusha Coffee Lodge', 'Gran Meliá Arusha', 'Mount Meru Hotel'] },
+  { id:'kigali-hotel', title:'Town hotel in Kigali', place:'Kigali', country:'rwanda', setting:'town', board:'Bed & breakfast', price:140,
+    img:'images/stays/rwanda-complete.jpg', alt:'Tea picker in the hills of Rwanda', options:['Kigali Serena', 'Kigali Marriott', 'Hôtel des Mille Collines'] }
 ];
 
 /* Labels used by filters and search */

@@ -51,27 +51,36 @@
   });
 
   /* ---------- Places to stay (accommodation.html) ----------
-     Kept simple, like Lindberg's lodges page: one row of tabs (one kind of stay at a time)
-     and a grid of cards, each with one button. accommodation.html#beach opens on that tab. */
+     Cards look exactly like the package cards: photo with the meal plan in the corner, a round icon,
+     the title ("Beach hotel in Lamu"), the place and the price per night. One tap asks for rates.
+     Tabs: All, then one kind of stay; accommodation.html#beach opens on that tab. */
   const stayGrid = document.getElementById('stayGrid'), stayTabs = document.getElementById('stayTabs');
   if(stayGrid && stayTabs && typeof STAY_SETTINGS !== 'undefined'){
     const esc = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
     const COUNTRY = { kenya:'Kenya', tanzania:'Tanzania', uganda:'Uganda', rwanda:'Rwanda' };
-    const LEVEL = ['', 'Budget', 'Mid-range', 'Upper mid-range', 'Luxury'];
-    const tier = n => `<span class="stay-tier" title="${LEVEL[n]}" translate="no">${'$'.repeat(n)}<i>${'$'.repeat(4 - n)}</i></span>`;
+    const ICON = Object.fromEntries(STAY_SETTINGS.map(st => [st.key, st.icon]));
     const kinds = STAY_SETTINGS.filter(st => STAYS.some(x => x.setting === st.key));
     const card = x => `
-      <article class="stay-card">
-        <h3 translate="no">${esc(x.name)}</h3>
-        <p class="stay-where"><i class="fa-solid fa-location-dot"></i> ${esc(x.area)}, ${COUNTRY[x.country]}</p>
-        <div class="stay-foot">${tier(x.tier)}<a class="btn btn-sm" href="contact.html?hotel=${encodeURIComponent(x.name)}">Ask for rates</a></div>
+      <article class="trip-card stay-card">
+        <a class="trip-link" href="contact.html?hotel=${encodeURIComponent(x.title)}" aria-label="${esc(x.title)}: ask for rates"></a>
+        <div class="trip-img"><img src="${x.img}" alt="${esc(x.alt)}" loading="lazy"><span class="dur">${esc(x.board)}</span></div>
+        <div class="trip-meta">
+          <span class="trip-icon" aria-hidden="true"><i class="fa-solid ${ICON[x.setting]}"></i></span>
+          <div class="trip-text">
+            <h3>${esc(x.title)}</h3>
+            <p class="trip-where">${esc(x.place)}, ${COUNTRY[x.country]}</p>
+            <p class="trip-price">From <span class="price-now" data-usd="${x.price}"></span> per night</p>
+          </div>
+        </div>
       </article>`;
-    stayTabs.innerHTML = kinds.map(st => `<button class="tab" role="tab" data-kind="${st.key}"><i class="fa-solid ${st.icon}"></i> ${esc(st.short)}</button>`).join('');
+    stayTabs.innerHTML = `<button class="tab" role="tab" data-kind="">All</button>`
+      + kinds.map(st => `<button class="tab" role="tab" data-kind="${st.key}"><i class="fa-solid ${st.icon}"></i> ${esc(st.short)}</button>`).join('');
     const show = key => {
-      const st = kinds.find(k => k.key === key) || kinds[0];
-      stayTabs.querySelectorAll('.tab').forEach(t => { const on = t.dataset.kind === st.key; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
-      stayGrid.innerHTML = STAYS.filter(x => x.setting === st.key).map(card).join('');
-      if(location.hash.slice(1) !== st.key) history.replaceState(null, '', '#' + st.key);
+      const k = kinds.some(st => st.key === key) ? key : '';
+      stayTabs.querySelectorAll('.tab').forEach(t => { const on = t.dataset.kind === k; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
+      stayGrid.innerHTML = STAYS.filter(x => !k || x.setting === k).map(card).join('');
+      if(typeof SN.refresh === 'function') SN.refresh();   // fill in prices in the chosen currency
+      history.replaceState(null, '', k ? '#' + k : location.pathname);
     };
     stayTabs.addEventListener('click', e => { const t = e.target.closest('.tab'); if(t) show(t.dataset.kind); });
     window.addEventListener('hashchange', () => show(location.hash.slice(1)));
