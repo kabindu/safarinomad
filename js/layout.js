@@ -247,6 +247,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
     <nav class="menu-bar" aria-label="Main">
       <div class="nav-item" data-nav="home"><a class="nav-trigger nav-home" href="index.html" title="Home"><i class="fa-solid fa-house"></i><span>Home</span></a></div>
       ${desktopMenu}
+      <div class="nav-item" data-nav="accommodation"><a class="nav-trigger" href="accommodation.html"><span>Accommodation</span></a></div>
     </nav>
 
     <div class="nav-right">
@@ -278,6 +279,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
     <a class="plain" href="index.html"><i class="fa-solid fa-house"></i> Home</a>
     <a class="plain" href="trips.html">All packages</a>
     ${mobileMenu}
+      <div class="d-item"><div class="d-row"><a href="accommodation.html">Accommodation</a></div></div>
     <a class="plain" href="contact.html">Contact us</a>
     <div class="d-prefs">
       <div class="d-pref"><span>Language</span><div><button data-lang="en" class="active">EN</button><button data-lang="fr">FR</button><button data-lang="es">ES</button><button data-lang="de">DE</button></div></div>
