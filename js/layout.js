@@ -379,6 +379,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
         <textarea id="aiInput" rows="1" maxlength="1000" placeholder="Ask about trips, prices, visas…"></textarea>
         <button type="submit" id="aiSend" aria-label="Send"><i class="fa-solid fa-arrow-up"></i></button>
       </form>
+      <a class="ai-wa" href="https://wa.me/${s.whatsapp}?text=${encodeURIComponent('Hi SafariNomad! I am planning a safari and have a question.')}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Prefer a person? <b>Chat on WhatsApp</b></a>
       <div class="ai-note">Nomad is an AI and can make mistakes. Prices are confirmed in your quote.</div>
     </div>
     <div class="chat-foot">

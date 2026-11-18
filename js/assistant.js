@@ -47,7 +47,7 @@
   function openAI(){
     $('.chat-home').hidden = true;
     $('#aiView').hidden = false;
-    back.hidden = false;
+    back.hidden = true;   // the chat opens straight into Nomad; WhatsApp is a link inside it
     team.classList.add('ai-mode');
     team.innerHTML = '<span><i class="fa-solid fa-wand-magic-sparkles"></i></span>';
     titleEl.textContent = 'Nomad · AI travel expert';
@@ -303,7 +303,9 @@
 
   // Closing the chat panel any way (X, Escape, clicking outside, the launcher) forgets that the visitor
   // was chatting, so the chat stays closed on the next pages until they open it again
+  // Opening it any way (launcher, Chat tab, "Live chat" links) goes straight to Nomad
   new MutationObserver(() => {
     if(!chat.classList.contains('open')){ try{ sessionStorage.removeItem('nomadOpen'); }catch(e){} }
+    else if($('#aiView').hidden) openAI();
   }).observe(chat, { attributes:true, attributeFilter:['class'] });
 })();

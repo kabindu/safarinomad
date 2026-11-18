@@ -1,0 +1,1517 @@
+{
+ "note": "Packages taken off the site on 2026-11-18 to keep the range focused. Old links to /tour-<id> redirect to the country page (redirect). To bring one back: copy it into TRIPS in js/data.js and move its photo from server/retired-photos/ to images/packages/.",
+ "trips": [
+  {
+   "id": "northern-kenya",
+   "route": "Nairobi → Samburu → Laikipia",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Samburu & Laikipia: Northern Kenya Wildlife",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "wildlife",
+    "luxury"
+   ],
+   "days": 6,
+   "group": 10,
+   "stay": "Conservancy camps",
+   "price": 1510,
+   "img": "server/retired-photos/northern-kenya.jpg",
+   "alt": "Elephants in the savannah",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "primate-explorer",
+   "route": "Kigali → Volcanoes → Bwindi → Kibale → Entebbe",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Primate Explorer: Rwanda & Uganda",
+   "countries": "Rwanda · Uganda",
+   "country": "multi",
+   "styles": [
+    "gorilla"
+   ],
+   "days": 9,
+   "group": 8,
+   "stay": "Forest lodges",
+   "price": 4480,
+   "badge": "2 gorilla treks",
+   "img": "server/retired-photos/primate-explorer.jpg",
+   "alt": "Mountain gorillas resting in Bwindi",
+   "redirect": "trips.html"
+  },
+  {
+   "id": "kilimanjaro-lemosho",
+   "route": "Moshi → Lemosho Gate → Uhuru Peak",
+   "months": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Kilimanjaro Climb: Lemosho Route",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "trek"
+   ],
+   "days": 8,
+   "group": 10,
+   "stay": "Mountain camps",
+   "price": 1790,
+   "badge": "Best views",
+   "img": "server/retired-photos/kilimanjaro-lemosho.jpg",
+   "alt": "Trail across the Shira moorlands on Kilimanjaro",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "lamu-island",
+   "route": "Nairobi → Lamu Island → Shela",
+   "months": [
+    1,
+    2,
+    3,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "title": "Lamu Island Getaway",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "beach",
+    "luxury"
+   ],
+   "days": 4,
+   "group": 2,
+   "stay": "Boutique beach hotel",
+   "price": 450,
+   "img": "server/retired-photos/lamu-island.jpg",
+   "alt": "Lamu Old Town waterfront",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "tsavo-watamu",
+   "route": "Mombasa → Tsavo East → Watamu",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Tsavo East & Watamu Beach",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "wildlife",
+    "beach",
+    "family"
+   ],
+   "days": 6,
+   "group": 12,
+   "stay": "Lodge & beach resort",
+   "price": 1060,
+   "img": "server/retired-photos/tsavo-watamu.jpg",
+   "alt": "Leopard on the rocks in Tsavo East",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "southern-tanzania",
+   "route": "Dar es Salaam → Nyerere → Ruaha",
+   "months": [
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Southern Tanzania: Nyerere & Ruaha",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "wildlife",
+    "luxury"
+   ],
+   "days": 8,
+   "group": 8,
+   "stay": "Remote tented camps",
+   "price": 2740,
+   "img": "server/retired-photos/southern-tanzania.jpg",
+   "alt": "Baobab trees in the dry-season bush",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "murchison-ziwa",
+   "route": "Kampala → Ziwa Rhino Sanctuary → Murchison Falls",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Murchison Falls & Ziwa Rhinos",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 4,
+   "group": 10,
+   "stay": "Riverside lodge",
+   "price": 800,
+   "img": "server/retired-photos/murchison-ziwa.jpg",
+   "alt": "Rhino grazing in green grass",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "nyungwe-chimps",
+   "route": "Kigali → Nyungwe → Lake Kivu",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Nyungwe Canopy Walk & Chimps",
+   "countries": "Rwanda",
+   "country": "rwanda",
+   "styles": [
+    "gorilla"
+   ],
+   "days": 4,
+   "group": 8,
+   "stay": "Forest lodge",
+   "price": 1010,
+   "img": "server/retired-photos/nyungwe-chimps.jpg",
+   "alt": "Forested hills of Nyungwe",
+   "redirect": "rwanda-safari-tours"
+  },
+  {
+   "id": "amboseli-kili-views",
+   "route": "Nairobi → Amboseli",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Amboseli: Kilimanjaro Views",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 3,
+   "group": 12,
+   "stay": "Lodges",
+   "price": 490,
+   "img": "server/retired-photos/amboseli-kili-views.jpg",
+   "alt": "Kilimanjaro rising above Amboseli",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "laikipia-walking",
+   "route": "Nairobi → Laikipia",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Laikipia Walking Safari",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "wildlife",
+    "trek"
+   ],
+   "days": 5,
+   "group": 8,
+   "stay": "Conservancy camps",
+   "price": 1600,
+   "img": "server/retired-photos/laikipia-walking.jpg",
+   "alt": "Elephant walking across dry plains",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "tarangire-manyara",
+   "route": "Arusha → Tarangire → Lake Manyara",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Tarangire & Lake Manyara",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "wildlife",
+    "family"
+   ],
+   "days": 3,
+   "group": 12,
+   "stay": "Lodges",
+   "price": 550,
+   "img": "server/retired-photos/tarangire-manyara.jpg",
+   "alt": "Lions resting in a tree in Tarangire",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "tanzania-family",
+   "route": "Arusha → Tarangire → Ngorongoro → Serengeti",
+   "months": [
+    3,
+    4,
+    7,
+    8,
+    12
+   ],
+   "title": "Tanzania Family Safari",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "wildlife",
+    "family"
+   ],
+   "days": 7,
+   "group": 12,
+   "stay": "Family lodges",
+   "price": 1800,
+   "img": "server/retired-photos/tanzania-family.jpg",
+   "alt": "Giraffe in the Serengeti",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "tanzania-camping-7",
+   "route": "Arusha → Tarangire → Serengeti → Ngorongoro",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Tanzania Budget Camping: 7 Days",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "camping",
+    "wildlife"
+   ],
+   "days": 7,
+   "group": 12,
+   "stay": "Public campsites",
+   "price": 1090,
+   "img": "server/retired-photos/tanzania-camping-7.jpg",
+   "alt": "Cheetahs on a termite mound in Tarangire",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "kilimanjaro-rongai",
+   "route": "Moshi → Rongai Gate → Uhuru Peak",
+   "months": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Kilimanjaro Climb: Rongai Route",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "trek"
+   ],
+   "days": 7,
+   "group": 10,
+   "stay": "Mountain camps",
+   "price": 1540,
+   "img": "server/retired-photos/kilimanjaro-rongai.jpg",
+   "alt": "Kilimanjaro rising above the clouds",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "mount-meru",
+   "route": "Arusha → Momella Gate → Socialist Peak",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Mount Meru Climb",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "trek"
+   ],
+   "days": 4,
+   "group": 10,
+   "stay": "Mountain huts",
+   "price": 770,
+   "img": "server/retired-photos/mount-meru.jpg",
+   "alt": "Silvery-cheeked hornbills near Arusha",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "nyerere-zanzibar",
+   "route": "Dar es Salaam → Nyerere → Zanzibar",
+   "months": [
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Nyerere & Zanzibar",
+   "countries": "Tanzania · Zanzibar",
+   "country": "tanzania",
+   "styles": [
+    "wildlife",
+    "beach"
+   ],
+   "days": 7,
+   "group": 10,
+   "stay": "Camps & beach resort",
+   "price": 2030,
+   "img": "server/retired-photos/nyerere-zanzibar.jpg",
+   "alt": "Elephant herd in the bush",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "uganda-in-depth",
+   "route": "Entebbe → Murchison Falls → Kibale → Queen Elizabeth → Bwindi",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Uganda in Depth: Gorillas, Chimps & Big Game",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "gorilla",
+    "wildlife"
+   ],
+   "days": 10,
+   "group": 8,
+   "stay": "Lodges",
+   "price": 3440,
+   "img": "server/retired-photos/uganda-in-depth.jpg",
+   "alt": "Lioness in golden morning light in Queen Elizabeth",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "mburo-bwindi",
+   "route": "Entebbe → Lake Mburo → Bwindi",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Lake Mburo & Bwindi Gorillas",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "gorilla"
+   ],
+   "days": 5,
+   "group": 8,
+   "stay": "Lodges",
+   "price": 1830,
+   "img": "server/retired-photos/mburo-bwindi.jpg",
+   "alt": "Waterbuck in Lake Mburo National Park",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "kibale-chimps",
+   "route": "Entebbe → Kibale",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Kibale Chimpanzee Trek",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "gorilla"
+   ],
+   "days": 3,
+   "group": 8,
+   "stay": "Forest lodge",
+   "price": 640,
+   "img": "server/retired-photos/kibale-chimps.jpg",
+   "alt": "Chimpanzee in Kibale Forest",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "ishasha-lions",
+   "route": "Entebbe → Queen Elizabeth → Ishasha",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Queen Elizabeth Tree-Climbing Lions",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 4,
+   "group": 10,
+   "stay": "Lodges",
+   "price": 830,
+   "img": "server/retired-photos/ishasha-lions.jpg",
+   "alt": "Lion resting in a tree in Queen Elizabeth National Park",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "rwenzori-trek",
+   "route": "Kasese → Rwenzori → Margherita Peak",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    12
+   ],
+   "title": "Rwenzori Mountains Trek",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "trek"
+   ],
+   "days": 8,
+   "group": 8,
+   "stay": "Mountain huts",
+   "price": 1710,
+   "img": "server/retired-photos/rwenzori-trek.jpg",
+   "alt": "Giant plants in the Rwenzori Mountains",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "rwanda-complete",
+   "route": "Kigali → Volcanoes → Lake Kivu → Nyungwe → Akagera",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Rwanda Complete: Gorillas, Chimps & Big Five",
+   "countries": "Rwanda",
+   "country": "rwanda",
+   "styles": [
+    "gorilla",
+    "wildlife"
+   ],
+   "days": 9,
+   "group": 8,
+   "stay": "Lodges",
+   "price": 4070,
+   "img": "server/retired-photos/rwanda-complete.jpg",
+   "alt": "Tea picker in the hills of Rwanda",
+   "redirect": "rwanda-safari-tours"
+  },
+  {
+   "id": "lake-kivu-retreat",
+   "route": "Kigali → Lake Kivu",
+   "months": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "title": "Lake Kivu Retreat",
+   "countries": "Rwanda",
+   "country": "rwanda",
+   "styles": [
+    "beach"
+   ],
+   "days": 3,
+   "group": 12,
+   "stay": "Lakeside lodge",
+   "price": 270,
+   "img": "server/retired-photos/lake-kivu-retreat.jpg",
+   "alt": "Children paddling a canoe on Lake Kivu",
+   "redirect": "rwanda-safari-tours"
+  },
+  {
+   "id": "golden-monkeys",
+   "route": "Kigali → Volcanoes",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Golden Monkeys & Dian Fossey Hike",
+   "countries": "Rwanda",
+   "country": "rwanda",
+   "styles": [
+    "gorilla",
+    "trek"
+   ],
+   "days": 3,
+   "group": 8,
+   "stay": "Lodges",
+   "price": 770,
+   "img": "server/retired-photos/golden-monkeys.jpg",
+   "alt": "Golden monkey feeding in the bamboo",
+   "redirect": "rwanda-safari-tours"
+  },
+  {
+   "id": "migration-crossing",
+   "route": "Nairobi → Maasai Mara → Serengeti → Arusha",
+   "months": [
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Mara–Serengeti Migration Crossing",
+   "countries": "Kenya · Tanzania",
+   "country": "multi",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 8,
+   "group": 12,
+   "stay": "Tented camps",
+   "price": 2570,
+   "img": "server/retired-photos/migration-crossing.jpg",
+   "alt": "Zebras leaping down the bank at a Mara River crossing",
+   "redirect": "trips.html"
+  },
+  {
+   "id": "kenya-uganda-overland",
+   "route": "Nairobi → Lake Naivasha → Jinja → Murchison Falls → Kampala",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Kenya & Uganda Overland Adventure",
+   "countries": "Kenya · Uganda",
+   "country": "multi",
+   "styles": [
+    "camping",
+    "wildlife"
+   ],
+   "days": 9,
+   "group": 12,
+   "stay": "Camps & lodges",
+   "price": 1410,
+   "img": "server/retired-photos/kenya-uganda-overland.jpg",
+   "alt": "The River Nile rapids at Jinja",
+   "redirect": "trips.html"
+  },
+  {
+   "id": "east-africa-highlights",
+   "route": "Nairobi → Maasai Mara → Serengeti → Ngorongoro → Kigali → Volcanoes",
+   "months": [
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "East Africa Highlights: 14 Days",
+   "countries": "Kenya · Tanzania · Rwanda",
+   "country": "multi",
+   "styles": [
+    "wildlife",
+    "gorilla",
+    "luxury"
+   ],
+   "days": 14,
+   "group": 10,
+   "stay": "Lodges & camps",
+   "price": 4440,
+   "img": "server/retired-photos/east-africa-highlights.jpg",
+   "alt": "Topi antelope and calf",
+   "redirect": "trips.html"
+  },
+  {
+   "id": "meru-national-park",
+   "route": "Nairobi → Meru National Park",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Meru National Park: Born Free Country",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 4,
+   "group": 10,
+   "stay": "Riverside lodge",
+   "price": 800,
+   "img": "server/retired-photos/meru-national-park.jpg",
+   "alt": "Male lion in the bush",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "tsavo-west-chyulu",
+   "route": "Nairobi → Tsavo West → Chyulu Hills",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Tsavo West & Chyulu Hills",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 4,
+   "group": 12,
+   "stay": "Lodges",
+   "price": 770,
+   "img": "server/retired-photos/tsavo-west-chyulu.jpg",
+   "alt": "Red-dusted elephant on the plains",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "baringo-bogoria",
+   "route": "Nairobi → Lake Baringo → Lake Bogoria",
+   "months": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "title": "Lake Baringo & Bogoria Birding",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 3,
+   "group": 10,
+   "stay": "Lakeside lodge",
+   "price": 440,
+   "img": "server/retired-photos/baringo-bogoria.jpg",
+   "alt": "Hamerkops on a branch",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "kisumu-kakamega",
+   "route": "Nairobi → Kisumu → Lake Victoria → Kakamega Forest",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Lake Victoria & Kakamega Forest",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "wildlife",
+    "trek"
+   ],
+   "days": 4,
+   "group": 10,
+   "stay": "Lodges",
+   "price": 630,
+   "img": "server/retired-photos/kisumu-kakamega.jpg",
+   "alt": "Butterfly on a flower",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "mombasa-kilifi",
+   "route": "Mombasa → Fort Jesus → Kilifi Creek",
+   "months": [
+    1,
+    2,
+    3,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "title": "Mombasa Old Town & Kilifi Creek",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "beach"
+   ],
+   "days": 4,
+   "group": 12,
+   "stay": "Beach hotel",
+   "price": 250,
+   "img": "server/retired-photos/mombasa-kilifi.jpg",
+   "alt": "Fort Jesus in Mombasa",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "aberdare-treetops",
+   "route": "Nairobi → Aberdare Mountains → Karuru Falls",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Aberdare Mountains & Waterfalls",
+   "countries": "Kenya",
+   "country": "kenya",
+   "styles": [
+    "wildlife",
+    "trek"
+   ],
+   "days": 3,
+   "group": 10,
+   "stay": "Tree lodge",
+   "price": 570,
+   "img": "server/retired-photos/aberdare-treetops.jpg",
+   "alt": "Waterfall in the Aberdare forest",
+   "redirect": "kenya-safari-packages"
+  },
+  {
+   "id": "sipi-falls-elgon",
+   "route": "Kampala → Sipi Falls → Mount Elgon",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Sipi Falls & Mount Elgon",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "trek"
+   ],
+   "days": 3,
+   "group": 10,
+   "stay": "Mountain lodge",
+   "price": 380,
+   "img": "server/retired-photos/sipi-falls-elgon.jpg",
+   "alt": "Sipi Falls in eastern Uganda",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "murchison-boat",
+   "route": "Kampala → Murchison Falls → Nile Delta",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Murchison Falls Boat Safari",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 3,
+   "group": 10,
+   "stay": "Riverside lodge",
+   "price": 570,
+   "img": "server/retired-photos/murchison-boat.jpg",
+   "alt": "Hippos along the riverbank",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "lake-bunyonyi",
+   "route": "Kabale → Lake Bunyonyi",
+   "months": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "title": "Lake Bunyonyi Island Escape",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "family"
+   ],
+   "days": 3,
+   "group": 12,
+   "stay": "Island eco-lodge",
+   "price": 360,
+   "img": "server/retired-photos/lake-bunyonyi.jpg",
+   "alt": "Grey crowned crane",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "kidepo-valley",
+   "route": "Kampala → Kidepo Valley",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Kidepo Valley Wilderness",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "wildlife",
+    "luxury"
+   ],
+   "days": 4,
+   "group": 8,
+   "stay": "Safari lodge",
+   "price": 1220,
+   "img": "server/retired-photos/kidepo-valley.jpg",
+   "alt": "Buffalo in the grass",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "ssese-islands",
+   "route": "Entebbe → Lake Victoria → Ssese Islands",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Ssese Islands & Lake Victoria",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "beach"
+   ],
+   "days": 3,
+   "group": 12,
+   "stay": "Beach lodge",
+   "price": 210,
+   "img": "server/retired-photos/ssese-islands.jpg",
+   "alt": "Lake Victoria shore on the Ssese Islands",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "mgahinga-gorillas",
+   "route": "Kisoro → Mgahinga",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Mgahinga Gorillas & Golden Monkeys",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "gorilla",
+    "trek"
+   ],
+   "days": 3,
+   "group": 8,
+   "stay": "Forest lodge",
+   "price": 1120,
+   "img": "server/retired-photos/mgahinga-gorillas.jpg",
+   "alt": "Trekkers in Mgahinga National Park",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "crater-lakes-kazinga",
+   "route": "Kampala → Fort Portal Crater Lakes → Kazinga Channel",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Crater Lakes & Kazinga Channel",
+   "countries": "Uganda",
+   "country": "uganda",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 4,
+   "group": 10,
+   "stay": "Lodges",
+   "price": 700,
+   "img": "server/retired-photos/crater-lakes-kazinga.jpg",
+   "alt": "African spoonbill wading",
+   "redirect": "uganda-safari-tours"
+  },
+  {
+   "id": "lake-natron",
+   "route": "Arusha → Lake Natron → Ol Doinyo Lengai",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Lake Natron & Ol Doinyo Lengai",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "trek"
+   ],
+   "days": 3,
+   "group": 10,
+   "stay": "Tented camp",
+   "price": 570,
+   "img": "server/retired-photos/lake-natron.jpg",
+   "alt": "Lake Natron and the Rift Valley",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "mikumi",
+   "route": "Dar es Salaam → Mikumi",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Mikumi National Park Safari",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "wildlife",
+    "family"
+   ],
+   "days": 3,
+   "group": 12,
+   "stay": "Lodges",
+   "price": 510,
+   "img": "server/retired-photos/mikumi.jpg",
+   "alt": "Zebras grazing together",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "katavi",
+   "route": "Arusha → Katavi",
+   "months": [
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Katavi Wilderness Fly-In",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "wildlife",
+    "luxury"
+   ],
+   "days": 5,
+   "group": 6,
+   "stay": "Remote tented camps",
+   "price": 3350,
+   "img": "server/retired-photos/katavi.jpg",
+   "alt": "Hippo pod resting on a riverbank",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "gombe-chimps",
+   "route": "Kigoma → Gombe Stream → Lake Tanganyika",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Gombe Stream Chimps & Lake Tanganyika",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "gorilla"
+   ],
+   "days": 3,
+   "group": 8,
+   "stay": "Lakeside camp",
+   "price": 930,
+   "img": "server/retired-photos/gombe-chimps.jpg",
+   "alt": "Chimpanzees in Gombe",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "mahale",
+   "route": "Arusha → Mahale Mountains → Lake Tanganyika",
+   "months": [
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Mahale Mountains Chimpanzee Safari",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "gorilla",
+    "luxury"
+   ],
+   "days": 5,
+   "group": 6,
+   "stay": "Beach tented camp",
+   "price": 3020,
+   "img": "server/retired-photos/mahale.jpg",
+   "alt": "Lake Tanganyika shore",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "pemba-island",
+   "route": "Zanzibar → Pemba Island",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Pemba Island Diving Escape",
+   "countries": "Zanzibar",
+   "country": "tanzania",
+   "styles": [
+    "beach",
+    "luxury"
+   ],
+   "days": 5,
+   "group": 8,
+   "stay": "Eco beach lodge",
+   "price": 550,
+   "img": "server/retired-photos/pemba-island.jpg",
+   "alt": "Vumawimbi Beach on Pemba Island",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "mafia-whale-sharks",
+   "route": "Dar es Salaam → Mafia Island",
+   "months": [
+    1,
+    2,
+    10,
+    11,
+    12
+   ],
+   "title": "Mafia Island Whale Sharks",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "beach"
+   ],
+   "days": 4,
+   "group": 10,
+   "stay": "Beach lodge",
+   "price": 470,
+   "img": "server/retired-photos/mafia-whale-sharks.jpg",
+   "alt": "Whale shark in open water",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "usambara-hike",
+   "route": "Moshi → Lushoto → Usambara Mountains",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Usambara Mountains Hiking",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "trek"
+   ],
+   "days": 4,
+   "group": 12,
+   "stay": "Mountain guesthouse",
+   "price": 380,
+   "img": "server/retired-photos/usambara-hike.jpg",
+   "alt": "Clouds below the Usambara cliffs",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "rubondo-island",
+   "route": "Mwanza → Lake Victoria → Rubondo Island",
+   "months": [
+    6,
+    7,
+    8,
+    9,
+    10,
+    12
+   ],
+   "title": "Rubondo Island & Lake Victoria",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 3,
+   "group": 8,
+   "stay": "Island camp",
+   "price": 830,
+   "img": "server/retired-photos/rubondo-island.jpg",
+   "alt": "Sunset over Lake Victoria",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "mount-bisoke",
+   "route": "Kigali → Volcanoes → Mount Bisoke",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Mount Bisoke Crater Lake Hike",
+   "countries": "Rwanda",
+   "country": "rwanda",
+   "styles": [
+    "trek"
+   ],
+   "days": 2,
+   "group": 10,
+   "stay": "Lodges",
+   "price": 440,
+   "img": "server/retired-photos/mount-bisoke.jpg",
+   "alt": "Crater lake on Mount Bisoke",
+   "redirect": "rwanda-safari-tours"
+  },
+  {
+   "id": "mount-karisimbi",
+   "route": "Kigali → Volcanoes → Mount Karisimbi",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Mount Karisimbi Summit Trek",
+   "countries": "Rwanda",
+   "country": "rwanda",
+   "styles": [
+    "trek"
+   ],
+   "days": 3,
+   "group": 8,
+   "stay": "Mountain camp",
+   "price": 640,
+   "img": "server/retired-photos/mount-karisimbi.jpg",
+   "alt": "Mount Karisimbi and the Virunga volcanoes",
+   "redirect": "rwanda-safari-tours"
+  },
+  {
+   "id": "congo-nile-trail",
+   "route": "Rubavu → Congo Nile Trail → Karongi → Lake Kivu",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Congo Nile Trail: Lake Kivu by Bike",
+   "countries": "Rwanda",
+   "country": "rwanda",
+   "styles": [
+    "trek"
+   ],
+   "days": 5,
+   "group": 10,
+   "stay": "Lakeside guesthouses",
+   "price": 700,
+   "img": "server/retired-photos/congo-nile-trail.jpg",
+   "alt": "Fishing boats on Lake Kivu",
+   "redirect": "rwanda-safari-tours"
+  },
+  {
+   "id": "gishwati-chimps",
+   "route": "Kigali → Gishwati-Mukura",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Gishwati-Mukura Forest Chimps",
+   "countries": "Rwanda",
+   "country": "rwanda",
+   "styles": [
+    "gorilla"
+   ],
+   "days": 2,
+   "group": 8,
+   "stay": "Eco lodge",
+   "price": 410,
+   "img": "server/retired-photos/gishwati-chimps.jpg",
+   "alt": "Green hills of Gishwati",
+   "redirect": "rwanda-safari-tours"
+  },
+  {
+   "id": "twin-lakes",
+   "route": "Kigali → Musanze → Twin Lakes Burera & Ruhondo",
+   "months": [
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+   ],
+   "title": "Twin Lakes Burera & Ruhondo",
+   "countries": "Rwanda",
+   "country": "rwanda",
+   "styles": [
+    "family"
+   ],
+   "days": 2,
+   "group": 12,
+   "stay": "Lakeside lodge",
+   "price": 250,
+   "img": "server/retired-photos/twin-lakes.jpg",
+   "alt": "Lake Burera from above",
+   "redirect": "rwanda-safari-tours"
+  },
+  {
+   "id": "akagera-camping",
+   "route": "Kigali → Akagera → Lake Ihema",
+   "months": [
+    1,
+    2,
+    6,
+    7,
+    8,
+    9,
+    12
+   ],
+   "title": "Akagera Camping & Lake Ihema Boat Trip",
+   "countries": "Rwanda",
+   "country": "rwanda",
+   "styles": [
+    "camping",
+    "wildlife"
+   ],
+   "days": 3,
+   "group": 12,
+   "stay": "Public campsites",
+   "price": 380,
+   "img": "server/retired-photos/akagera-camping.jpg",
+   "alt": "Giraffes on the golden plains of Akagera",
+   "redirect": "rwanda-safari-tours"
+  },
+  {
+   "id": "rufiji-river",
+   "route": "Dar es Salaam → Nyerere → Rufiji River",
+   "months": [
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "title": "Nyerere: Rufiji River Boat Safari",
+   "countries": "Tanzania",
+   "country": "tanzania",
+   "styles": [
+    "wildlife"
+   ],
+   "days": 4,
+   "group": 8,
+   "stay": "Riverside tented camp",
+   "price": 1090,
+   "img": "server/retired-photos/rufiji-river.jpg",
+   "alt": "Hippos splashing in the river",
+   "redirect": "tanzania-safari-packages"
+  },
+  {
+   "id": "algarve-festival",
+   "route": "Nairobi → Algarve, Portugal → Nairobi",
+   "months": [],
+   "title": "Afrobeats Festival Week in the Algarve",
+   "countries": "Portugal",
+   "country": "world",
+   "styles": [
+    "abroad"
+   ],
+   "days": 11,
+   "group": 20,
+   "stay": "Beach hotel",
+   "price": 3997,
+   "badge": "Festival",
+   "img": "server/retired-photos/algarve-festival.jpg",
+   "alt": "Golden cliffs on the Algarve coast",
+   "redirect": "trips.html"
+  }
+ ]
+}

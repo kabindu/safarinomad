@@ -371,6 +371,10 @@ a.df-title:hover{color:var(--orange-dark);}
 .ai-form button:hover{background:var(--orange-dark);}
 .ai-form button:disabled{opacity:.4;cursor:wait;}
 .ai-note{font-size:12px;color:var(--yt-muted);text-align:center;padding:8px 16px 12px;}
+.ai-wa{align-self:center;display:inline-flex;align-items:center;gap:7px;margin:8px auto 0;padding:6px 14px;border-radius:50px;background:#e9f9ef;color:#128c4a;font-size:13px;text-decoration:none;}
+.ai-wa i{font-size:16px;color:#25D366;}
+.ai-wa:hover{background:#d6f5e2;}
+.ai-wa b{font-weight:700;}
 
 /* ---------- Floating Instagram, Facebook and WhatsApp buttons ----------
    Middle of the right edge on laptops; bottom right, above the tab bar, on phones.

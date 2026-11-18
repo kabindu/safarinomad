@@ -1250,6 +1250,10 @@ async function builtPage(url, type, make){
 }
 // Old addresses move permanently to where the content lives now
 const MOVED = { '/guides.html': 'services.html#guides', '/deals.html': 'services.html#flash-deals' };
+// Packages taken off the site: their old tour pages send visitors (and Google) to the country page
+try {
+  for(const t of JSON.parse(fs.readFileSync(path.join(ROOT, 'server', 'retired-trips.json'), 'utf8')).trips) MOVED['/tour-' + t.id] = t.redirect;
+} catch {}
 async function seoRoute(req, res, url){
   if(MOVED[url]){ res.writeHead(301, { Location: '/' + MOVED[url] }); res.end(); return true; }
   if(url === '/sitemap.xml'){ sendFile(req, res, await builtPage(url, 'application/xml; charset=utf-8', () => seo.sitemap())); return true; }
