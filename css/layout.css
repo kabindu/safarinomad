@@ -389,6 +389,8 @@ a.df-title:hover{color:var(--orange-dark);}
 .chat.open ~ .social-float,.social-float.away{opacity:0;visibility:hidden;}
 /* Contact already lists every way to reach us; on Booking and Customise they would cover prices and forms */
 body[data-page="contact"] .social-float,body[data-page="book"] .social-float,body[data-page="plan"] .social-float{display:none;}
+/* Places to stay has a WhatsApp button on every card; on phones the floating ones would cover them */
+@media (max-width:700px){body[data-page="accommodation"] .social-float{display:none;}}
 @media print{.social-float{display:none;}}
 /* Tablets: up over the hero photo, clear of the search form */
 @media (min-width:701px) and (max-width:1180px){.social-float{top:210px !important;bottom:auto !important;}}

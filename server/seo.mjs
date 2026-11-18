@@ -287,7 +287,7 @@ ${body}
     return html.replace(/<meta property="og:image" content="(?!https?:)([^"]+)">/, (m, p) => `<meta property="og:image" content="${abs(p)}">`).replace('</head>', extra + '\n</head>');
   }
 
-  const STATIC = ['', 'trips.html', 'destinations.html', 'flights.html', 'services.html', 'plan.html', 'groups.html', 'blog.html', 'about.html', 'contact.html'];
+  const STATIC = ['', 'trips.html', 'destinations.html', 'flights.html', 'services.html', 'plan.html', 'groups.html', 'accommodation.html', 'blog.html', 'about.html', 'contact.html'];
   function urls(){ const d = load(); return [...STATIC, ...hubList(d).map(x => x.h.slug), ...d.TRIPS.map(t => 'tour-' + t.id), ...getArticles().map(a => 'guide-' + a.id)]; }
   function sitemap(){
     const lastmod = new Date(stamp()).toISOString().slice(0, 10);

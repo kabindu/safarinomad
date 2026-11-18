@@ -102,8 +102,8 @@ const MENU = (function(f){
         ] },
         { title:'On safari', links:[
           ['Safari vehicles', 'services.html#vehicles', 'Pop-top Land Cruisers, a window seat each', 'fa-van-shuttle'],
-          ['Accommodation', 'services.html#stays', 'From park campsites to luxury lodges', 'fa-bed'],
-          ['City & beach hotels', 'services.html#hotels', 'Before and after your safari', 'fa-hotel']
+          ['Places to stay', 'accommodation.html', 'Savannah lodges, lake views, beach resorts', 'fa-bed'],
+          ['Town hotels', 'accommodation.html#town', 'Before and after your safari', 'fa-hotel']
         ] },
         { title:'Guides', links:[
           ['Tour guides', 'services.html#guides', 'A local guide on every trip', 'fa-id-badge'],
@@ -312,6 +312,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
         <a href="destinations.html">Destinations</a>
         <a href="services.html#flash-deals">Flash deals</a>
         <a href="flights.html">Flights</a>
+        <a href="accommodation.html">Places to stay</a>
         <a href="groups.html">Group &amp; school trips</a>
       </div>
       <div class="ft-col">

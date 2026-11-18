@@ -416,3 +416,49 @@
 .credit-list{margin:20px 0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--yt-muted, #555);}
 .credit-list li{margin-bottom:6px;overflow-wrap:anywhere;}
 .credit-list b{color:var(--yt-ink, #0B1F3A);font-weight:600;}
+
+/* ---------- Places to stay (accommodation.html) ---------- */
+.stay-top{padding-bottom:0 !important;}
+.stay-top .wrap{padding-top:28px;display:flex;flex-direction:column;gap:14px;}
+.stay-jump{display:flex;flex-wrap:wrap;gap:8px;}
+.stay-jump a{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:50px;background:var(--box-bg);color:var(--yt-text);font-size:14px;font-weight:600;}
+.stay-jump a i{color:var(--orange);}
+.stay-jump a:hover{background:#e7eef8;}
+.stay-sec{padding-top:56px !important;padding-bottom:0;scroll-margin-top:90px;}
+.stay-band{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:40px;align-items:center;margin-bottom:22px;}
+.stay-media img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:var(--yt-radius);}
+#town .stay-media img{object-position:center 80%;}
+.stay-band h2{margin:6px 0 10px;}
+.stay-band p{color:var(--yt-muted);max-width:560px;}
+.stay-band .eyebrow i{margin-right:4px;}
+.stay-feats{list-style:none;padding:0;margin:16px 0 18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;font-size:14px;}
+.stay-feats i{color:#1f9d55;margin-right:6px;}
+.stay-regions{margin-bottom:14px;}
+.stay-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;}
+.stay-card{display:flex;flex-direction:column;gap:6px;background:var(--box-bg);border-radius:14px;padding:16px;}
+.stay-card[hidden]{display:none;}
+.stay-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.stay-card h3{font-family:var(--font-body);font-size:15.5px;font-weight:700;color:var(--yt-text);line-height:1.3;text-wrap:balance;}
+.stay-tier{font-size:13px;font-weight:800;color:#1f9d55;letter-spacing:1px;white-space:nowrap;}
+.stay-tier i{font-style:normal;color:#c9d3df;}
+.stay-where{font-size:13.5px;color:var(--yt-muted);margin:0;}
+.stay-where i{color:var(--orange);margin-right:3px;}
+.stay-btns{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:8px;}
+.stay-wa{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#e9f9ef;color:#25D366;font-size:19px;}
+.stay-wa:hover{background:#d6f5e2;}
+.stay-none{color:var(--yt-muted);font-size:14px;}
+.stay-note{font-size:12.5px;color:var(--yt-muted);margin-top:14px;}
+@media (max-width:860px){
+  .stay-band{grid-template-columns:minmax(0,1fr);gap:18px;}
+  .stay-sec{padding-top:40px !important;}
+}
+@media (max-width:600px){
+  /* Phones: compact rows, name and place on the left, buttons on the right */
+  .stay-grid{gap:8px;}
+  .stay-card{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'top btns' 'where btns';align-items:center;column-gap:10px;row-gap:2px;padding:12px 14px;}
+  .stay-card-top{grid-area:top;justify-content:flex-start;}
+  .stay-where{grid-area:where;font-size:12.5px;}
+  .stay-btns{grid-area:btns;padding-top:0;margin-top:0;}
+  .stay-btns .btn{padding:8px 12px;font-size:13px;}
+  .stay-feats{grid-template-columns:minmax(0,1fr);}
+}
