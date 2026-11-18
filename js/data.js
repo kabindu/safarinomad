@@ -436,22 +436,15 @@ const FLIGHTS = [
   { from:'DAR', to:'JRO', time:'1h 10m', stops:0, region:'regional' }
 ];
 
-/* Places to stay (accommodation.html). Grouped by setting, like Lindberg's lodges / camps / resorts / town hotels.
-   tier: 1 budget … 4 luxury (a guide only; rates change by season). region: the city tab for town hotels.
+/* Places to stay (accommodation.html): one tab per setting, like Lindberg's lodges / resorts / town hotels.
+   tier: 1 budget … 4 luxury (a guide only; rates change by season). region: the city, for town hotels.
    Only list places we can really book; no ratings or prices here (the team quotes rates). */
 const STAY_SETTINGS = [
-  { key:'savannah', label:'Savannah lodges & tented camps', short:'Savannah', icon:'fa-sun', img:'images/tent-view.jpg', imgAlt:'View of the bush from inside a safari tent',
-    intro:'Wake up inside the park, with game drives from the door.' },
-  { key:'lake', label:'Lake-view lodges', short:'Lake view', icon:'fa-water', img:'images/lake-kivu-sunset.jpg', imgAlt:'Sunset over a lake',
-    intro:'Flamingos, hippos and Rift Valley sunsets from your terrace.' },
-  { key:'beach', label:'Beach hotels & resorts', short:'Beach', icon:'fa-umbrella-beach', img:'images/coast-resort.jpg', imgAlt:'Beach resort on the Indian Ocean',
-    intro:'White sand and warm Indian Ocean water after your safari.' },
-  { key:'mountain', label:'Mountain & forest lodges', short:'Mountain & forest', icon:'fa-mountain', img:'images/forest-canopy-walk.jpg', imgAlt:'Rainforest canopy walk',
-    intro:'Cool air, log fires and forest walks near the big treks and gorilla forests.' },
-  { key:'town', label:'Town hotels', short:'Town', icon:'fa-hotel', img:'images/nairobi-skyline.jpg', imgAlt:'Nairobi city skyline at dawn',
-    intro:'A good night before and after your safari, close to the airport.' },
-  { key:'camp', label:'Bush camps & budget camping', short:'Bush camps', icon:'fa-campground', img:'images/camp-at-night.jpg', imgAlt:'Tents glowing at a campsite at night',
-    intro:'Dome tents in the parks with a camp cook. The best value, on our camping safaris.', packages:'trips.html?style=camping' }
+  { key:'savannah', short:'Savannah lodges', icon:'fa-sun' },
+  { key:'lake',     short:'Lake view',       icon:'fa-water' },
+  { key:'beach',    short:'Beach resorts',   icon:'fa-umbrella-beach' },
+  { key:'mountain', short:'Mountain & forest', icon:'fa-mountain' },
+  { key:'town',     short:'Town hotels',     icon:'fa-hotel' }
 ];
 const STAYS = [
   // Savannah: inside or beside the parks

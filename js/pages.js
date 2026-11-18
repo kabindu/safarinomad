@@ -50,76 +50,32 @@
       </a>`).join('');
   });
 
-  /* ---------- Places to stay (accommodation.html): one section per setting ---------- */
-  const stayBox = document.querySelector('[data-stays]');
-  if(stayBox && typeof STAY_SETTINGS !== 'undefined'){
+  /* ---------- Places to stay (accommodation.html) ----------
+     Kept simple, like Lindberg's lodges page: one row of tabs (one kind of stay at a time)
+     and a grid of cards, each with one button. accommodation.html#beach opens on that tab. */
+  const stayGrid = document.getElementById('stayGrid'), stayTabs = document.getElementById('stayTabs');
+  if(stayGrid && stayTabs && typeof STAY_SETTINGS !== 'undefined'){
     const esc = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
     const COUNTRY = { kenya:'Kenya', tanzania:'Tanzania', uganda:'Uganda', rwanda:'Rwanda' };
-    const tier = n => `<span class="stay-tier" title="${['', 'Budget', 'Mid-range', 'Upper mid-range', 'Luxury'][n]}" translate="no">${'$'.repeat(n)}<i>${'$'.repeat(4 - n)}</i></span>`;
-    const ask = name => `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(`Hi SafariNomad! I'd like rates for ${name}.`)}`;
-    // A stay, YouTube style: the whole card is one link (ask for rates), with a round icon for the setting,
-    // the name, where it is and the budget level; WhatsApp sits on top as its own small button
-    const card = (x, st) => `
-      <article class="stay-card" data-country="${x.country}"${x.region ? ` data-region="${esc(x.region)}"` : ''}>
-        <a class="stay-link" href="contact.html?hotel=${encodeURIComponent(x.name)}" aria-label="Ask for rates at ${esc(x.name)}"></a>
-        <span class="stay-icon" aria-hidden="true"><i class="fa-solid ${st.icon}"></i></span>
-        <div class="stay-text">
-          <h3 translate="no">${esc(x.name)}</h3>
-          <p class="stay-where">${esc(x.area)} · ${COUNTRY[x.country]}</p>
-          <p class="stay-ask">${tier(x.tier)} <span class="stay-ask-go">Ask for rates <i class="fa-solid fa-arrow-right"></i></span></p>
-        </div>
-        <a class="stay-wa" href="${ask(x.name)}" target="_blank" rel="noopener" aria-label="Ask about ${esc(x.name)} on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+    const LEVEL = ['', 'Budget', 'Mid-range', 'Upper mid-range', 'Luxury'];
+    const tier = n => `<span class="stay-tier" title="${LEVEL[n]}" translate="no">${'$'.repeat(n)}<i>${'$'.repeat(4 - n)}</i></span>`;
+    const kinds = STAY_SETTINGS.filter(st => STAYS.some(x => x.setting === st.key));
+    const card = x => `
+      <article class="stay-card">
+        <h3 translate="no">${esc(x.name)}</h3>
+        <p class="stay-where"><i class="fa-solid fa-location-dot"></i> ${esc(x.area)}, ${COUNTRY[x.country]}</p>
+        <div class="stay-foot">${tier(x.tier)}<a class="btn btn-sm" href="contact.html?hotel=${encodeURIComponent(x.name)}">Ask for rates</a></div>
       </article>`;
-    stayBox.innerHTML = STAY_SETTINGS.map(st => {
-      const list = STAYS.filter(x => x.setting === st.key);
-      const regions = st.key === 'town' ? [...new Set(list.map(x => x.region))] : [];
-      return `
-      <section class="pt-0 stay-sec" id="${st.key}" data-setting="${st.key}">
-        <div class="wrap">
-          <div class="stay-banner">
-            <img src="${st.img}" alt="${esc(st.imgAlt)}" loading="lazy">
-            <div class="stay-banner-text">
-              <span class="stay-count"><i class="fa-solid ${st.icon}"></i> ${list.length ? `${list.length} places` : 'On our camping safaris'}</span>
-              <h2>${esc(st.label)}</h2>
-              <p>${esc(st.intro)}</p>
-              ${st.packages ? `<a class="btn" href="${st.packages}">See camping safaris</a>` : ''}
-            </div>
-          </div>
-          ${regions.length > 1 ? `<div class="tabs stay-regions">${['', ...regions].map((r, i) => `<button class="tab${i ? '' : ' active'}" data-region="${esc(r)}">${r ? esc(r) : 'All cities'}</button>`).join('')}</div>` : ''}
-          ${list.length ? `<div class="stay-grid">${list.map(x => card(x, st)).join('')}</div>` : ''}
-          <p class="stay-none" hidden>None in this country yet. <a href="contact.html">Ask us</a> and we'll find one.</p>
-        </div>
-      </section>`;
-    }).join('');
-    // Jump links to each kind of stay
-    const jump = document.getElementById('stayJump');
-    if(jump) jump.innerHTML = STAY_SETTINGS.map(st => `<a href="#${st.key}"><i class="fa-solid ${st.icon}"></i> ${esc(st.short)}</a>`).join('');
-    // Country filter (and the city tabs for town hotels)
-    let country = '', region = '';
-    const all = sel => Array.from(document.querySelectorAll(sel));
-    const apply = () => {
-      all('.stay-sec').forEach(sec => {
-        const cards = Array.from(sec.querySelectorAll('.stay-card'));
-        cards.forEach(c => { c.hidden = (!!country && c.dataset.country !== country) || (!!region && c.dataset.region !== undefined && c.dataset.region !== region); });
-        const none = sec.querySelector('.stay-none');
-        if(none) none.hidden = !cards.length || cards.some(c => !c.hidden);
-      });
+    stayTabs.innerHTML = kinds.map(st => `<button class="tab" role="tab" data-kind="${st.key}"><i class="fa-solid ${st.icon}"></i> ${esc(st.short)}</button>`).join('');
+    const show = key => {
+      const st = kinds.find(k => k.key === key) || kinds[0];
+      stayTabs.querySelectorAll('.tab').forEach(t => { const on = t.dataset.kind === st.key; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
+      stayGrid.innerHTML = STAYS.filter(x => x.setting === st.key).map(card).join('');
+      if(location.hash.slice(1) !== st.key) history.replaceState(null, '', '#' + st.key);
     };
-    const ctry = document.getElementById('stayCountry');
-    if(ctry) ctry.addEventListener('click', e => {
-      const t = e.target.closest('.tab'); if(!t) return;
-      Array.from(ctry.querySelectorAll('.tab')).forEach(x => x.classList.toggle('active', x === t));
-      country = t.dataset.country; region = '';
-      all('.stay-regions .tab').forEach((x, i) => x.classList.toggle('active', i === 0));
-      apply();
-    });
-    stayBox.addEventListener('click', e => {
-      const t = e.target.closest('.stay-regions .tab'); if(!t) return;
-      all('.stay-regions .tab').forEach(x => x.classList.toggle('active', x === t));
-      region = t.dataset.region; apply();
-    });
-    const wa = document.querySelector('[data-wa-stay]');
-    if(wa) wa.href = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent('Hi SafariNomad! Can you suggest places to stay for my trip?')}`;
+    stayTabs.addEventListener('click', e => { const t = e.target.closest('.tab'); if(t) show(t.dataset.kind); });
+    window.addEventListener('hashchange', () => show(location.hash.slice(1)));
+    show(location.hash.slice(1));
   }
 
   /* ---------- Filter tabs (flights: data-route, guides: data-region) ---------- */
