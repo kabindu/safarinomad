@@ -79,7 +79,10 @@
       (!s.saved || SN.wish.has(t.id)) &&
       (!s.q || SNSearch.tripMatches(t, s.q))
     ).sort(SORT[s.sort]);
-    if(s.sort === 'popular' && typeof TripMix !== 'undefined') list = TripMix.order(list);
+    if(s.sort === 'popular'){
+      if(s.country && s.country !== 'world' && typeof TripRank !== 'undefined') list = TripRank.order(list);   // one country: main parks first
+      else if(typeof TripMix !== 'undefined') list = TripMix.order(list);                                        // all countries: a varied mix
+    }
 
     grid.innerHTML = list.map(SN.tripCard).join('');
     $('#noResults').classList.toggle('show', list.length === 0);

@@ -278,29 +278,31 @@ const LAST_MINUTE = [
    destinations pages; the number of trips and the lowest price are
    worked out from TRIPS (any trip whose title or route mentions `match`). */
 const PLACES = [
-  { name:'Maasai Mara',       country:'kenya',    img:'images/lion-walking.jpg',       match:'Maasai Mara|Mara' },
-  { name:'Amboseli',          country:'kenya',    img:'images/elephant-amboseli.jpg',  match:'Amboseli' },
-  { name:'Samburu',           country:'kenya',    img:'images/lioness.jpg',            match:'Samburu' },
-  { name:'Lake Nakuru',       country:'kenya',    img:'images/flamingo.jpg',           match:'Nakuru|Naivasha' },
-  { name:'Ol Pejeta',         country:'kenya',    img:'images/rhinos.jpg',             match:'Ol Pejeta|Laikipia' },
-  { name:'Tsavo',             country:'kenya',    img:'images/elephants-grassland.jpg',match:'Tsavo' },
-  { name:'Diani & Watamu',    country:'kenya',    img:'images/coast-resort.jpg',       match:'Diani|Watamu' },
-  { name:'Lamu',              country:'kenya',    img:'images/resort-pool.jpg',        match:'Lamu' },
-  { name:'Serengeti',         country:'tanzania', img:'images/serengeti-acacia.jpg',   match:'Serengeti' },
-  { name:'Ngorongoro Crater', country:'tanzania', img:'images/misty-acacia.jpg',       match:'Ngorongoro' },
-  { name:'Tarangire',         country:'tanzania', img:'images/elephant-savannah.jpg',  match:'Tarangire' },
-  { name:'Kilimanjaro',       country:'tanzania', img:'images/kilimanjaro.jpg',        match:'Kilimanjaro|Uhuru' },
-  { name:'Zanzibar',          country:'tanzania', img:'images/zanzibar-palms.jpg',     match:'Zanzibar|Stone Town' },
-  { name:'Bwindi',            country:'uganda',   img:'images/forest-canopy-walk.jpg', match:'Bwindi' },
-  { name:'Kibale',            country:'uganda',   img:'images/forest-elephant.jpg',    match:'Kibale' },
-  { name:'Queen Elizabeth',   country:'uganda',   img:'images/elephant-walking.jpg',   match:'Queen Elizabeth' },
-  { name:'Murchison Falls',   country:'uganda',   img:'images/rhino-and-calf.jpg',     match:'Murchison' },
-  { name:'Volcanoes',         country:'rwanda',   img:'images/hiker-summit.jpg',       match:'Volcanoes|Bwindi → Kigali' },
-  { name:'Akagera',           country:'rwanda',   img:'images/zebra.jpg',              match:'Akagera' },
-  { name:'Lake Kivu',         country:'rwanda',   img:'images/lake-kivu-sunset.jpg',   match:'Kivu' },
-  { name:'Mount Kenya',       country:'kenya',    img:'images/hiker-summit.jpg',       match:'Mount Kenya|Sirimon|Lenana' },
-  { name:'Jinja & the Nile',  country:'uganda',   img:'images/lake-kivu-sunset.jpg',   match:'Jinja|Nile' },
-  { name:'Malindi & Watamu',  country:'kenya',    img:'images/coast-resort.jpg',       match:'Malindi|Watamu' },
+  // In order of importance within each country: main parks, then beaches, lakes, mountains, rivers.
+  // Country listings follow this order (see TripRank below). kind = park | beach | lake | mountain | river
+  { name:'Maasai Mara',       country:'kenya',    img:'images/lion-walking.jpg',       match:'Maasai Mara|Mara', kind:'park' },
+  { name:'Amboseli',          country:'kenya',    img:'images/elephant-amboseli.jpg',  match:'Amboseli', kind:'park' },
+  { name:'Tsavo',             country:'kenya',    img:'images/elephants-grassland.jpg',match:'Tsavo', kind:'park' },
+  { name:'Samburu',           country:'kenya',    img:'images/lioness.jpg',            match:'Samburu', kind:'park' },
+  { name:'Ol Pejeta',         country:'kenya',    img:'images/rhinos.jpg',             match:'Ol Pejeta|Laikipia', kind:'park' },
+  { name:'Diani & Watamu',    country:'kenya',    img:'images/coast-resort.jpg',       match:'Diani|Watamu', kind:'beach' },
+  { name:'Malindi & Watamu',  country:'kenya',    img:'images/coast-resort.jpg',       match:'Malindi|Watamu', kind:'beach' },
+  { name:'Lamu',              country:'kenya',    img:'images/resort-pool.jpg',        match:'Lamu', kind:'beach' },
+  { name:'Lake Nakuru',       country:'kenya',    img:'images/flamingo.jpg',           match:'Nakuru|Naivasha', kind:'lake' },
+  { name:'Mount Kenya',       country:'kenya',    img:'images/hiker-summit.jpg',       match:'Mount Kenya|Sirimon|Lenana', kind:'mountain' },
+  { name:'Serengeti',         country:'tanzania', img:'images/serengeti-acacia.jpg',   match:'Serengeti', kind:'park' },
+  { name:'Ngorongoro Crater', country:'tanzania', img:'images/misty-acacia.jpg',       match:'Ngorongoro', kind:'park' },
+  { name:'Tarangire',         country:'tanzania', img:'images/elephant-savannah.jpg',  match:'Tarangire', kind:'park' },
+  { name:'Zanzibar',          country:'tanzania', img:'images/zanzibar-palms.jpg',     match:'Zanzibar|Stone Town', kind:'beach' },
+  { name:'Kilimanjaro',       country:'tanzania', img:'images/kilimanjaro.jpg',        match:'Kilimanjaro|Uhuru', kind:'mountain' },
+  { name:'Bwindi',            country:'uganda',   img:'images/forest-canopy-walk.jpg', match:'Bwindi', kind:'park' },
+  { name:'Queen Elizabeth',   country:'uganda',   img:'images/elephant-walking.jpg',   match:'Queen Elizabeth', kind:'park' },
+  { name:'Murchison Falls',   country:'uganda',   img:'images/rhino-and-calf.jpg',     match:'Murchison', kind:'park' },
+  { name:'Kibale',            country:'uganda',   img:'images/forest-elephant.jpg',    match:'Kibale', kind:'park' },
+  { name:'Jinja & the Nile',  country:'uganda',   img:'images/lake-kivu-sunset.jpg',   match:'Jinja|Nile', kind:'river' },
+  { name:'Volcanoes',         country:'rwanda',   img:'images/hiker-summit.jpg',       match:'Volcanoes|Bwindi → Kigali', kind:'park' },
+  { name:'Akagera',           country:'rwanda',   img:'images/zebra.jpg',              match:'Akagera', kind:'park' },
+  { name:'Lake Kivu',         country:'rwanda',   img:'images/lake-kivu-sunset.jpg',   match:'Kivu', kind:'lake' },
 ];
 
 
@@ -316,7 +318,7 @@ const LANDSCAPES = [
   { key:'mountains', label:'Mountains & hikes', icon:'fa-mountain',
     match:'Kilimanjaro|Uhuru|Mount Kenya|Mount Meru|Rwenzori|Elgon|Bisoke|Karisimbi|Longonot|Usambara|Aberdare|Mahale|Ol Doinyo|Golden Monkeys|Mgahinga|Chyulu|Hike|Trek' },
   { key:'rivers',    label:'Rivers & waterfalls', icon:'fa-droplet',
-    match:'Murchison|Nile|Jinja|Sipi|Falls|Kazinga|Rufiji|Hell\'s Gate' },
+    match:'Murchison|Nile|Jinja|Sipi|Falls|Kazinga|Rufiji|Hell\'s Gate|Sagana|Rafting' },
   { key:'forests',   label:'Forests & primates', icon:'fa-tree',
     match:'Bwindi|Kibale|Nyungwe|Volcanoes|Gorilla|Chimp|Kakamega|Gombe|Mahale|Gishwati|Mgahinga|Primate' }
 ];
@@ -595,6 +597,62 @@ const TripMix = (function(){
     order: list => arrange(list),
     pick: (list, n) => arrange(list, { window: n, look: list.length, keep: 0.35 }).slice(0, n)
   };
+})();
+
+
+/* =========================================================
+   Main first: how a country's packages are ordered (country
+   filter on the packages page, destinations rows, country
+   pages). Main parks come first (Mara, Amboseli, Tsavo…),
+   then beaches, lakes (Naivasha, Hell's Gate), mountains,
+   and rivers, waterfalls and adventures last. Within a group,
+   the place higher in PLACES wins, then featured and
+   best-selling packages, then the order in TRIPS.
+     TripRank.order(list)   sorted copy
+     TripRank.group(trip)   0 park … 4 river/adventure, 5 abroad
+   ========================================================= */
+const TripRank = (function(){
+  const KIND = { park:0, beach:1, lake:2, mountain:3, river:4 };
+  const text = t => `${t.title} ${t.route || ''}`;
+  const index = new Map(TRIPS.map((t, i) => [t.id, i]));
+  // The most important listed place the trip visits (its own country's places; any place for multi-country trips)
+  function best(t){
+    let at = -1;
+    PLACES.forEach((p, i) => {
+      if(at >= 0 || (t.country !== 'multi' && p.country !== t.country)) return;
+      if(new RegExp(p.match, 'i').test(text(t))) at = i;
+    });
+    return at;
+  }
+  // No listed place: fall back on what kind of trip it is
+  function fallback(t){
+    const s = t.styles || [];
+    if(t.country === 'world' || s.includes('abroad')) return 5;
+    if(s.includes('adventure') && !s.includes('wildlife') && !s.includes('beach')) return 4;
+    if(s.includes('wildlife') || s.includes('gorilla')) return 0;
+    if(s.includes('beach')) return 1;
+    if(/lake/i.test(text(t))) return 2;
+    if(s.includes('trek')) return 3;
+    return 4;
+  }
+  const key = t => {
+    const s = t.styles || [];
+    // Activity trips (running camps, rafting) sit with the adventures, whatever lake they pass
+    const i = s.includes('adventure') && !s.includes('wildlife') && !s.includes('beach') ? -1 : best(t);
+    return {
+      group: i >= 0 ? KIND[PLACES[i].kind] : fallback(t),
+      place: i >= 0 ? i : 999,
+      score: (t.featured ? 2 : 0) + (/best seller|signature/i.test(t.badge || '') ? 1 : 0)
+    };
+  };
+  function order(list){
+    const k = new Map(list.map(t => [t, key(t)]));
+    return list.slice().sort((a, b) => {
+      const x = k.get(a), y = k.get(b);
+      return x.group - y.group || x.place - y.place || y.score - x.score || (index.get(a.id) ?? 0) - (index.get(b.id) ?? 0);
+    });
+  }
+  return { order, group: t => key(t).group };
 })();
 
 

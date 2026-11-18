@@ -209,7 +209,7 @@ ${body}
       body:`<section><div class="wrap">
         <p class="seo-intro">${esc(fill(h.intro[0], n, from))}</p>
         <div class="sec-head"><div><h2>${esc(h.h1)}, lowest price first</h2></div></div>
-        <div class="card-grid">${(d.TripMix ? d.TripMix.order(list) : list).map(card).join('')}</div>
+        <div class="card-grid">${(d.TripRank ? d.TripRank.order(list) : list).map(card).join('')}</div>
       </div></section>
       <section class="pt-0"><div class="wrap"><div class="sec-head"><div><h2>Questions about ${esc(h.name.replace(/^an? /, ''))}</h2></div></div>${faqHtml(qa)}<p class="seo-more"><a href="about.html#faqs">More answers: visas, deposits, insurance and what's included</a></p></div></section>
       ${linkRow('Explore more trips', others)}` });

@@ -39,7 +39,7 @@ const MENU_FACTS = (function(){
     places: c => PLACES.filter(p => p.country === c).map(p => {
       const re = new RegExp(p.match, 'i');
       return [p.name, `trips.html?q=${encodeURIComponent(p.match.split('|')[0])}`, TRIPS.filter(t => re.test(`${t.title} ${t.route || ''}`)).length];
-    }).filter(p => p[2]).sort((a, b) => b[2] - a[2]).slice(0, 6),
+    }).filter(p => p[2]).slice(0, 6),   // PLACES is already in main-first order
     bestNow: TRIPS.filter(t => (t.months || []).includes(month) && t.days >= 5).sort((a, b) => score(b) - score(a)).slice(0, 3),
     onSale: onSale.length,
     topDeals: onSale.slice().sort((a, b) => b.was / b.price - a.was / a.price).slice(0, 3),

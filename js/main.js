@@ -313,7 +313,12 @@ const SN = (function(){
   // Destinations page: a row per landscape the country has
   $$('[data-country-lands]').forEach(el => {
     const c = el.dataset.countryLands;
-    el.innerHTML = LANDS.map(l => {
+    // Rows in main-first order: parks (and gorilla forests), then beaches, lakes, mountains, rivers
+    const ROW = { savannah:0, forests:0, coast:1, lakes:2, mountains:3, rivers:4 };
+    const ranked = typeof TripRank !== 'undefined' ? TripRank.order(TRIPS.filter(t => t.country === c)) : [];
+    const firstAt = l => { const i = ranked.findIndex(t => inLand(t, l.key) && TripRank.group(t) === ROW[l.key]); return i < 0 ? 999 : i; };
+    const rows = LANDS.slice().sort((a, b) => (ROW[a.key] ?? 9) - (ROW[b.key] ?? 9) || firstAt(a) - firstAt(b));
+    el.innerHTML = rows.map(l => {
       const n = pick({ packCountry:c, packLand:l.key }).length;
       if(!n) return '';
       const id = `land-${c}-${l.key}`;
@@ -325,7 +330,13 @@ const SN = (function(){
   });
   $$('[data-pack-country],[data-pack-style],[data-pack-maxdays],[data-pack-land]').forEach(el => {
     const n = el.classList.contains('carousel') ? 12 : 3, found = pick(el.dataset);
-    el.innerHTML = (typeof TripMix !== 'undefined' ? TripMix.pick(found, n) : found.slice(0, n)).map(tripCard).join('');
+    // A country row: main first, and a landscape row starts with trips that are mainly about that landscape
+    // (Naivasha before a Mara safari that passes a lake)
+    const ROWG = { savannah:0, forests:0, coast:1, lakes:2, mountains:3, rivers:4 }, g = ROWG[el.dataset.packLand];
+    const own = t => g === undefined || TripRank.group(t) === g ? 0 : 1;
+    const list = el.dataset.packCountry && typeof TripRank !== 'undefined' ? TripRank.order(found).sort((a, b) => own(a) - own(b)).slice(0, n)
+      : typeof TripMix !== 'undefined' ? TripMix.pick(found, n) : found.slice(0, n);
+    el.innerHTML = list.map(tripCard).join('');
   });
   if(typeof PLACES !== 'undefined') $$('[data-places]').forEach(el => {
     const c = el.dataset.places;
