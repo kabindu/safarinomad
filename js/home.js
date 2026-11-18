@@ -30,12 +30,14 @@
   });
   function renderFeatured(style){
     const all = ofStyle(style);
+    // Beach and climbing tabs show the real beach holidays / climbs first, then safari-and-beach combos
+    const OWN = { beach:1, trek:3 }, own = t => typeof TripRank !== 'undefined' && OWN[style] !== undefined && TripRank.group(t) === OWN[style] ? 0 : 1;
     let list = all.filter(t => !dealIds.has(t.id) && (style || t.featured))
-      .sort((a, b) => style ? loved(b) - loved(a) : 0);
+      .sort((a, b) => style ? own(a) - own(b) || loved(b) - loved(a) : 0);
     // Top picks: fill any gap with the next packages, so the grid has full rows
     if(!style && list.length < SHOW) list = list.concat(all.filter(t => !dealIds.has(t.id) && !list.includes(t)).sort((a, b) => loved(b) - loved(a)).slice(0, SHOW - list.length));
     // No look-alikes side by side: varied by photo, park, theme and country
-    list = typeof TripMix !== 'undefined' ? TripMix.pick(list, SHOW) : list.slice(0, SHOW);
+    list = typeof TripMix !== 'undefined' && OWN[style] === undefined ? TripMix.pick(list, SHOW) : list.slice(0, SHOW);
     pkgGrid.innerHTML = list.map(t => SN.tripCard(t)).join('');
     $('#emptyState').classList.toggle('show', list.length === 0);
     $$('#tripTabs .tab').forEach(t => { const on = t.dataset.style === style; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
