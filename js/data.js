@@ -441,23 +441,17 @@ const FLIGHTS = [
    Only list places we can really book; no ratings or prices here (the team quotes rates). */
 const STAY_SETTINGS = [
   { key:'savannah', label:'Savannah lodges & tented camps', short:'Savannah', icon:'fa-sun', img:'images/tent-view.jpg', imgAlt:'View of the bush from inside a safari tent',
-    intro:'Wake up inside the park. Lodges and tented camps in the Mara, Amboseli, Tsavo, the Serengeti and beyond, so your first game drive starts at the door.',
-    features:['Game drives from the door', 'Full board on safari days', 'Pool at most lodges', 'Campfire evenings'] },
+    intro:'Wake up inside the park, with game drives from the door.' },
   { key:'lake', label:'Lake-view lodges', short:'Lake view', icon:'fa-water', img:'images/lake-kivu-sunset.jpg', imgAlt:'Sunset over a lake',
-    intro:'Flamingos, hippos and Rift Valley sunsets from your terrace, at Naivasha, Nakuru, Manyara, Lake Victoria and Lake Kivu.',
-    features:['Lake or flamingo views', 'Boat trips nearby', 'Gardens and pools', 'Easy drive from Nairobi'] },
+    intro:'Flamingos, hippos and Rift Valley sunsets from your terrace.' },
   { key:'beach', label:'Beach hotels & resorts', short:'Beach', icon:'fa-umbrella-beach', img:'images/coast-resort.jpg', imgAlt:'Beach resort on the Indian Ocean',
-    intro:'White sand and warm Indian Ocean water after the dust of safari: Diani, Mombasa, Watamu, Lamu and Zanzibar.',
-    features:['On the beach', 'Snorkelling and dhow trips', 'All-inclusive options', 'Family rooms'] },
+    intro:'White sand and warm Indian Ocean water after your safari.' },
   { key:'mountain', label:'Mountain & forest lodges', short:'Mountain & forest', icon:'fa-mountain', img:'images/forest-canopy-walk.jpg', imgAlt:'Rainforest canopy walk',
-    intro:'Cool air, log fires and forest walks: on the slopes of Mount Kenya and Kilimanjaro, and beside the gorilla forests of Bwindi and the Virungas.',
-    features:['Forest and mountain views', 'Cool nights, log fires', 'Treks start nearby', 'Gorilla permits arranged'] },
+    intro:'Cool air, log fires and forest walks near the big treks and gorilla forests.' },
   { key:'town', label:'Town hotels', short:'Town', icon:'fa-hotel', img:'images/nairobi-skyline.jpg', imgAlt:'Nairobi city skyline at dawn',
-    intro:'A good night before and after your safari, close to the airport or the city: Nairobi, Arusha, Dar es Salaam, Stone Town, Kampala and Kigali.',
-    features:['Airport transfers', 'Before and after safari', 'Business and family rooms', 'Easy late arrivals'] },
+    intro:'A good night before and after your safari, close to the airport.' },
   { key:'camp', label:'Bush camps & budget camping', short:'Bush camps', icon:'fa-campground', img:'images/camp-at-night.jpg', imgAlt:'Tents glowing at a campsite at night',
-    intro:'Our crew sets up dome tents at campsites inside the parks, with a camp cook and fresh meals. Simple, social and the best value: it comes with our camping packages.',
-    features:['Tents and bedding provided', 'Camp cook and fresh meals', 'Shared hot showers', 'Best value'], packages:'trips.html?style=camping' }
+    intro:'Dome tents in the parks with a camp cook. The best value, on our camping safaris.', packages:'trips.html?style=camping' }
 ];
 const STAYS = [
   // Savannah: inside or beside the parks

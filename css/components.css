@@ -15,7 +15,7 @@
 .tab{border:none;background:var(--yt-surface);border-radius:8px;padding:7px 14px;font-weight:600;font-size:14px;cursor:pointer;color:var(--yt-text);transition:background .2s;}
 
 /* ---------- Carousel ---------- */
-.carousel{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 40px)/3);gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:4px 2px 12px;scrollbar-width:none;}
+.carousel{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 40px)/3);gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:10px 10px 16px;margin:-6px -10px 0;scroll-padding:0 10px;scrollbar-width:none;}
 .carousel::-webkit-scrollbar{display:none;}
 .carousel > *{scroll-snap-align:start;}
 .car-nav{display:flex;gap:8px;}
@@ -41,45 +41,39 @@
 .empty-state.show{display:block;}
 .empty-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;}
 
-/* ---------- Trip card (classic brochure card) ---------- */
-.trip-card{position:relative;display:flex;flex-direction:column;min-width:0;}
-.trip-card:hover{background:none;}
-.trip-img{display:block;position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--box-bg);border-radius:var(--box-radius);}
+/* ---------- Trip card (YouTube style) ----------
+   One big photo, the whole card is one link (.trip-link covers it), a soft grey highlight on hover,
+   then a round trip-type icon beside the title, where it goes and the price. Large, calm text. */
+.trip-card{position:relative;display:flex;flex-direction:column;min-width:0;border-radius:18px;}
+.trip-card::before{content:"";position:absolute;inset:-8px;border-radius:20px;background:var(--box-bg);opacity:0;transform:scale(.97);transition:opacity .2s,transform .2s;z-index:-1;}
+.trip-card:hover::before,.trip-card:focus-within::before{opacity:1;transform:none;}
+.trip-link{position:absolute;inset:0;z-index:1;border-radius:14px;}
+.trip-link:focus-visible{outline:3px solid var(--orange);outline-offset:6px;}
+.trip-img{display:block;position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--box-bg);border-radius:14px;}
 .trip-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s;}
 .trip-card:hover .trip-img img{transform:scale(1.04);}
-.trip-img .chip{position:absolute;top:8px;left:8px;border-radius:4px;padding:3px 7px;font-size:11px;background:rgba(255,255,255,.95);color:var(--yt-text);}
-.dur{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.8);color:#fff;font-size:12px;font-weight:600;padding:2px 6px;border-radius:4px;line-height:1.5;}
+.trip-img .chip{position:absolute;top:10px;left:10px;border-radius:6px;padding:4px 8px;font-size:12px;font-weight:700;background:rgba(255,255,255,.95);color:var(--yt-text);}
+.dur{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.82);color:#fff;font-size:13px;font-weight:700;padding:3px 8px;border-radius:6px;line-height:1.4;}
 .chip.sale,.chip.live{background:#b4231a !important;color:#fff !important;}
-.tc-label{position:absolute;top:8px;left:8px;background:#fff;color:var(--yt-text);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:4px 8px;border-radius:4px;}
+.tc-label{position:absolute;top:10px;left:10px;background:#fff;color:var(--yt-text);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:4px 8px;border-radius:6px;}
 .tc-label.sale{background:#b4231a;color:#fff;}
 .tc-label.new{background:var(--green);color:#fff;}
-.tc-rating{order:3;display:flex;align-items:center;gap:6px;margin-top:6px;font-size:13px;color:var(--yt-muted);}
-.tc-rating b{color:var(--yt-text);font-weight:700;}
-.stars{--r:5;position:relative;display:inline-block;font-size:13px;line-height:1;letter-spacing:1px;}
-.stars::before{content:"★★★★★";color:#d6d6d6;}
-.stars::after{content:"★★★★★";position:absolute;left:0;top:0;width:calc(var(--r) / 5 * 100%);overflow:hidden;white-space:nowrap;color:#f2a516;}
 .chip.flash{background:#1E6FD9 !important;color:#fff !important;}
-.flash-ends{font-size:12.5px;color:#b4231a;font-weight:600;margin-top:4px;}
+.flash-ends{font-size:13px;color:#b4231a;font-weight:600;margin-top:4px;}
 .flash-ends i{margin-right:4px;}
 .chip.new{background:var(--green) !important;color:#fff !important;}
 .chip.best{background:var(--orange) !important;color:#fff !important;}
-.wish{position:absolute;top:8px;right:8px;z-index:2;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.55);border:none;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;cursor:pointer;transition:background .2s;}
+.wish{position:absolute;top:10px;right:10px;z-index:2;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);border:none;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;cursor:pointer;transition:background .2s;}
 .wish:hover{background:rgba(0,0,0,.8);}
 .wish.on{color:#ff4e45;}
-.trip-body{padding:12px 2px 0;flex:1;display:flex;flex-direction:column;}
-.trip-desc{font-size:14px;line-height:1.5;color:var(--yt-muted);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;order:2;}
-.trip-body h3{font-family:var(--font-body);font-weight:600;font-size:16px;line-height:22px;color:var(--yt-text);display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;order:1;}
-.trip-body h3 a:hover{color:var(--yt-text);}
-   /* space above the facts row, which sits at the bottom */
-
-   /* stay / extra on its own line */
-
-.trip-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 2px 0;}
-.trip-price{display:flex;align-items:baseline;gap:0 6px;flex-wrap:wrap;font-size:13px;color:var(--yt-muted);min-width:0;}
-.trip-price small{font-size:13px;}
-.price-now{font-weight:700;font-size:16px;color:var(--yt-text);}
-.price-was{font-size:13px;color:#8a8578;text-decoration:line-through;}
-.trip-foot .btn{flex-shrink:0;}
+.trip-meta{display:flex;gap:12px;padding:12px 2px 2px;align-items:flex-start;}
+.trip-icon{flex-shrink:0;width:38px;height:38px;border-radius:50%;background:#e8f0fc;color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:15px;margin-top:1px;}
+.trip-text{min-width:0;flex:1;}
+.trip-text h3{font-family:var(--font-body);font-weight:700;font-size:17px;line-height:1.35;color:var(--yt-text);display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-wrap:pretty;}
+.trip-where{font-size:15px;color:var(--yt-muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.trip-price{font-size:15px;color:var(--yt-muted);margin-top:2px;}
+.price-now{font-weight:800;font-size:16px;color:var(--yt-text);}
+.price-was{font-size:14px;color:#8a8578;text-decoration:line-through;margin-left:2px;}
 .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 20px;}
 .card-grid.cols-3{grid-template-columns:repeat(3,1fr);}
 
@@ -294,6 +288,5 @@ a.contact-meta-item:hover{background:var(--yt-hover);}
 
 /* ---------- Readability: slightly larger small print on cards (easier for every age) ---------- */
 .tc-rating{font-size:14px;}
-.trip-price,.trip-price small{font-size:14px;}
 .tc-label,.trip-img .chip{font-size:12px;}
 @media (max-width:620px){.partners-head{flex-direction:column;align-items:center;gap:4px;}.partners-head .dot{display:none;}}

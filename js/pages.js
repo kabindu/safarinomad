@@ -57,14 +57,18 @@
     const COUNTRY = { kenya:'Kenya', tanzania:'Tanzania', uganda:'Uganda', rwanda:'Rwanda' };
     const tier = n => `<span class="stay-tier" title="${['', 'Budget', 'Mid-range', 'Upper mid-range', 'Luxury'][n]}" translate="no">${'$'.repeat(n)}<i>${'$'.repeat(4 - n)}</i></span>`;
     const ask = name => `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(`Hi SafariNomad! I'd like rates for ${name}.`)}`;
-    const card = x => `
+    // A stay, YouTube style: the whole card is one link (ask for rates), with a round icon for the setting,
+    // the name, where it is and the budget level; WhatsApp sits on top as its own small button
+    const card = (x, st) => `
       <article class="stay-card" data-country="${x.country}"${x.region ? ` data-region="${esc(x.region)}"` : ''}>
-        <div class="stay-card-top"><h3 translate="no">${esc(x.name)}</h3>${tier(x.tier)}</div>
-        <p class="stay-where"><i class="fa-solid fa-location-dot"></i> ${esc(x.area)} · ${COUNTRY[x.country]}</p>
-        <div class="stay-btns">
-          <a class="btn btn-sm" href="contact.html?hotel=${encodeURIComponent(x.name)}">Ask for rates</a>
-          <a class="stay-wa" href="${ask(x.name)}" target="_blank" rel="noopener" aria-label="Ask about ${esc(x.name)} on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a class="stay-link" href="contact.html?hotel=${encodeURIComponent(x.name)}" aria-label="Ask for rates at ${esc(x.name)}"></a>
+        <span class="stay-icon" aria-hidden="true"><i class="fa-solid ${st.icon}"></i></span>
+        <div class="stay-text">
+          <h3 translate="no">${esc(x.name)}</h3>
+          <p class="stay-where">${esc(x.area)} · ${COUNTRY[x.country]}</p>
+          <p class="stay-ask">${tier(x.tier)} <span class="stay-ask-go">Ask for rates <i class="fa-solid fa-arrow-right"></i></span></p>
         </div>
+        <a class="stay-wa" href="${ask(x.name)}" target="_blank" rel="noopener" aria-label="Ask about ${esc(x.name)} on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
       </article>`;
     stayBox.innerHTML = STAY_SETTINGS.map(st => {
       const list = STAYS.filter(x => x.setting === st.key);
@@ -72,18 +76,17 @@
       return `
       <section class="pt-0 stay-sec" id="${st.key}" data-setting="${st.key}">
         <div class="wrap">
-          <div class="stay-band">
-            <div class="stay-media"><img src="${st.img}" alt="${esc(st.imgAlt)}" loading="lazy"></div>
-            <div>
-              <div class="eyebrow"><i class="fa-solid ${st.icon}"></i> ${list.length ? `${list.length} places` : 'On our camping safaris'}</div>
+          <div class="stay-banner">
+            <img src="${st.img}" alt="${esc(st.imgAlt)}" loading="lazy">
+            <div class="stay-banner-text">
+              <span class="stay-count"><i class="fa-solid ${st.icon}"></i> ${list.length ? `${list.length} places` : 'On our camping safaris'}</span>
               <h2>${esc(st.label)}</h2>
               <p>${esc(st.intro)}</p>
-              <ul class="stay-feats">${st.features.map(f => `<li><i class="fa-solid fa-check"></i> ${esc(f)}</li>`).join('')}</ul>
               ${st.packages ? `<a class="btn" href="${st.packages}">See camping safaris</a>` : ''}
             </div>
           </div>
           ${regions.length > 1 ? `<div class="tabs stay-regions">${['', ...regions].map((r, i) => `<button class="tab${i ? '' : ' active'}" data-region="${esc(r)}">${r ? esc(r) : 'All cities'}</button>`).join('')}</div>` : ''}
-          ${list.length ? `<div class="stay-grid">${list.map(card).join('')}</div>` : ''}
+          ${list.length ? `<div class="stay-grid">${list.map(x => card(x, st)).join('')}</div>` : ''}
           <p class="stay-none" hidden>None in this country yet. <a href="contact.html">Ask us</a> and we'll find one.</p>
         </div>
       </section>`;

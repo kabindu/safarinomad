@@ -272,46 +272,44 @@ const SN = (function(){
      YouTube-style cards: rounded thumbnail with a length badge,
      a 2-line title, grey info lines, then price and button. */
   const wishBtn = id => `<button class="wish" data-id="${id}" aria-label="Save trip"><i class="fa-regular fa-heart"></i></button>`;
-  function tripCard(t, deal){
-    const link = `book.html?trip=${t.id}`;
-    const off = deal === true && t.was > t.price && !t.flash ? Math.round((1 - t.price / t.was) * 100) : 0;   // deals: show the saving
+  /* Package card, YouTube style: one big photo, the whole card is one link, and under the photo a round
+     icon for the kind of trip (where YouTube shows the channel), the title, where it goes and the price. */
+  const TRIP_ICON = { wildlife:'fa-paw', gorilla:'fa-leaf', beach:'fa-umbrella-beach', trek:'fa-mountain-sun', camping:'fa-campground',
+    family:'fa-children', luxury:'fa-gem', adventure:'fa-person-hiking', abroad:'fa-plane' };
+  const tripIcon = t => TRIP_ICON[(t.styles || [])[0]] || 'fa-compass';
+  function cardShell(c){
     return `
-    <article class="trip-card" data-country="${t.country}" data-style="${t.styles.join(' ')}">
-      <a class="trip-img" href="${link}" tabindex="-1">
-        <img src="${t.img}" alt="${t.alt}" loading="lazy">
-        <span class="dur">${t.days} days</span>
-        ${t.flash ? `<span class="chip flash"><i class="fa-solid fa-bolt"></i> −${t.flash.pct}%</span>` : off ? `<span class="chip flash">−${off}%</span>` : t.badge ? `<span class="tc-label${t.badgeType ? ' ' + t.badgeType : ''}">${t.badge}</span>` : ''}
-      </a>
-      ${wishBtn(t.id)}
-      <div class="trip-body">
-        <h3><a href="tour-${t.id}">${t.title}</a></h3>
-        <p class="trip-desc">${t.route || t.countries}</p>
-        ${t.flash && t.flash.ends ? `<p class="flash-ends"><i class="fa-regular fa-clock"></i> Sale ends ${new Date(t.flash.ends).toLocaleDateString('en-GB', { day:'numeric', month:'short' })}</p>` : ''}
-      </div>
-      <div class="trip-foot">
-        <div class="trip-price"><small>From</small><span class="price-now" data-usd="${t.price}"></span>${t.flash || off ? `<span class="price-was" data-usd="${t.was}"></span>` : '<small>per person</small>'}</div>
-        <a class="btn btn-sm" href="${link}">View dates</a>
+    <article class="trip-card"${c.country ? ` data-country="${c.country}"` : ''}>
+      <a class="trip-link" href="${c.link}" aria-label="${String(c.label).replace(/"/g, '&quot;')}"></a>
+      <div class="trip-img"><img src="${c.img}" alt="${c.alt}" loading="lazy"><span class="dur">${c.days} days</span>${c.chip || ''}</div>
+      ${c.id ? wishBtn(c.id) : ''}
+      <div class="trip-meta">
+        <span class="trip-icon" aria-hidden="true"><i class="fa-solid ${c.icon}"></i></span>
+        <div class="trip-text">
+          <h3>${c.title}</h3>
+          <p class="trip-where">${c.where}</p>
+          <p class="trip-price">${c.price}</p>
+          ${c.extra || ''}
+        </div>
       </div>
     </article>`;
   }
+  function tripCard(t, deal){
+    const off = deal === true && t.was > t.price && !t.flash ? Math.round((1 - t.price / t.was) * 100) : 0;   // deals: show the saving
+    const chip = t.flash ? `<span class="chip flash"><i class="fa-solid fa-bolt"></i> −${t.flash.pct}%</span>` : off ? `<span class="chip flash">−${off}%</span>` : t.badge ? `<span class="tc-label${t.badgeType ? ' ' + t.badgeType : ''}">${t.badge}</span>` : '';
+    return cardShell({
+      link:'tour-' + t.id, label:`${t.title}, ${t.days} days`, img:t.img, alt:t.alt, days:t.days, chip, id:t.id, icon:tripIcon(t), country:t.country,
+      title:t.title, where:t.countries,
+      price:`From <span class="price-now" data-usd="${t.price}"></span>${t.flash || off ? ` <span class="price-was" data-usd="${t.was}"></span>` : ' per person'}`,
+      extra: t.flash && t.flash.ends ? `<p class="flash-ends"><i class="fa-regular fa-clock"></i> Sale ends ${new Date(t.flash.ends).toLocaleDateString('en-GB', { day:'numeric', month:'short' })}</p>` : ''
+    });
+  }
   function lastMinuteCard(t){
-    const link = `book.html?trip=${t.id}`;
-    return `
-    <article class="trip-card">
-      <a class="trip-img" href="${link}" tabindex="-1">
-        <img src="${t.img}" alt="${t.alt}" loading="lazy">
-        <span class="dur">${t.days} days</span>
-      </a>
-      ${wishBtn(t.id)}
-      <div class="trip-body">
-        <h3><a href="${link}">${t.title}</a></h3>
-        <p class="trip-desc">Departs ${t.departs}</p>
-      </div>
-      <div class="trip-foot">
-        <div class="trip-price"><span class="price-now" data-usd="${t.price}"></span><span class="price-was" data-usd="${t.was}"></span></div>
-        <a class="btn btn-sm" href="${link}">View dates</a>
-      </div>
-    </article>`;
+    return cardShell({
+      link:'book.html?trip=' + t.id, label:`${t.title}, departs ${t.departs}`, img:t.img, alt:t.alt, days:t.days, id:t.id, icon:'fa-hourglass-half',
+      title:t.title, where:`${t.countries} · departs ${t.departs}`,
+      price:`<span class="price-now" data-usd="${t.price}"></span> <span class="price-was" data-usd="${t.was}"></span>`
+    });
   }
 
   /* ---------- Package & place rows (home and destinations pages) ----------

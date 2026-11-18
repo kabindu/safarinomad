@@ -185,13 +185,17 @@ ${body}
 </html>`;
   }
 
+  // Same YouTube-style card as js/main.js (tripCard): one link, photo, trip-type icon, title, where, price
+  const TRIP_ICON = { wildlife:'fa-paw', gorilla:'fa-leaf', beach:'fa-umbrella-beach', trek:'fa-mountain-sun', camping:'fa-campground',
+    family:'fa-children', luxury:'fa-gem', adventure:'fa-person-hiking', abroad:'fa-plane' };
   const card = t => `
     <article class="trip-card" data-country="${esc(t.country)}">
-      <a class="trip-img" href="tour-${esc(t.id)}" tabindex="-1"><img src="${esc(t.img)}" alt="${esc(t.alt)}" loading="lazy"><span class="dur">${t.days} days</span></a>
-      <div class="trip-body"><h3><a href="tour-${esc(t.id)}">${esc(t.title)}</a></h3><p class="trip-desc">${esc(t.route || t.countries)}</p></div>
-      <div class="trip-foot">
-        <div class="trip-price"><small>From</small><span class="price-now" data-usd="${t.price}">${usd(t.price)}</span><small>per person</small></div>
-        <a class="btn btn-sm" href="book.html?trip=${esc(t.id)}">View dates</a>
+      <a class="trip-link" href="tour-${esc(t.id)}" aria-label="${esc(t.title)}, ${t.days} days"></a>
+      <div class="trip-img"><img src="${esc(t.img)}" alt="${esc(t.alt)}" loading="lazy"><span class="dur">${t.days} days</span></div>
+      <div class="trip-meta">
+        <span class="trip-icon" aria-hidden="true"><i class="fa-solid ${TRIP_ICON[(t.styles || [])[0]] || 'fa-compass'}"></i></span>
+        <div class="trip-text"><h3>${esc(t.title)}</h3><p class="trip-where">${esc(t.countries)}</p>
+          <p class="trip-price">From <span class="price-now" data-usd="${t.price}">${usd(t.price)}</span> per person</p></div>
       </div>
     </article>`;
   const faqHtml = list => `<div class="faq-list">${list.map(({ q, a }, i) => `<details class="faq"${i === 0 ? ' open' : ''}><summary>${esc(q)} <i class="fa-solid fa-plus"></i></summary><p>${esc(a)}</p></details>`).join('')}</div>`;
