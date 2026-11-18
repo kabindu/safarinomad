@@ -120,7 +120,10 @@
           <label><input type="radio" name="flights" value="later"><span><b>I'll decide later</b><small>You can tell us any time before you travel</small></span></label>
         </fieldset>
         <div class="bk-fields" id="flyHelp">
-          <label class="bk-field full"><span>Flying from (city or airport)</span><input name="flyFrom" class="bk-input" type="text" placeholder="e.g. Frankfurt"></label>
+          <label class="bk-field"><span>Country you fly from</span><select id="flyCountry" class="bk-input"></select></label>
+          <label class="bk-field"><span>Airport</span><select id="flyAirport" class="bk-input" translate="no"></select></label>
+          <label class="bk-field full"><span>Arriving at <small>(East Africa)</small></span><select name="arriveAt" id="flyArrive" class="bk-input" translate="no"></select></label>
+          <input type="hidden" name="flyFrom" id="flyFrom">
         </div>
         <div class="bk-fields" id="flyBooked" hidden>
           <label class="bk-field"><span>Arrival flight number</span><input name="flightNo" class="bk-input" type="text" placeholder="e.g. KQ 117"></label>

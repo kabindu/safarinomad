@@ -226,6 +226,24 @@
   }
   form.addEventListener('change', e => { if(e.target.name === 'flights') showFlightFields(); });
   showFlightFields();
+  // Flying from: country, then airport. Arriving at: East Africa only, starting with the trip's usual airport.
+  const fly = SN.airportPicker($('#flyCountry'), $('#flyAirport'), { other:true });
+  const syncFly = () => { if(fly) $('#flyFrom').value = fly.label(); };
+  $('#flyCountry').addEventListener('change', syncFly); $('#flyAirport').addEventListener('change', syncFly); syncFly();
+  const arrive = $('#flyArrive'), EA = typeof EAST_AFRICA_AIRPORTS !== 'undefined' ? EAST_AFRICA_AIRPORTS : {};
+  arrive.innerHTML = Object.entries(EA).map(([k, v]) => `<option value="${v} (${k})">${v} (${k})</option>`).join('');
+  let arriveTouched = false;
+  arrive.addEventListener('change', () => { arriveTouched = true; });
+  const ARRIVE_FOR = { kenya:'NBO', tanzania:'JRO', uganda:'EBB', rwanda:'KGL', multi:'NBO' };
+  function defaultArrival(){
+    if(arriveTouched || !state.trip) return;
+    const t = state.trip, code = /zanzibar|stone town/i.test(t.title) && t.country === 'tanzania' && !/serengeti|ngorongoro/i.test(t.title) ? 'ZNZ'
+      : /mombasa|diani|malindi|watamu/i.test(`${t.title} ${t.route || ''}`) && !/mara/i.test(t.title) ? 'MBA'
+      : /gorilla/i.test(t.title) && t.country === 'multi' ? 'EBB' : (ARRIVE_FOR[t.country] || 'NBO');
+    if(EA[code]) arrive.value = `${EA[code]} (${code})`;
+  }
+  defaultArrival();
+  sel.addEventListener('change', defaultArrival);
 
   /* ---------- Follow-up: save progress so a planner can help if the traveller leaves ---------- */
   const lead = SN.lead('booking', 'book');
@@ -240,7 +258,7 @@
         Name: d.name, Email: (d.email || '').trim(), Phone: d.phone, Country: d.country,
         Trip: state.trip.title, Date: state.date || '', Travellers: `${state.adults} adults, ${state.children} children`,
         Nationality: d.nationality, Visa: VISA[d.visa], Flights: FLIGHTS[d.flights],
-        'Flying from': d.flights === 'help' ? d.flyFrom : '', 'Arrival flight': d.flights === 'booked' ? [d.flightNo, d.arrival].filter(Boolean).join(' · ') : '',
+        'Flying from': d.flights === 'help' ? d.flyFrom : '', 'Arriving at': d.flights === 'help' ? d.arriveAt : '', 'Arrival flight': d.flights === 'booked' ? [d.flightNo, d.arrival].filter(Boolean).join(' · ') : '',
         Notes: d.notes
       }
     });
@@ -269,7 +287,7 @@
     const payload = { trip:state.trip.id, date:state.date, private:isPrivate(), adults:state.adults, children:state.children,
       name:d.name.trim(), email:d.email.trim(), phone:(d.phone || '').trim(), country:(d.country || '').trim(), notes:(d.notes || '').trim(),
       nationality:(d.nationality || '').trim(), visa:d.visa || '', flights:d.flights || '',
-      flyFrom:d.flights === 'help' ? (d.flyFrom || '').trim() : '', flightNo:d.flights === 'booked' ? (d.flightNo || '').trim() : '', arrival:d.flights === 'booked' ? (d.arrival || '') : '',
+      flyFrom:d.flights === 'help' ? (d.flyFrom || '').trim() : '', arriveAt:d.flights === 'help' ? (d.arriveAt || '') : '', flightNo:d.flights === 'booked' ? (d.flightNo || '').trim() : '', arrival:d.flights === 'booked' ? (d.arrival || '') : '',
       lang:SNI18N.lang, currency:(SN.store.get('currency') || 'USD'), draft:lead.draft,
       discount:$('#wantDiscount').checked ? { reason:$('#discountReason').value, message:$('#discountMessage').value.trim() } : null };
 
@@ -300,7 +318,7 @@
       'Total: $' + R.price(p.trip, p.adults, p.children).toLocaleString('en-US') + ' (deposit $' + R.deposit(p.trip, p.adults, p.children).toLocaleString('en-US') + ')',
       'Name: ' + p.name, 'Email: ' + p.email, 'Phone: ' + (p.phone || '-'), 'Country: ' + (p.country || '-'),
       'Nationality: ' + (p.nationality || '-'), 'Visa: ' + (VISA[p.visa] || '-'), 'Flights: ' + (FLIGHTS[p.flights] || '-'),
-      p.flyFrom ? 'Flying from: ' + p.flyFrom : '', p.flightNo || p.arrival ? 'Arrival: ' + [p.flightNo, p.arrival].filter(Boolean).join(' · ') : '',
+      p.flyFrom ? 'Flying from: ' + p.flyFrom : '', p.arriveAt ? 'Arriving at: ' + p.arriveAt : '', p.flightNo || p.arrival ? 'Arrival: ' + [p.flightNo, p.arrival].filter(Boolean).join(' · ') : '',
       p.discount ? 'Discount requested: ' + p.discount.reason + (p.discount.message ? ' (' + p.discount.message + ')' : '') : '',
       p.notes ? '\nNotes:\n' + p.notes : ''
     ].filter(Boolean).join('\n');
@@ -347,4 +365,5 @@
   document.addEventListener('langchange', () => state.trip && render());
   document.addEventListener('currencychange', () => state.trip && render());
   setTrip(params.get('trip') || TRIPS[0].id, params.get('date') || (R.find(params.get('trip')) || {}).date);
+  defaultArrival();   // now the trip is known, start the arrival airport on its usual one
 })();

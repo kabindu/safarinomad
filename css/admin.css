@@ -519,3 +519,13 @@ button.ins-r:hover,a.ins-r:hover{background:var(--box-bg);}
 .disc-go{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
 .disc-warn{background:#FDECEC;color:#8a1f1f;}
 small.disc.requested{color:#6b4e00;font-weight:700;}small.disc.approved{color:#1d6d39;font-weight:700;}
+
+/* Visa & flights page */
+.th-need{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:50px;white-space:nowrap;}
+.th-need i{font-size:11px;}
+.th-need.visa{background:#f3ecff;color:#5b2bb5;}
+.th-need.fly{background:#e7f1ff;color:#1a5fd0;}
+.th-route{font-size:13px;margin:6px 0 2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.th-route i{color:var(--yt-muted);font-size:11px;}
+.th-actions{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;}
+.adm-btn.disabled{opacity:.5;cursor:default;pointer-events:none;}

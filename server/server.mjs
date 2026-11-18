@@ -95,7 +95,7 @@ let dataCache = { key: '', value: null };
 function evalData(withContent){
   const code = fs.readFileSync(DATA_FILE, 'utf8');
   return new vm.Script(code + '\n;' + (withContent ? 'applyContent(__C);' : '') +
-    '({ SITE, TRIPS, LAST_MINUTE, FLIGHTS, AIRPORTS, PLACES, PARTNERS, KNOWLEDGE, BOOKING, BookingRules, TripMix, TripRank })').runInNewContext({ __C: JSON.parse(JSON.stringify(content)) });
+    '({ SITE, TRIPS, LAST_MINUTE, FLIGHTS, AIRPORTS, AIRPORT_COUNTRIES, EAST_AFRICA_AIRPORTS, PLACES, PARTNERS, KNOWLEDGE, BOOKING, BookingRules, TripMix, TripRank })').runInNewContext({ __C: JSON.parse(JSON.stringify(content)) });
 }
 function dataKey(){ return fs.statSync(DATA_FILE).mtimeMs + '|' + contentVersion + '|' + Math.floor(Date.now() / 60_000); }
 function loadData(){
@@ -677,7 +677,7 @@ async function handleBooking(req, res){
     notes: clean(b.notes, 2000), lang: LANGUAGES[b.lang] ? b.lang : 'en', currency: clean(b.currency, 4), note: '',
     // Travel documents & flights (step 5 on the booking page)
     nationality: clean(b.nationality, 80), visa: clean(b.visa, 40), flights: clean(b.flights, 40),
-    flightNo: clean(b.flightNo, 40), arrival: clean(b.arrival, 40), flyFrom: clean(b.flyFrom, 80)
+    flightNo: clean(b.flightNo, 40), arrival: clean(b.arrival, 40), flyFrom: clean(b.flyFrom, 100), arriveAt: clean(b.arriveAt, 60)
   };
   // A discount request never changes the price by itself: the team decides in admin
   if(b.discount && typeof b.discount === 'object'){
@@ -1047,7 +1047,7 @@ async function handleAdmin(req, res){
     team.logout(tokenOf(req));
     return sendJSON(res, 200, { ok: true });
   }
-  if(route === 'me' && req.method === 'GET') return sendJSON(res, 200, { me: team.publicUser(me), can: team.ROLES[me.role].can, team: team.directory(), now: new Date().toISOString() });
+  if(route === 'me' && req.method === 'GET') return sendJSON(res, 200, { me: team.publicUser(me), can: team.ROLES[me.role].can, team: team.directory(), now: new Date().toISOString(), site: { phone: loadData().SITE.phone, whatsapp: loadData().SITE.whatsapp } });
   if(route === 'password' && req.method === 'POST'){
     const b = await readJSON(req, 2000) || {};
     try { team.changePassword(me, String(b.current || ''), String(b.next || '')); return sendJSON(res, 200, { ok: true, user: team.publicUser(me) }); }
@@ -1127,6 +1127,11 @@ async function handleAdmin(req, res){
       if(b.assignedTo && (!to || to.disabled)) return sendJSON(res, 400, { error: 'Pick an active team member.' });
       item.assignedTo = to ? to.id : '';
       what.push(to ? `assigned to ${to.name}` : 'unassigned');
+    }
+    // Visa & flight help on a booking: done / not done (Visa & flights page)
+    if(typeof b.travelHelped === 'boolean' && b.kind === 'bookings' && b.travelHelped !== !!(item.travelHelp && item.travelHelp.done)){
+      item.travelHelp = b.travelHelped ? { done: true, by: me.id, at: when } : null;
+      what.push(b.travelHelped ? 'marked visa & flight help done' : 'reopened visa & flight help');
     }
     if(typeof b.emailed === 'string' && b.kind !== 'questions'){ item.lastEmail = { at: when, by: me.id, subject: clean(b.emailed, 160) }; what.push('opened an email to the customer'); }
     if(!what.length) return sendJSON(res, 200, { item });

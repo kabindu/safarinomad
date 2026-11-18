@@ -126,6 +126,7 @@
     set('#cntQuestions', data.questions.filter(q => q.status === 'new').length);
     set('#cntLeads', (data.leads || []).filter(l => l.status === 'open').length);
     set('#cntFlights', flightPlans().filter(x => ['new', 'open'].includes(x.item.status)).length);
+    set('#cntTravelHelp', travelHelpList().filter(x => !x.done).length);
     // Total waiting, on the phone Menu button
     set('#menuCount', ['#cntBookings', '#cntEnquiries', '#cntLeads'].reduce((n, id) => n + (Number($(id).textContent) || 0), 0));
   }
@@ -139,6 +140,7 @@
     deals:      { title:'Deals', sub:'Flash sales and last-minute departures shown on the website.', filters:null, manual:true },
     enquiries:  { title:'Enquiries', sub:'Quote requests, flight requests, guide requests and sign-ups.', filters:['all','new','replied','closed'] },
     leads:      { title:'Unfinished', sub:'Travellers who started a booking or custom trip and left before sending it. Email, call or WhatsApp them to help finish.', filters:['open','contacted','booked','lost','all'] },
+    travelhelp: { title:'Visa & flights', sub:'Travellers who asked us to help with a visa or flights. Email or WhatsApp them in one tap: the message is written for you. Mark them helped when done.', filters:['waiting','helped','all'] },
     flightplans:{ title:'Flight plans', sub:'Flights travellers are comparing or asked us to book. Open one to see their options, check live prices and email them.', filters:['waiting','all'] },
     questions:  { title:'Chat questions', sub:'What travellers asked Nomad, the AI assistant, and how it answered.', filters:['all','new','reviewed'] },
     pricing:    { title:'Prices', sub:'Estimated cost and suggested price for every package. Nothing changes on the website until you publish.', filters:null, manual:true },
@@ -185,7 +187,7 @@
     $('#viewTitle').textContent = v.title;
     $('#mbarTitle').textContent = v.title;
     $('#viewSub').textContent = v.sub;
-    $('#export').hidden = ['overview', 'insights', 'deals', 'team', 'flightplans', 'pricing'].includes(view) || !!v.custom;
+    $('#export').hidden = ['overview', 'insights', 'deals', 'team', 'flightplans', 'travelhelp', 'pricing'].includes(view) || !!v.custom;
     $('.adm-search').hidden = ['insights', 'overview', 'team', 'pricing'].includes(view);
     if(view === 'pricing'){ $('#filters').innerHTML = ''; return AdminPricing.render($('#view'), { api, toast, esc, usd, content: AdminContent }); }
     if(view === 'team'){ $('#filters').innerHTML = ''; return AdminTeam.render($('#view'), { api, toast, esc, data, me: data.me || {}, fmtWhen, usd, openDetail, reload: true }); }
@@ -202,10 +204,11 @@
       const n = countFor(f);
       return `<button data-filter="${f}" class="${f === filter ? 'on' : ''}">${f[0].toUpperCase() + f.slice(1)}${n !== null ? ` <b>${n}</b>` : ''}</button>`;
     }).join('') : '';
-    $('#view').innerHTML = ({ overview, bookings, departures, enquiries, questions, leads, flightplans })[view]();
+    $('#view').innerHTML = ({ overview, bookings, departures, enquiries, questions, leads, flightplans, travelhelp })[view]();
   }
   function countFor(f){
     const list = view === 'bookings' ? data.bookings : view === 'enquiries' ? data.enquiries : view === 'questions' ? data.questions : view === 'leads' ? (data.leads || []) : null;
+    if(view === 'travelhelp'){ const all = travelHelpList(); return f === 'all' ? all.length : all.filter(x => f === 'waiting' ? !x.done : x.done).length; }
     if(!list) return null;
     if(f === 'discounts') return list.filter(x => x.discount && x.discount.status === 'requested').length;
     return f === 'all' ? list.length : list.filter(x => x.status === f).length;
@@ -405,6 +408,80 @@
           : `<p class="clip"><b>${esc((item.fields || {}).Route || '')}</b>${(item.fields || {}).Date ? ' · ' + fmtDate(item.fields.Date) : ''}</p>`}
       </article>`).join('')}</div>`;
   }
+  /* ---------- Visa & flights: everyone who asked us for help, with email and WhatsApp ready to send ---------- */
+  function travelHelpList(){
+    const done = b => !!(b.travelHelp && b.travelHelp.done);
+    const fromBookings = data.bookings.filter(b => b.status !== 'cancelled' && (b.visa === 'help' || b.flights === 'help')).map(b => ({
+      kind:'bookings', item:b, name:b.name, email:b.email, phone:b.phone, when:b.created, done:done(b),
+      visa:b.visa === 'help', flights:b.flights === 'help'
+    }));
+    const fromFlights = flightPlans().map(x => ({
+      kind:x.kind, item:x.item, name:x.name, email:x.kind === 'leads' ? x.item.email : x.email,
+      phone:x.kind === 'leads' ? x.item.phone : Object.entries(x.item.fields || {}).find(([k]) => /phone|whatsapp/i.test(k))?.[1] || '',
+      when:x.when, done:x.kind === 'leads' ? x.item.status !== 'open' : x.item.status !== 'new', visa:false, flights:true, request:true
+    }));
+    return [...fromBookings, ...fromFlights].sort((a, b) => a.done - b.done || b.when.localeCompare(a.when));
+  }
+  function travelHelpMessages(x){
+    const b = x.item, first = firstName(x.name), me = (data.me || {}).name || 'the SafariNomad team';
+    const bye = `\n\nBest wishes,\n${(data.me || {}).name || 'The team'}\nSafariNomad\nWhatsApp / phone: ${(data.site || {}).phone || ""}`.trimEnd();
+    if(x.request){
+      const f = b.fields || {}, route = f.Route || '', when = f.Date ? fmtDate(f.Date) : '';
+      const t = (b.flights || []).length ? emailTemplates(x.kind, b)[0]
+        : { subject:`Your flight request${route ? ': ' + route : ''}`, body:`Hi ${first},\n\nThank you for your flight request${route ? ` for ${route}` : ''}${when ? ` on ${when}` : ''}.\n\nI'll compare fares on the airlines that fly this route and send you the best options. How many travellers, and do you have a preferred airline, cabin or budget?${bye}` };
+      return { subject:t.subject, body:t.body, wa:`Hi ${first}, this is ${me} from SafariNomad. I saw your flight search and I'd be glad to help you find the best fare and book it. When are you hoping to travel?` };
+    }
+    const trip = `${b.tripTitle} (starting ${fmtDate(b.date)})`, party = b.adults + b.children;
+    const what = x.visa && x.flights ? 'your visa and flights' : x.visa ? 'your visa' : 'your flights';
+    const visaPart = x.visa ? `VISA\nYou asked us to help with your visa or eTA${b.nationality ? ` (passport: ${b.nationality})` : ''}. ${VISA_TEXT}\n\nIf you send a photo of your passport's main page, I'll check exactly what you need and guide you through the form.` : '';
+    const flightPart = x.flights ? `FLIGHTS\nYou asked us to find flights for ${party} traveller${party === 1 ? '' : 's'}.\nFrom: ${b.flyFrom || 'not given yet'}\nTo: ${b.arriveAt || 'East Africa'}\nArriving before: ${fmtDate(b.date)}\n\nI'll compare fares and send you the best options. Do you have a preferred airline, cabin or budget?` : '';
+    return {
+      subject:`Help with ${what}: ${b.tripTitle}`,
+      body:`Hi ${first},\n\nThank you for booking ${trip} with SafariNomad. ${x.visa && x.flights ? 'Here is how we can help with your visa and flights.' : ''}\n\n${[visaPart, flightPart].filter(Boolean).join('\n\n')}${bye}`.replace(/\n{3,}/g, '\n\n'),
+      wa:`Hi ${first}, this is ${me} from SafariNomad about your ${b.tripTitle} on ${fmtDate(b.date)}. You asked us to help with ${what}. ${x.flights && b.flyFrom ? `I'm looking at flights from ${b.flyFrom}${b.arriveAt ? ' to ' + b.arriveAt : ''}. ` : ''}What's the best way to reach you, here on WhatsApp or by email?`
+    };
+  }
+  function travelhelp(){
+    const list = travelHelpList().filter(x => (filter === 'all' || (filter === 'waiting' ? !x.done : x.done)) && matches(x.item));
+    if(!list.length) return empty('fa-passport', query ? 'Nobody matches your search.' : filter === 'waiting' ? 'Nobody is waiting. When a traveller asks for help with a visa or flights, they appear here.' : 'Nothing here yet.');
+    return `<div class="cards th-cards">${list.map(x => {
+      const b = x.item, m = travelHelpMessages(x), wa = waNumber(x.phone);
+      const needs = [x.visa ? '<span class="th-need visa"><i class="fa-solid fa-passport"></i> Visa</span>' : '', x.flights ? '<span class="th-need fly"><i class="fa-solid fa-plane"></i> Flights</span>' : ''].join('');
+      const detail = x.request ? `<p class="clip">${esc((b.fields || {}).Route || (b.flights || []).map(o => `${o.fromName} → ${o.toName}`).join(', ') || 'Flight search')}</p>`
+        : `<p class="clip"><b>${esc(b.tripTitle)}</b> · ${fmtDate(b.date)} · ${b.adults + b.children} traveller${b.adults + b.children === 1 ? '' : 's'}</p>
+           ${x.flights ? `<p class="th-route"><i class="fa-solid fa-plane-departure"></i> ${esc(b.flyFrom || 'Not given')} <i class="fa-solid fa-arrow-right"></i> ${esc(b.arriveAt || 'East Africa')}</p>` : ''}
+           ${x.visa && b.nationality ? `<p class="muted">Passport: ${esc(b.nationality)}</p>` : ''}`;
+      return `<article class="card ${x.done ? '' : 'unread'}" data-open="${x.kind}:${b.id}">
+        <header><span class="type">${x.request ? 'Flight request' : 'Booking ' + esc(b.ref)}</span>${needs}${x.done ? '<span class="pill confirmed">helped</span>' : ''}<small>${fmtWhen(x.when)}</small></header>
+        <h3>${esc(x.name)}</h3>${detail}
+        <div class="lead-actions th-actions">
+          ${x.email ? `<a class="adm-btn" data-th-mail="${x.kind}:${b.id}" href="mailto:${esc(x.email)}?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}"><i class="fa-solid fa-envelope"></i> Email</a>` : ''}
+          ${wa ? `<a class="adm-btn wa" target="_blank" rel="noopener" href="https://wa.me/${esc(wa)}?text=${encodeURIComponent(m.wa)}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : '<span class="adm-btn disabled" title="No phone number given"><i class="fa-brands fa-whatsapp"></i> No phone</span>'}
+          <button type="button" class="adm-btn" data-th-done="${x.kind}:${b.id}:${x.done ? 0 : 1}"><i class="fa-solid ${x.done ? 'fa-rotate-left' : 'fa-check'}"></i> ${x.done ? 'Reopen' : 'Mark helped'}</button>
+        </div>
+      </article>`;
+    }).join('')}</div>`;
+  }
+  // Email / mark helped on the Visa & flights page (without opening the drawer)
+  $('#view').addEventListener('click', async e => {
+    const mail = e.target.closest('[data-th-mail]');
+    if(mail){
+      const [kind, id] = mail.dataset.thMail.split(':');
+      api('update', { method:'POST', body:JSON.stringify({ kind, id, emailed: decodeURIComponent((mail.href.split('subject=')[1] || '').split('&')[0]) }) }).catch(() => {});
+      return;
+    }
+    const d = e.target.closest('[data-th-done]');
+    if(!d) return;
+    e.stopPropagation();
+    const [kind, id, on] = d.dataset.thDone.split(':'), yes = on === '1';
+    const change = kind === 'bookings' ? { travelHelped: yes } : kind === 'leads' ? { status: yes ? 'contacted' : 'open' } : { status: yes ? 'replied' : 'new' };
+    try{
+      const { item } = await api('update', { method:'POST', body:JSON.stringify(Object.assign({ kind, id }, change)) });
+      data[kind][data[kind].findIndex(x => x.id === id)] = item;
+      counts(); render(); toast(yes ? 'Marked as helped' : 'Reopened');
+    }catch(err){ if(err.message !== 'Signed out') toast(err.message, true); }
+  }, true);
+
   function flightDetail(item){
     if(!(item.flights || []).length) return '';
     return `<h4>Flights they're comparing</h4><ul class="fp-list">${item.flights.map(o => `
@@ -539,7 +616,7 @@
           ${row('Lives in', esc(b.country))}${row('Nationality', esc(b.nationality))}
           ${row('Visa', esc({ help:'Wants help with visa / eTA', own:'Arranging own visa', none:'Not needed (East African citizen)' }[b.visa] || ''))}
           ${row('Flights', esc({ help:'Wants us to find flights', booked:'Already booked', later:'Will decide later' }[b.flights] || ''))}
-          ${row('Flying from', esc(b.flyFrom))}${row('Arrival', esc([b.flightNo, b.arrival && b.arrival.replace('T', ' ')].filter(Boolean).join(' · ')))}
+          ${row('Flying from', esc(b.flyFrom))}${row('Arriving at', esc(b.arriveAt))}${row('Arrival', esc([b.flightNo, b.arrival && b.arrival.replace('T', ' ')].filter(Boolean).join(' · ')))}
           ${row('Travellers', `${b.adults} adult${b.adults === 1 ? '' : 's'}${b.children ? `, ${b.children} child${b.children === 1 ? '' : 'ren'}` : ''}`)}
           ${row('Total', `<b>${usd(b.total)}</b>${b.private ? ' <small>(private price to confirm)</small>' : ''}`)}
           ${row('Deposit', usd(b.deposit))}${row('Balance due', fmtDate(b.balanceDue))}

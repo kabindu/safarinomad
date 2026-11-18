@@ -45,22 +45,19 @@
 
   /* ---------- Search form ---------- */
   const fromSel = $('#fsFrom'), toSel = $('#fsTo'), depIn = $('#fsDepart'), retIn = $('#fsReturn'), cabin = $('#fsCabin');
-  const codes = Object.keys(AIRPORTS);
   const opt = c => `<option value="${c}">${AIRPORTS[c]} (${c})</option>`;
-  const group = (label, list) => `<optgroup label="${label}">${list.map(opt).join('')}</optgroup>`;
-  fromSel.innerHTML = group('Fly from', codes.filter(c => !isEA(c))) + group('East Africa', codes.filter(isEA));
-  // From outside East Africa you can fly to East Africa; within East Africa, anywhere
+  // From: pick your country, then one of its airports. To: always an East African airport.
+  const picker = SN.airportPicker($('#fsCountry'), fromSel);
   const fillTo = () => {
     const keep = toSel.value, from = fromSel.value;
-    const list = codes.filter(c => c !== from && (isEA(from) || isEA(c)));
-    toSel.innerHTML = isEA(from) ? group('East Africa', list.filter(isEA)) + group('Abroad', list.filter(c => !isEA(c))) : group('East Africa', list);
+    toSel.innerHTML = EAST_AFRICA.filter(c => c !== from).map(opt).join('');
     if([...toSel.options].some(o => o.value === keep)) toSel.value = keep;
   };
   const iso = d => d.toISOString().slice(0, 10);
   const addDays = (s, n) => iso(new Date(new Date(s + 'T12:00:00Z').getTime() + n * 864e5));
   const today = iso(new Date());
   depIn.min = retIn.min = today;
-  fromSel.value = 'FRA'; fillTo(); toSel.value = 'NBO';
+  fillTo(); toSel.value = fromSel.value === 'NBO' ? 'ZNZ' : 'NBO';
   depIn.value = addDays(today, 21); retIn.value = addDays(today, 31);
 
   let trip = 'return';
@@ -70,11 +67,6 @@
     retIn.closest('.fs-field').hidden = trip === 'oneway';
   }));
   fromSel.addEventListener('change', fillTo);
-  $('#fsSwap').addEventListener('click', () => {
-    const a = fromSel.value, b = toSel.value;
-    fromSel.value = b; fillTo();
-    if([...toSel.options].some(o => o.value === a)) toSel.value = a;
-  });
   depIn.addEventListener('change', () => { if(retIn.value < depIn.value) retIn.value = addDays(depIn.value, 7); retIn.min = depIn.value; });
 
   // Travellers & cabin
@@ -169,7 +161,7 @@
   // Popular routes list: clicking one runs a search for it
   $$('.route-card[data-from]').forEach(c => c.addEventListener('click', e => {
     e.preventDefault();
-    fromSel.value = c.dataset.from; fillTo(); toSel.value = c.dataset.to;
+    picker.set(c.dataset.from); fillTo(); toSel.value = c.dataset.to;
     run();
     form.scrollIntoView({ behavior:'smooth' });
   }));

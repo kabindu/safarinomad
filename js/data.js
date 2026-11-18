@@ -326,15 +326,51 @@ const LANDSCAPES = [
 
 /* Flights we can book: from Europe to East Africa, and between East African cities.
    time is approximate; stops: 0 = direct. The photo shows the arrival city. */
-const AIRPORTS = {
-  // Where travellers fly from (Europe, Middle East, Africa, Americas, Asia)
-  LHR:'London Heathrow', LGW:'London Gatwick', AMS:'Amsterdam', CDG:'Paris', BRU:'Brussels', FRA:'Frankfurt', MUC:'Munich',
-  ZRH:'Zurich', FCO:'Rome', MAD:'Madrid', IST:'Istanbul', DXB:'Dubai', DOH:'Doha', CAI:'Cairo', ADD:'Addis Ababa',
-  JNB:'Johannesburg', JFK:'New York', BOM:'Mumbai',
-  // East Africa
-  NBO:'Nairobi', MBA:'Mombasa', KIS:'Kisumu', JRO:'Kilimanjaro', ARK:'Arusha', DAR:'Dar es Salaam', ZNZ:'Zanzibar',
-  EBB:'Entebbe', KGL:'Kigali'
-};
+/* Airports. Travellers pick their country first, then an airport there; they always land in East Africa.
+   AIRPORT_COUNTRIES: where people fly from (country → airports). EAST_AFRICA_AIRPORTS: where they land.
+   AIRPORTS (every code → name) is built from both and used across the site. */
+const AIRPORT_COUNTRIES = [
+  { code:'US', name:'United States', airports:{ JFK:'New York JFK', EWR:'Newark', IAD:'Washington Dulles', ATL:'Atlanta', ORD:"Chicago O'Hare", BOS:'Boston', MIA:'Miami', IAH:'Houston', DFW:'Dallas/Fort Worth', LAX:'Los Angeles', SFO:'San Francisco', SEA:'Seattle' } },
+  { code:'GB', name:'United Kingdom', airports:{ LHR:'London Heathrow', LGW:'London Gatwick', MAN:'Manchester', BHX:'Birmingham', EDI:'Edinburgh', GLA:'Glasgow' } },
+  { code:'NL', name:'Netherlands', airports:{ AMS:'Amsterdam Schiphol', RTM:'Rotterdam The Hague', EIN:'Eindhoven' } },
+  { code:'ES', name:'Spain', airports:{ MAD:'Madrid', BCN:'Barcelona', AGP:'Málaga', PMI:'Palma de Mallorca' } },
+  { code:'DE', name:'Germany', airports:{ FRA:'Frankfurt', MUC:'Munich', BER:'Berlin', DUS:'Düsseldorf', HAM:'Hamburg' } },
+  { code:'FR', name:'France', airports:{ CDG:'Paris Charles de Gaulle', ORY:'Paris Orly', NCE:'Nice', LYS:'Lyon' } },
+  { code:'BE', name:'Belgium', airports:{ BRU:'Brussels' } },
+  { code:'CH', name:'Switzerland', airports:{ ZRH:'Zurich', GVA:'Geneva' } },
+  { code:'IT', name:'Italy', airports:{ FCO:'Rome Fiumicino', MXP:'Milan Malpensa', VCE:'Venice' } },
+  { code:'PT', name:'Portugal', airports:{ LIS:'Lisbon', OPO:'Porto' } },
+  { code:'IE', name:'Ireland', airports:{ DUB:'Dublin' } },
+  { code:'AT', name:'Austria', airports:{ VIE:'Vienna' } },
+  { code:'SE', name:'Sweden', airports:{ ARN:'Stockholm Arlanda' } },
+  { code:'NO', name:'Norway', airports:{ OSL:'Oslo' } },
+  { code:'DK', name:'Denmark', airports:{ CPH:'Copenhagen' } },
+  { code:'FI', name:'Finland', airports:{ HEL:'Helsinki' } },
+  { code:'PL', name:'Poland', airports:{ WAW:'Warsaw' } },
+  { code:'TR', name:'Turkey', airports:{ IST:'Istanbul' } },
+  { code:'CA', name:'Canada', airports:{ YYZ:'Toronto', YUL:'Montreal', YVR:'Vancouver', YYC:'Calgary' } },
+  { code:'AU', name:'Australia', airports:{ SYD:'Sydney', MEL:'Melbourne', PER:'Perth' } },
+  { code:'AE', name:'United Arab Emirates', airports:{ DXB:'Dubai', AUH:'Abu Dhabi' } },
+  { code:'QA', name:'Qatar', airports:{ DOH:'Doha' } },
+  { code:'SA', name:'Saudi Arabia', airports:{ JED:'Jeddah', RUH:'Riyadh' } },
+  { code:'IN', name:'India', airports:{ BOM:'Mumbai', DEL:'Delhi', BLR:'Bengaluru' } },
+  { code:'CN', name:'China', airports:{ PEK:'Beijing Capital', PVG:'Shanghai Pudong', CAN:'Guangzhou' } },
+  { code:'JP', name:'Japan', airports:{ NRT:'Tokyo Narita', HND:'Tokyo Haneda' } },
+  { code:'KR', name:'South Korea', airports:{ ICN:'Seoul Incheon' } },
+  { code:'SG', name:'Singapore', airports:{ SIN:'Singapore' } },
+  { code:'ZA', name:'South Africa', airports:{ JNB:'Johannesburg', CPT:'Cape Town' } },
+  { code:'NG', name:'Nigeria', airports:{ LOS:'Lagos', ABV:'Abuja' } },
+  { code:'GH', name:'Ghana', airports:{ ACC:'Accra' } },
+  { code:'EG', name:'Egypt', airports:{ CAI:'Cairo' } },
+  { code:'ET', name:'Ethiopia', airports:{ ADD:'Addis Ababa' } },
+  // Already in East Africa (flights between the countries)
+  { code:'KE', name:'Kenya', airports:{ NBO:'Nairobi', MBA:'Mombasa', KIS:'Kisumu' } },
+  { code:'TZ', name:'Tanzania', airports:{ JRO:'Kilimanjaro', ARK:'Arusha', DAR:'Dar es Salaam', ZNZ:'Zanzibar' } },
+  { code:'UG', name:'Uganda', airports:{ EBB:'Entebbe' } },
+  { code:'RW', name:'Rwanda', airports:{ KGL:'Kigali' } }
+];
+const EAST_AFRICA_AIRPORTS = { NBO:'Nairobi', MBA:'Mombasa', KIS:'Kisumu', JRO:'Kilimanjaro', ARK:'Arusha', DAR:'Dar es Salaam', ZNZ:'Zanzibar', EBB:'Entebbe', KGL:'Kigali' };
+const AIRPORTS = Object.assign({}, ...AIRPORT_COUNTRIES.map(c => c.airports), EAST_AFRICA_AIRPORTS);
 /* Airlines serving East Africa: name, home airport, official website (book direct, check flight status).
    Used by the flight search and the flight-status tracker on flights.html. */
 const AIRLINES = {

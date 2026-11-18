@@ -30,6 +30,38 @@ const SN = (function(){
     }
   });
 
+  /* ---------- Airport picker: country first, then its airports (data in js/data.js) ----------
+     airportPicker(countrySelect, airportSelect, { other }) fills both and keeps them in step.
+     The visitor's country is guessed from the browser language (en-US → United States), else UK. */
+  function airportPicker(countrySel, airportSel, opts = {}){
+    if(typeof AIRPORT_COUNTRIES === 'undefined' || !countrySel || !airportSel) return null;
+    const EA = ['KE', 'TZ', 'UG', 'RW'];
+    const o = c => `<option value="${c.code}">${c.name}</option>`;
+    countrySel.innerHTML = `<optgroup label="Flying in from">${AIRPORT_COUNTRIES.filter(c => !EA.includes(c.code)).map(o).join('')}</optgroup>`
+      + `<optgroup label="Already in East Africa">${AIRPORT_COUNTRIES.filter(c => EA.includes(c.code)).map(o).join('')}</optgroup>`;
+    const country = () => AIRPORT_COUNTRIES.find(c => c.code === countrySel.value) || AIRPORT_COUNTRIES[0];
+    const fill = () => {
+      airportSel.innerHTML = Object.entries(country().airports).map(([k, v]) => `<option value="${k}">${v} (${k})</option>`).join('')
+        + (opts.other ? '<option value="">Other airport / not sure</option>' : '');
+    };
+    const region = (navigator.languages || [navigator.language || '']).map(l => (l.split('-')[1] || '').toUpperCase()).find(r => AIRPORT_COUNTRIES.some(c => c.code === r));
+    const langGuess = { nl:'NL', es:'ES', de:'DE', fr:'FR', it:'IT', pt:'PT' }[(navigator.language || '').slice(0, 2)];
+    countrySel.value = opts.country || region || langGuess || 'GB';
+    fill();
+    countrySel.addEventListener('change', () => { fill(); airportSel.dispatchEvent(new Event('change', { bubbles:true })); });
+    return {
+      // Select an airport by code (its country comes with it)
+      set(code){
+        const c = AIRPORT_COUNTRIES.find(x => x.airports[code]);
+        if(!c) return false;
+        countrySel.value = c.code; fill(); airportSel.value = code; return true;
+      },
+      country,
+      // e.g. "Amsterdam Schiphol (AMS), Netherlands", or just the country when the airport is "Other"
+      label: () => airportSel.value ? `${country().airports[airportSel.value]} (${airportSel.value}), ${country().name}` : `${country().name} (airport not decided)`
+    };
+  }
+
   /* ---------- Toast ---------- */
   let toastTimer;
   function toast(msg){
@@ -360,5 +392,5 @@ const SN = (function(){
   /* ---------- Start ---------- */
   document.addEventListener('DOMContentLoaded', () => { refresh(); showLanguage(SNI18N.lang); });
 
-  return { $, $$, store, params, toast, money, emailOk, tripCard, lastMinuteCard, refresh, wish, updateCarNav, sendEnquiry, lead, track, LANDS, inLand };
+  return { $, $$, store, params, toast, money, emailOk, tripCard, lastMinuteCard, refresh, wish, updateCarNav, sendEnquiry, lead, track, LANDS, inLand, airportPicker };
 })();
