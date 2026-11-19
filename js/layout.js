@@ -444,7 +444,7 @@ MENU.forEach(m => { m.links = m.cols.flatMap(c => c.links.map(([t, h]) => [t, h]
     let mx = 0, my = 0, sy = 0, raf = 0;
     const apply = () => {
       raf = 0;
-      bg.style.transform = `translate3d(${mx * -18}px, ${my * -12 + sy * 0.35}px, 0) rotateY(${mx * 3}deg) rotateX(${my * -3}deg) scale(1.02)`;
+      bg.style.transform = `translate3d(${mx * -10}px, ${my * -6 + sy * 0.18}px, 0) rotateY(${mx * 2}deg) rotateX(${my * -2}deg)`;
       fg.style.transform = `translate3d(${mx * 10}px, ${my * 6 + sy * 0.12}px, 0)`;
       fg.style.opacity = String(Math.max(0, 1 - sy / (hero.offsetHeight * 0.9)));
     };

@@ -181,22 +181,23 @@ a.df-title:hover{color:var(--orange-dark);}
 .drawer-cta{padding:16px 18px;border-top:1px solid var(--yt-line);display:flex;flex-wrap:wrap;gap:10px;}
 
 /* ---------- Inner-page hero ---------- */
-.page-hero{position:relative;color:#fff;padding:0;overflow:hidden;perspective:1100px;background:#0B1F3A;}
+/* Same height on every page, text near the bottom, so more of each photo shows (and nothing important is cut) */
+.page-hero{position:relative;color:#fff;padding:0;overflow:hidden;perspective:1100px;background:#0B1F3A;min-height:clamp(360px,52vh,480px);display:flex;align-items:flex-end;}
 /* The photo layer is a little larger than the hero so it can move (3D tilt + scroll parallax set by js/layout.js) */
-.page-hero .bg{position:absolute;inset:-6%;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.2,.8,.2,1);will-change:transform;}
+.page-hero .bg{position:absolute;inset:-3% -2%;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.2,.8,.2,1);will-change:transform;}
 .page-hero .bg img{width:100%;height:100%;object-fit:cover;animation:heroDrift 26s ease-in-out infinite alternate;transform-origin:60% 45%;}
 /* Several photos: stacked, the current one fades in */
 .page-hero .bg[data-slides] img{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease;}
 .page-hero .bg[data-slides] img.on{opacity:1;}
 @keyframes heroDrift{
-  0%{transform:scale(1.04) translate3d(0,0,0);}
-  50%{transform:scale(1.14) translate3d(-2.2%,-1.2%,0);}
-  100%{transform:scale(1.09) translate3d(1.8%,-2.4%,0);}
+  0%{transform:scale(1) translate3d(0,0,0);}
+  50%{transform:scale(1.04) translate3d(-1%,-.6%,0);}
+  100%{transform:scale(1.025) translate3d(.8%,-1%,0);}
 }
-.page-hero .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(95deg,rgba(8,22,44,.74),rgba(8,22,44,.3) 60%,rgba(8,22,44,.12));}
+.page-hero .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,22,44,.78) 0%,rgba(8,22,44,.32) 45%,rgba(8,22,44,.08) 80%),linear-gradient(90deg,rgba(8,22,44,.55) 0%,rgba(8,22,44,0) 65%);}
 /* Golden-hour dust drifting in front of the photo (canvas added by js/layout.js) */
 .hero-dust{position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;}
-.page-hero .wrap{position:relative;z-index:2;padding-top:84px;padding-bottom:84px;transition:transform .9s cubic-bezier(.2,.8,.2,1);will-change:transform,opacity;}
+.page-hero .wrap{position:relative;z-index:2;width:100%;padding-top:110px;padding-bottom:56px;transition:transform .9s cubic-bezier(.2,.8,.2,1);will-change:transform,opacity;}
 .page-hero h1,.page-hero p,.page-hero .breadcrumb,.page-hero .country-nav{animation:heroRise .9s cubic-bezier(.2,.8,.2,1) both;}
 .page-hero .country-nav{animation-delay:.24s;}
 @keyframes heroRise{from{opacity:0;transform:translate3d(0,22px,0);}to{opacity:1;transform:none;}}
@@ -444,7 +445,8 @@ body[data-page="contact"] .social-float,body[data-page="book"] .social-float,bod
   .yt-go{width:52px;}
   .logo{font-size:21px;}
   .hide-sm{display:none !important;}
-  .page-hero .wrap{padding-top:50px;padding-bottom:50px;}
+  .page-hero{min-height:340px;}
+  .page-hero .wrap{padding-top:80px;padding-bottom:34px;}
   .chat{right:14px;bottom:14px;}
   .chat-label{display:none;}
   .chat-launcher{padding:7px;}
