@@ -104,7 +104,7 @@ const TRIPS = [
 
   { id:'kilimanjaro-machame', route:'Moshi → Machame Gate → Uhuru Peak', months:[1,2,3,6,7,8,9,10], title:'Kilimanjaro Climb: Machame Route', countries:'Tanzania', country:'tanzania',
     styles:['trek'], days:7, group:10, stay:'Mountain camps', price:1440,
-    badge:'93% summit rate', img:'images/packages/kilimanjaro-machame.jpg', alt:'Kilimanjaro\'s peak from the Barranco Wall', featured:true },
+    badge:'93% summit rate', img:'images/packages/kilimanjaro-machame.jpg', alt:'Kilimanjaro\'s snowy summit in the early morning', featured:true },
 
   { id:'amboseli-tsavo', route:'Nairobi → Amboseli → Tsavo West', months:[1,2,6,7,8,9,10], title:'Amboseli & Tsavo: Land of Giants', countries:'Kenya', country:'kenya',
     styles:['wildlife'], days:4, group:12, stay:'Lodges', price:630, was:700,
@@ -157,7 +157,7 @@ const TRIPS = [
 
   { id:'kilimanjaro-marangu', route:'Moshi → Marangu Gate → Uhuru Peak', months:[1,2,3,6,7,8,9,10], title:'Kilimanjaro Climb: Marangu Route', countries:'Tanzania', country:'tanzania',
     styles:['trek'], days:6, group:10, stay:'Mountain huts', price:1280,
-    img:'images/packages/kilimanjaro-marangu.jpg', alt:'Glacier near Kilimanjaro\'s summit' },
+    img:'images/packages/kilimanjaro-marangu.jpg', alt:'Kilimanjaro\'s snow-capped summit above the forest' },
 
   { id:'bwindi-gorilla-express', route:'Entebbe → Bwindi', months:[1,2,6,7,8,9,12], title:'Bwindi Gorilla Express', countries:'Uganda', country:'uganda',
     styles:['gorilla'], days:3, group:8, stay:'Forest lodge', price:1500,
