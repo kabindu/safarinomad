@@ -211,7 +211,7 @@ const TRIPS = [
 
   { id:'zanzibar-honeymoon', route:'Stone Town → Nungwi → Mnemba Atoll', months:[1, 2, 6, 7, 8, 9, 10, 12], title:'Zanzibar Honeymoon Villas', countries:'Zanzibar', country:'tanzania',
     styles:['beach', 'luxury'], days:6, group:2, stay:'Beach villa', price:850,
-    img:'images/packages/zanzibar-honeymoon.jpg', alt:'Palm-lined beach in Zanzibar' },
+    img:'images/packages/zanzibar-honeymoon.jpg', alt:'White sand and turquoise sea at Nungwi, Zanzibar' },
 
   { id:'rwanda-gorilla-express', route:'Kigali → Volcanoes', months:[1, 2, 6, 7, 8, 9, 12], title:'Rwanda Gorilla Express', countries:'Rwanda', country:'rwanda',
     styles:['gorilla', 'luxury'], days:3, group:8, stay:'Boutique lodge', price:2270,
@@ -228,7 +228,7 @@ const TRIPS = [
 
   { id:'malindi-watamu', route:'Mombasa → Malindi → Watamu', months:[1, 2, 3, 7, 8, 9, 10, 11, 12], title:'Malindi & Watamu Marine Park', countries:'Kenya', country:'kenya',
     styles:['beach', 'family'], days:5, group:12, stay:'Beach resort', price:300,
-    img:'images/packages/malindi-watamu.jpg', alt:'Watamu Beach on the Kenyan coast' },
+    img:'images/packages/malindi-watamu.jpg', alt:'Turquoise water and white sand at Watamu' },
 
   { id:'longonot-hike', route:'Nairobi → Mount Longonot → Hell\'s Gate', months:[1, 2, 3, 6, 7, 8, 9, 10, 11, 12], title:'Mount Longonot & Hell\'s Gate Hike', countries:'Kenya', country:'kenya',
     styles:['trek', 'family'], days:2, group:12, stay:'Lakeside lodge', price:190,
@@ -241,7 +241,7 @@ const TRIPS = [
   /* ---- Packages sold by Lindberg Safaris, at their published prices (KES ÷ 129) ---- */
   { id:'mombasa-sgr-escape', route:'Nairobi → SGR train → Mombasa North Coast', months:[1,2,3,6,7,8,9,10,11,12], title:'Mombasa North Coast Escape by SGR', countries:'Kenya', country:'kenya',
     styles:['beach'], days:4, group:12, stay:'North Coast resort, full board', price:280,
-    badge:'Train & meals included', badgeType:'new', img:'images/packages/mombasa-sgr-escape.jpg', alt:'Madaraka Express train to Mombasa' },
+    badge:'Train & meals included', badgeType:'new', img:'images/packages/mombasa-sgr-escape.jpg', alt:'Palm tree over turquoise water at Nyali Beach, Mombasa' },
 
   { id:'lamu-dhow-escape', route:'Nairobi → Lamu Island', months:[1,2,3,7,8,9,10,11,12], title:'Lamu Island: Old Town & Dhow Escape', countries:'Kenya', country:'kenya',
     styles:['beach'], days:4, group:12, stay:'Island hotel, sharing', price:405,
@@ -489,15 +489,15 @@ const STAYS = [
     img:'images/stays/kivu-hotel.jpg', alt:'Hotel in Gisenyi on Lake Kivu', options:['Lake Kivu Serena Hotel'] },
   // Beach, half board
   { id:'lamu-hotel', title:'Beach hotel in Lamu', place:'Lamu & Shela', country:'kenya', setting:'beach', board:'Half board', price:150,
-    img:'images/stays/lamu-hotel.jpg', alt:'Hotel courtyard and pool in Lamu', options:['Peponi Hotel', 'The Majlis Resort'] },
+    img:'images/stays/lamu-hotel.jpg', alt:'Thatched beach houses on the water in Lamu', options:['Peponi Hotel', 'The Majlis Resort'] },
   { id:'diani-resort', title:'Beach resort in Diani', place:'Diani Beach', country:'kenya', setting:'beach', board:'Half board', price:130,
-    img:'images/stays/diani-resort.jpg', alt:'Beach hotel on Diani Beach', options:['Leopard Beach Resort & Spa', 'Baobab Beach Resort & Spa', 'Diani Reef Beach Resort'] },
+    img:'images/stays/diani-resort.jpg', alt:'Trees over white sand and blue sea at Diani Beach', options:['Leopard Beach Resort & Spa', 'Baobab Beach Resort & Spa', 'Diani Reef Beach Resort'] },
   { id:'mombasa-hotel', title:'Beach hotel in Mombasa', place:'Mombasa North Coast', country:'kenya', setting:'beach', board:'Half board', price:90,
-    img:'images/stays/mombasa-hotel.jpg', alt:'Beach hotel rooms among the palms in Mombasa', options:['Serena Beach Resort & Spa', 'Sarova Whitesands', 'Voyager Beach Resort'] },
+    img:'images/stays/mombasa-hotel.jpg', alt:'Hotel lawn and palms leading to Nyali Beach', options:['Serena Beach Resort & Spa', 'Sarova Whitesands', 'Voyager Beach Resort'] },
   { id:'watamu-hotel', title:'Beach hotel in Watamu & Malindi', place:'Watamu & Malindi', country:'kenya', setting:'beach', board:'Half board', price:110,
-    img:'images/stays/watamu-hotel.jpg', alt:'Hemingways resort pool in Watamu', options:['Hemingways Watamu', 'Turtle Bay Beach Club'] },
+    img:'images/stays/watamu-hotel.jpg', alt:'Watamu bay with islands and a dhow', options:['Hemingways Watamu', 'Turtle Bay Beach Club'] },
   { id:'zanzibar-resort', title:'Beach resort in Zanzibar', place:'Zanzibar', country:'tanzania', setting:'beach', board:'Half board', price:150,
-    img:'images/stays/zanzibar-resort.jpg', alt:'Resort pool among palm trees in Zanzibar', options:['Zuri Zanzibar', 'Park Hyatt Zanzibar', 'Emerson Spice'] },
+    img:'images/stays/zanzibar-resort.jpg', alt:'Thatched umbrellas and loungers on Kendwa Beach, Zanzibar', options:['Zuri Zanzibar', 'Park Hyatt Zanzibar', 'Emerson Spice'] },
   // Mountain & forest
   { id:'mount-kenya-lodge', title:'Forest lodge on Mount Kenya', place:'Mount Kenya & the Aberdares', country:'kenya', setting:'mountain', board:'Full board', price:195,
     img:'images/stays/mount-kenya-lodge.jpg', alt:'Fairmont Mount Kenya Safari Club pool with the mountain behind', options:['Serena Mountain Lodge', 'The Ark', 'Fairmont Mount Kenya Safari Club'] },

@@ -9,7 +9,7 @@ visitors see the new photo straight away.
 When every photo here is your own, delete `photo-credits.html`, its footer link in `js/layout.js`
 and `credits.json`.
 
-These preview photos are from Wikimedia Commons. 33 of the 47 are top-rated there ("Featured"
+These preview photos are from Wikimedia Commons. 32 of the 47 are top-rated there ("Featured"
 or "Quality" images, reviewed for sharpness, natural colour and composition); the rest are the best
 available for places with no rated photos. Their licences allow commercial use as long as the
 photographer is credited, which `photo-credits.html` does. `credits.json` holds the same list.
@@ -40,12 +40,12 @@ photographer is credited, which `photo-credits.html` does. `credits.json` holds 
 | lm-serengeti.jpg | Quality | [León (Panthera leo), parque nacional Serengueti, Tanzania, 2024-05-26, DD 23.jpg](https://commons.wikimedia.org/wiki/File:Le%C3%B3n_(Panthera_leo),_parque_nacional_Serengueti,_Tanzania,_2024-05-26,_DD_23.jpg) | Diego Delso | CC BY-SA 4.0 |
 | longonot-hike.jpg | not rated | [Longonot volcano crater.jpg](https://commons.wikimedia.org/wiki/File:Longonot_volcano_crater.jpg) | Baldfatchris | CC BY-SA 4.0 |
 | luxury-honeymoon.jpg | Quality | [037 Cheetah close-up in the Serengeti National Park Photo by Giles Laurent.jpg](https://commons.wikimedia.org/wiki/File:037_Cheetah_close-up_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg) | Giles Laurent | CC BY-SA 4.0 |
-| malindi-watamu.jpg | not rated | [Watamu Beach, Kenya 01.jpg](https://commons.wikimedia.org/wiki/File:Watamu_Beach,_Kenya_01.jpg) | Jenny Kellett | CC BY-SA 4.0 |
+| malindi-watamu.jpg | not rated | [Watamu Beach, Kenya 11.jpg](https://commons.wikimedia.org/wiki/File:Watamu_Beach,_Kenya_11.jpg) | Jenny Kellett | CC BY-SA 4.0 |
 | manyara-ngorongoro.jpg | Featured | [Lake Manyara Wildlife.jpg](https://commons.wikimedia.org/wiki/File:Lake_Manyara_Wildlife.jpg) | Gaurav Pandit | CC BY-SA 3.0 |
 | mara-balloon.jpg | Quality | [Mara River Sunrise Aerial View Serengeti Nov26 A7R 07185.jpg](https://commons.wikimedia.org/wiki/File:Mara_River_Sunrise_Aerial_View_Serengeti_Nov26_A7R_07185.jpg) | This Photo was taken by Timothy A. Gonsalves. Feel free to u | CC BY-SA 4.0 |
 | mara-diani.jpg | Featured | [Masai Mara National Reserve 07 - cheetah (Acinonyx jubatus).jpg](https://commons.wikimedia.org/wiki/File:Masai_Mara_National_Reserve_07_-_cheetah_(Acinonyx_jubatus).jpg) | Thomas Fuhrmann | CC BY-SA 4.0 |
 | mara-short-break.jpg | Quality | [African bush elephant (Loxodonta africana), Masai Mara.jpg](https://commons.wikimedia.org/wiki/File:African_bush_elephant_(Loxodonta_africana),_Masai_Mara.jpg) | Hobbyfotowiki | CC0 |
-| mombasa-sgr-escape.jpg | not rated | [Express passenger train on the Mombasa - Nairobi Standard Gauge Railway (SGR).jpg](https://commons.wikimedia.org/wiki/File:Express_passenger_train_on_the_Mombasa_-_Nairobi_Standard_Gauge_Railway_(SGR).jpg) | TTC dude | CC BY-SA 4.0 |
+| mombasa-sgr-escape.jpg | not rated | [Nyali Beach.JPG](https://commons.wikimedia.org/wiki/File:Nyali_Beach.JPG) | FredD | CC BY-SA 3.0 |
 | mount-kenya-climb.jpg | not rated | [Mount kenya.JPG](https://commons.wikimedia.org/wiki/File:Mount_kenya.JPG) | Ruud Zwart | CC BY-SA 2.5 nl |
 | nairobi-national-park.jpg | Quality | [Buffalo Nairobi Skyline Savannah Kenya May19 R1600769.jpg](https://commons.wikimedia.org/wiki/File:Buffalo_Nairobi_Skyline_Savannah_Kenya_May19_R1600769.jpg) | This Photo was taken by Timothy A. Gonsalves. Feel free to u | CC BY-SA 4.0 |
 | naivasha-hells-gate.jpg | not rated | [Hippos eating on shore of Lake Naivasha, Kenya.jpg](https://commons.wikimedia.org/wiki/File:Hippos_eating_on_shore_of_Lake_Naivasha,_Kenya.jpg) | Daniel Case | CC BY-SA 4.0 |
@@ -61,7 +61,7 @@ photographer is credited, which `photo-credits.html` does. `credits.json` holds 
 | serengeti-zanzibar.jpg | Quality | [Leones (Panthera leo), parque nacional Serengueti, Tanzania, 2024-05-27, DD 02.jpg](https://commons.wikimedia.org/wiki/File:Leones_(Panthera_leo),_parque_nacional_Serengueti,_Tanzania,_2024-05-27,_DD_02.jpg) | Diego Delso | CC BY-SA 4.0 |
 | uganda-classic.jpg | Featured | [African elephant (Loxodonta africana) 2.jpg](https://commons.wikimedia.org/wiki/File:African_elephant_(Loxodonta_africana)_2.jpg) | Charles J. Sharp | CC BY-SA 4.0 |
 | uganda-primates.jpg | Featured | [013 Alpha male chimpanzee at Kibale forest National Park Photo by Giles Laurent.jpg](https://commons.wikimedia.org/wiki/File:013_Alpha_male_chimpanzee_at_Kibale_forest_National_Park_Photo_by_Giles_Laurent.jpg) | Giles Laurent | CC BY-SA 4.0 |
-| zanzibar-honeymoon.jpg | Quality | [Beach Coconut Kizimkazi Zanzibar Nov26 A7CR 17906.jpg](https://commons.wikimedia.org/wiki/File:Beach_Coconut_Kizimkazi_Zanzibar_Nov26_A7CR_17906.jpg) | This Photo was taken by Timothy A. Gonsalves. Feel free to u | CC BY-SA 4.0 |
+| zanzibar-honeymoon.jpg | not rated | [Nungwi,Zanzibar - panoramio.jpg](https://commons.wikimedia.org/wiki/File:Nungwi,Zanzibar_-_panoramio.jpg) | Jang Woo Lee | CC BY 3.0 |
 | zanzibar-spice.jpg | Quality | [South Waterfront Stone Town Oct26 A7CR 14689.jpg](https://commons.wikimedia.org/wiki/File:South_Waterfront_Stone_Town_Oct26_A7CR_14689.jpg) | This Photo was taken by Timothy A. Gonsalves. Feel free to u | CC BY-SA 4.0 |
 
 Packages taken off the site keep their photos in `server/retired-photos/` (with their own
